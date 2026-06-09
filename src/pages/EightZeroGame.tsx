@@ -314,7 +314,7 @@ function SetupScreen({
           </button>
           <h1 className="mt-7 font-serif text-6xl font-black tracking-normal text-white">8-0</h1>
           <p className="mt-2 text-lg leading-7 text-gray-400">
-            Draft the greatest World Cup XI. Go unbeaten - can you lift the trophy?
+            #Russel=Mogged
           </p>
         </div>
         <div className="text-right">
