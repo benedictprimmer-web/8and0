@@ -64,6 +64,8 @@ function scoreMatch(
   const opponentLambda = clamp((1.40 - ratingEdge * 0.020 - defenceEdge * 0.013) * pressure, 0.25, 3.6);
   let userGoals = poisson(userLambda, random);
   let opponentGoals = poisson(opponentLambda, random);
+  const regularTimeUserGoals = userGoals;
+  const regularTimeOpponentGoals = opponentGoals;
   let decidedByPens = false;
   let extraTime = false;
   let penaltyShootout: PenaltyKick[] | undefined;
@@ -94,7 +96,7 @@ function scoreMatch(
   }
 
   const result = userGoals > opponentGoals ? "W" : userGoals < opponentGoals ? "L" : "D";
-  return { stage, opponent, userGoals, opponentGoals, result, decidedByPens, extraTime, penaltyShootout };
+  return { stage, opponent, userGoals, opponentGoals, regularTimeUserGoals, regularTimeOpponentGoals, result, decidedByPens, extraTime, penaltyShootout };
 }
 
 function simulatePenalties(
@@ -104,7 +106,7 @@ function simulatePenalties(
 ): PenaltyKick[] {
   const kicks: PenaltyKick[] = [];
   const userPenRating = clamp(0.55 + (ratings.attack - 75) * 0.005, 0.35, 0.85);
-  const oppPenRating = clamp(0.55 + (80 - ratings.defence) * 0.003, 0.35, 0.80);
+  const oppPenRating = clamp(0.55 - (ratings.gk - 75) * 0.008, 0.25, 0.75);
   let userScored = 0;
   let oppScored = 0;
   let round = 1;
@@ -324,14 +326,14 @@ export function buildMatchEvents(
 
   events.push({ minute: 0, type: "kickoff", team: "user" });
 
-  const userGoalMinutes = distributeGoalMinutes(result.userGoals, random);
+  const userGoalMinutes = distributeGoalMinutes(result.regularTimeUserGoals, random);
   for (const minute of userGoalMinutes) {
     const scorer = pickRandomPlayer(picks, random);
     events.push({ minute, type: "goal", team: "user", playerName: scorer.name, playerRating: scorer.rating });
     scorers[scorer.name] = (scorers[scorer.name] ?? 0) + 1;
   }
 
-  const oppGoalMinutes = distributeGoalMinutes(result.opponentGoals, random);
+  const oppGoalMinutes = distributeGoalMinutes(result.regularTimeOpponentGoals, random);
   for (const minute of oppGoalMinutes) {
     events.push({ minute, type: "goal", team: "opponent", playerName: result.opponent.name, playerRating: 0 });
   }
@@ -393,8 +395,8 @@ export function buildMatchEvents(
   if (result.extraTime) {
     events.push({ minute: 91, type: "extra_time_start", team: "user" });
     // Distribute extra time goals (91-120)
-    const etUserGoals = result.userGoals - userGoalMinutes.length;
-    const etOppGoals = result.opponentGoals - oppGoalMinutes.length;
+    const etUserGoals = result.userGoals - result.regularTimeUserGoals;
+    const etOppGoals = result.opponentGoals - result.regularTimeOpponentGoals;
     if (etUserGoals > 0) {
       const etMinutes = distributeGoalMinutes(etUserGoals, random).map((m) => m + 90);
       for (const minute of etMinutes) {

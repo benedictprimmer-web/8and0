@@ -156,7 +156,6 @@ export default function LiveMatch({ stage, opponent, result, events, onFinished 
     setUserScore(uGoals);
     setOppScore(oGoals);
     setRecentEvent({ minute: targetMinute, type: targetMinute === 45 ? "halftime" : "fulltime", team: "user" });
-    clearTimer();
   }
 
   function skipToEnd() {
