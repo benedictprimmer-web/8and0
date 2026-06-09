@@ -270,20 +270,45 @@ export function buildMatchEvents(
     events.push({ minute, type: "goal", team: "opponent", playerName: result.opponent.name, playerRating: 0 });
   }
 
-  // Yellow cards ~12% chance
-  if (random() < 0.12) {
-    const minute = Math.floor(random() * 89) + 1;
-    const isUser = random() < 0.5;
-    const player = isUser ? pickRandomPlayer(picks, random) : { name: result.opponent.name, rating: 0 };
-    events.push({ minute, type: "yellow_card", team: isUser ? "user" : "opponent", playerName: player.name, playerRating: player.rating });
+  // Cards per player
+  const userYellows: Record<string, number> = {};
+  const oppYellows: Record<string, number> = {};
+
+  // User team cards
+  for (const pick of picks) {
+    const playerName = pick.player.name;
+    // 10% chance of yellow per player
+    if (random() < 0.10) {
+      const minute = Math.floor(random() * 89) + 1;
+      userYellows[playerName] = (userYellows[playerName] ?? 0) + 1;
+      events.push({ minute, type: "yellow_card", team: "user", playerName, playerRating: pick.player.rating });
+    }
+    // 1% chance of direct red per player
+    if (random() < 0.01) {
+      const minute = Math.floor(random() * 89) + 1;
+      events.push({ minute, type: "red_card", team: "user", playerName, playerRating: pick.player.rating });
+    }
+    // 2% chance of second yellow (→ red) if already booked
+    if ((userYellows[playerName] ?? 0) >= 1 && random() < 0.02) {
+      const minute = Math.floor(random() * 89) + 1;
+      events.push({ minute, type: "red_card", team: "user", playerName, playerRating: pick.player.rating });
+    }
   }
 
-  // Red cards ~2% chance
-  if (random() < 0.02) {
+  // Opponent cards (simplified - just team name)
+  const oppPlayerName = result.opponent.name;
+  if (random() < 0.10) {
     const minute = Math.floor(random() * 89) + 1;
-    const isUser = random() < 0.5;
-    const player = isUser ? pickRandomPlayer(picks, random) : { name: result.opponent.name, rating: 0 };
-    events.push({ minute, type: "red_card", team: isUser ? "user" : "opponent", playerName: player.name, playerRating: player.rating });
+    oppYellows[oppPlayerName] = (oppYellows[oppPlayerName] ?? 0) + 1;
+    events.push({ minute, type: "yellow_card", team: "opponent", playerName: oppPlayerName, playerRating: 0 });
+  }
+  if (random() < 0.01) {
+    const minute = Math.floor(random() * 89) + 1;
+    events.push({ minute, type: "red_card", team: "opponent", playerName: oppPlayerName, playerRating: 0 });
+  }
+  if ((oppYellows[oppPlayerName] ?? 0) >= 1 && random() < 0.02) {
+    const minute = Math.floor(random() * 89) + 1;
+    events.push({ minute, type: "red_card", team: "opponent", playerName: oppPlayerName, playerRating: 0 });
   }
 
   // Near misses: 2-3 per match

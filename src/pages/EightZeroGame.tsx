@@ -14,6 +14,7 @@ import {
 import { api } from "../api/client";
 import Flag from "../components/Flag";
 import LiveMatch from "../components/LiveMatch";
+import TournamentBracket from "../components/TournamentBracket";
 import { buildEightZeroData, type RawPlayer, type RawTeam } from "../game8/data";
 import {
   canPickPlayer,
@@ -1151,6 +1152,13 @@ export default function EightZeroGame() {
             showPitch={Boolean(run)}
             goalScorers={run?.goalScorers ?? {}}
           />
+          {run && (tournamentPhase === "ready" || tournamentPhase === "live" || tournamentPhase === "complete") && (
+            <TournamentBracket
+              run={run}
+              currentMatchIndex={currentMatchIndex}
+              tournamentPhase={tournamentPhase}
+            />
+          )}
           <section className="stat-card">
             <div className="flex items-center justify-between">
               <div>
