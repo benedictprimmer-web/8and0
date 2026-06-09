@@ -147,15 +147,15 @@ export default function LiveMatch({ stage, opponent, result, events, onFinished 
   }, [clearTimer, tick, speed]);
 
   function skipToHalf() {
-    setCurrentMinute(45);
-    const halfEvents = events.filter((e) => e.minute <= 45);
+    const targetMinute = currentMinute < 45 ? 45 : 90;
+    setCurrentMinute(targetMinute);
+    const halfEvents = events.filter((e) => e.minute <= targetMinute);
     setVisibleEvents(halfEvents);
     const uGoals = halfEvents.filter(e => e.type === "goal" && e.team === "user").length;
     const oGoals = halfEvents.filter(e => e.type === "goal" && e.team === "opponent").length;
     setUserScore(uGoals);
     setOppScore(oGoals);
-    setRecentEvent({ minute: 45, type: "halftime", team: "user" });
-    clearTimer();
+    setRecentEvent({ minute: targetMinute, type: targetMinute === 45 ? "halftime" : "fulltime", team: "user" });
   }
 
   function skipToEnd() {
