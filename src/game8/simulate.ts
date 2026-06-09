@@ -59,8 +59,8 @@ function scoreMatch(
   const attackEdge = (ratings.attack + ratings.midfield) / 2 - opponentStrength;
   const defenceEdge = (ratings.defence + ratings.gk) / 2 - opponentStrength;
   const pressure = STAGE_PRESSURE[stage] ?? 1.0;
-  const userLambda = clamp(1.18 + ratingEdge * 0.020 + attackEdge * 0.013, 0.22, 3.5);
-  const opponentLambda = clamp((1.18 - ratingEdge * 0.016 - defenceEdge * 0.011) * pressure, 0.2, 3.4);
+  const userLambda = clamp(1.40 + ratingEdge * 0.020 + attackEdge * 0.013, 0.22, 3.5);
+  const opponentLambda = clamp((1.35 - ratingEdge * 0.016 - defenceEdge * 0.011) * pressure, 0.2, 3.4);
   let userGoals = poisson(userLambda, random);
   let opponentGoals = poisson(opponentLambda, random);
   let decidedByPens = false;
@@ -190,6 +190,14 @@ export function simulateTournamentRun(args: {
     blindMode,
   });
 
+  const goalScorers: Record<string, number> = {};
+  for (const match of matches) {
+    const { scorers } = buildMatchEvents(match, args.picks, `${args.seed}:events:${matches.indexOf(match)}`);
+    for (const [name, count] of Object.entries(scorers)) {
+      goalScorers[name] = (goalScorers[name] ?? 0) + count;
+    }
+  }
+
   return {
     id: `${args.seed}:${Date.now()}`,
     createdAt: new Date().toISOString(),
@@ -210,6 +218,7 @@ export function simulateTournamentRun(args: {
     ratings: args.ratings,
     picks: args.picks,
     matches,
+    goalScorers,
   };
 }
 
@@ -219,32 +228,72 @@ export function distributeGoalMinutes(totalGoals: number, random: () => number):
   return times.sort((a, b) => a - b);
 }
 
-function pickScorer(picks: DraftPick[], random: () => number): string {
+const NEAR_MISS_FLAVORS = [
+  "draws it wide",
+  "skies it over the bar",
+  "hits the post!",
+  "saved brilliantly!",
+  "misses an open goal!",
+  "blazes it over",
+  "header just wide",
+  "shot blocked at the last second",
+];
+
+function pickRandomPlayer(picks: DraftPick[], random: () => number): { name: string; rating: number } {
   const attackers = picks.filter((p) => p.category === "FWD" || p.category === "MID");
   const pool = attackers.length > 0 ? attackers : picks;
   const index = Math.floor(random() * pool.length);
-  return pool[index]?.player.name ?? "Unknown";
+  const player = pool[index];
+  return { name: player?.player.name ?? "Unknown", rating: player?.player.rating ?? 0 };
 }
 
 export function buildMatchEvents(
   result: MatchResult,
   picks: DraftPick[],
   seed: string
-): MatchEvent[] {
+): { events: MatchEvent[]; scorers: Record<string, number> } {
   const random = seededRandom(seed);
   const events: MatchEvent[] = [];
+  const scorers: Record<string, number> = {};
 
   events.push({ minute: 0, type: "kickoff", team: "user" });
 
   const userGoalMinutes = distributeGoalMinutes(result.userGoals, random);
   for (const minute of userGoalMinutes) {
-    const playerName = pickScorer(picks, random);
-    events.push({ minute, type: "goal", team: "user", playerName });
+    const scorer = pickRandomPlayer(picks, random);
+    events.push({ minute, type: "goal", team: "user", playerName: scorer.name, playerRating: scorer.rating });
+    scorers[scorer.name] = (scorers[scorer.name] ?? 0) + 1;
   }
 
   const oppGoalMinutes = distributeGoalMinutes(result.opponentGoals, random);
   for (const minute of oppGoalMinutes) {
-    events.push({ minute, type: "goal", team: "opponent" });
+    events.push({ minute, type: "goal", team: "opponent", playerName: result.opponent.name, playerRating: 0 });
+  }
+
+  // Yellow cards ~12% chance
+  if (random() < 0.12) {
+    const minute = Math.floor(random() * 89) + 1;
+    const isUser = random() < 0.5;
+    const player = isUser ? pickRandomPlayer(picks, random) : { name: result.opponent.name, rating: 0 };
+    events.push({ minute, type: "yellow_card", team: isUser ? "user" : "opponent", playerName: player.name, playerRating: player.rating });
+  }
+
+  // Red cards ~2% chance
+  if (random() < 0.02) {
+    const minute = Math.floor(random() * 89) + 1;
+    const isUser = random() < 0.5;
+    const player = isUser ? pickRandomPlayer(picks, random) : { name: result.opponent.name, rating: 0 };
+    events.push({ minute, type: "red_card", team: isUser ? "user" : "opponent", playerName: player.name, playerRating: player.rating });
+  }
+
+  // Near misses: 2-3 per match
+  const nearMissCount = 2 + Math.floor(random() * 2);
+  for (let i = 0; i < nearMissCount; i++) {
+    const minute = Math.floor(random() * 89) + 1;
+    const isUser = random() < 0.5;
+    const player = isUser ? pickRandomPlayer(picks, random) : { name: result.opponent.name, rating: 0 };
+    const flavor = NEAR_MISS_FLAVORS[Math.floor(random() * NEAR_MISS_FLAVORS.length)];
+    events.push({ minute, type: "near_miss", team: isUser ? "user" : "opponent", playerName: player.name, playerRating: player.rating, flavorText: flavor });
   }
 
   events.push({ minute: 45, type: "halftime", team: "user" });
@@ -254,5 +303,5 @@ export function buildMatchEvents(
     events.push({ minute: 91, type: "penalty_shootout", team: "user" });
   }
 
-  return events.sort((a, b) => a.minute - b.minute);
+  return { events: events.sort((a, b) => a.minute - b.minute), scorers };
 }
