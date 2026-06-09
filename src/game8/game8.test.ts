@@ -15,6 +15,8 @@ import { calculateTeamRatings } from "./ratings";
 import { simulateTournamentRun } from "./simulate";
 import { sortRuns } from "./storage";
 import type { DraftPick, EightZeroPlayer, EightZeroTeam, TournamentRun } from "./types";
+import teamsData from "../../public/data/teams.json";
+import playersData from "../../public/data/players.json";
 
 const rawTeams: RawTeam[] = Array.from({ length: 12 }, (_, index) => ({
   team_id: index + 1,
@@ -105,6 +107,23 @@ describe("8-0 data", () => {
     expect(teamPlayers[0].rating).toBeGreaterThanOrEqual(
       teamPlayers[teamPlayers.length - 1].rating
     );
+  });
+
+  it("includes all 48 teams when generated squads have 26 valid players", () => {
+    const data = buildEightZeroData(teamsData as RawTeam[], playersData as RawPlayer[]);
+
+    expect(data.teams).toHaveLength(48);
+    expect(data.players).toHaveLength(1248);
+    expect(data.teams.every((team) => (data.playersByTeam.get(team.teamId)?.length ?? 0) === 26)).toBe(true);
+  });
+
+  it("gives every generated team draftable GK/DEF/MID/FWD coverage", () => {
+    const data = buildEightZeroData(teamsData as RawTeam[], playersData as RawPlayer[]);
+
+    for (const team of data.teams) {
+      const categories = new Set((data.playersByTeam.get(team.teamId) ?? []).map((player) => player.category));
+      expect(categories, team.name).toEqual(new Set(["GK", "DEF", "MID", "FWD"]));
+    }
   });
 });
 
@@ -301,6 +320,20 @@ describe("8-0 draft", () => {
     expect(run.matches.length).toBeGreaterThan(0);
     expect(run.record).toMatch(/^\d+-\d+-\d+$/);
     expect(run.score).toBeGreaterThanOrEqual(0);
+  });
+
+  it("completes a full draft with the expanded generated roster", () => {
+    const data = buildEightZeroData(teamsData as RawTeam[], playersData as RawPlayer[]);
+    let state = createDraftState("expanded-full-draft-seed", "433");
+
+    while (!state.complete) {
+      state = spinTeam(data, state);
+      const player = getAvailablePlayers(data, state).find((candidate) => canPickPlayer(candidate, state));
+      expect(player).toBeDefined();
+      state = selectPlayer(data, state, player!.id);
+    }
+
+    expect(state.picks).toHaveLength(11);
   });
 });
 
