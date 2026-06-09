@@ -256,7 +256,6 @@ export default function LiveMatch({ stage, opponent, result, events, onFinished 
               }`}
             >
               {result.result === "W" ? "WIN" : result.result === "L" ? "LOSS" : "DRAW"}
-              {result.decidedByPens && " (pens)"}
             </span>
           </div>
           <button
