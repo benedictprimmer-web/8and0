@@ -186,12 +186,14 @@ function PitchXI({
   activeSlotId,
   hideRatings,
   revealRatings = false,
+  goalScorers = {},
 }: {
   formationId: string;
   picks: DraftPick[];
   activeSlotId?: string;
   hideRatings: boolean;
   revealRatings?: boolean;
+  goalScorers?: Record<string, number>;
 }) {
   const formation = getFormation(formationId);
   const pickBySlot = new Map(picks.map((pick) => [pick.slotId, pick]));
@@ -214,14 +216,20 @@ function PitchXI({
               {slots.map((slot) => {
                 const pick = pickBySlot.get(slot.id);
                 const active = activeSlotId === slot.id && !pick;
+                const goals = pick ? (goalScorers[pick.player.name] ?? 0) : 0;
                 return (
                   <div key={slot.id} className="flex min-w-0 flex-1 max-w-[116px] flex-col items-center">
                     <div
-                      className={`rounded-xl px-2 py-1 ${
+                      className={`relative rounded-xl px-2 py-1 ${
                         active ? "bg-gold-500/20 ring-2 ring-gold-400/80" : ""
                       }`}
                     >
                       <ShirtIcon code={pick?.player.teamCode ?? slot.category} empty={!pick} />
+                      {goals > 0 && (
+                        <span className="absolute -top-1 -right-1 flex h-5 w-5 items-center justify-center rounded-full bg-gold-500 text-[10px] font-black text-black">
+                          {goals}
+                        </span>
+                      )}
                     </div>
                     <div className="mt-1 w-full overflow-hidden rounded-md bg-white px-2 py-1 text-center text-xs font-black text-surface-950 shadow-sm">
                       <p className="truncate">{pick?.player.name ?? slot.label}</p>
@@ -419,11 +427,13 @@ function SquadPanel({
   state,
   hideRatings,
   showPitch,
+  goalScorers = {},
 }: {
   picks: DraftPick[];
   state: DraftState;
   hideRatings: boolean;
   showPitch: boolean;
+  goalScorers?: Record<string, number>;
 }) {
   const ratings = picks.length ? calculateTeamRatings(picks) : null;
 
@@ -460,6 +470,7 @@ function SquadPanel({
           activeSlotId={state.activeSlotId}
           hideRatings={hideRatings}
           revealRatings
+          goalScorers={goalScorers}
         />
       )}
     </aside>
@@ -772,7 +783,7 @@ export default function EightZeroGame() {
     setHistory(saveRun(nextRun));
 
     const events = nextRun.matches.map((match, index) =>
-      buildMatchEvents(match, next.picks, `${next.seed}:events:${index}`)
+      buildMatchEvents(match, next.picks, `${next.seed}:events:${index}`).events
     );
     setAllMatchEvents(events);
     setCurrentMatchIndex(0);
@@ -1138,6 +1149,7 @@ export default function EightZeroGame() {
             state={draftState}
             hideRatings={hideDraftRatings && !run}
             showPitch={Boolean(run)}
+            goalScorers={run?.goalScorers ?? {}}
           />
           <section className="stat-card">
             <div className="flex items-center justify-between">

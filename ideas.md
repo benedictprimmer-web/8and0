@@ -300,6 +300,29 @@ Add tactical choice that affects probability values:
 
 ---
 
+## Phase 4: Assists (future)
+
+Track assists alongside goals for more depth.
+
+### How it works
+- For each goal, pick a second player from the XI as the assist provider
+- Show assist icon on shirts (different from goal icon, e.g. a small arrow or different color badge)
+- Display in goal popup: "GOAL! Mbappé (92) — assist by Dembélé"
+- Track assists in `goalScorers` or separate `assistProviders` map
+
+### Implementation
+- In `buildMatchEvents()`, after picking a scorer, pick a different player for the assist
+- Add `assistName?: string` to `MatchEvent`
+- Update `TournamentRun` to track assists per player
+- Show assist badge on pitch shirts
+
+### UI
+- Goal popup shows both scorer and assist
+- Pitch shows goal count + assist count per player
+- Post-match summary shows top scorers and assist leaders
+
+---
+
 ## All-Time Mode (deferred)
 
 Left for later — needs historical data pipeline. Will plan separately when we get to it.
