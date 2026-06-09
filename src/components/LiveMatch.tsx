@@ -33,8 +33,24 @@ function EventRow({ event }: { event: MatchEvent }) {
       {event.type === "fulltime" && (
         <span className="text-gray-500">Full time</span>
       )}
+      {event.type === "extra_time_start" && (
+        <span className="text-purple-400 font-semibold">Extra Time starts</span>
+      )}
+      {event.type === "extra_time_end" && (
+        <span className="text-purple-400 font-semibold">Extra Time ends</span>
+      )}
       {event.type === "penalty_shootout" && (
-        <span className="text-yellow-400 font-semibold">Penalties!</span>
+        <span className="text-yellow-400 font-semibold">Penalty Shootout!</span>
+      )}
+      {event.type === "penalty_scored" && (
+        <span className="text-green-400 font-bold">
+          &#9917; {event.playerName} SCORES!
+        </span>
+      )}
+      {event.type === "penalty_saved" && (
+        <span className="text-red-400 font-bold">
+          {event.playerName} - SAVED!
+        </span>
       )}
       {event.type === "yellow_card" && (
         <span className="text-yellow-400">
@@ -94,8 +110,9 @@ export default function LiveMatch({ stage, opponent, result, events, onFinished 
 
   const tick = useCallback(() => {
     setCurrentMinute((prev) => {
+      const maxMinute = result.decidedByPens ? 121 : result.extraTime ? 120 : 91;
       const next = prev + 1;
-      if (next > 91) return prev;
+      if (next > maxMinute) return prev;
 
       const minuteEvents = eventsByMinute.current.get(next);
       if (minuteEvents) {
@@ -114,14 +131,14 @@ export default function LiveMatch({ stage, opponent, result, events, onFinished 
         }
       }
 
-      if (next >= 91) {
+      if (next >= maxMinute) {
         setIsFinished(true);
         clearTimer();
       }
 
       return next;
     });
-  }, [clearTimer]);
+  }, [clearTimer, result.decidedByPens, result.extraTime]);
 
   useEffect(() => {
     clearTimer();
@@ -137,26 +154,34 @@ export default function LiveMatch({ stage, opponent, result, events, onFinished 
   }
 
   function skipToEnd() {
-    setCurrentMinute(90);
+    const maxMinute = result.decidedByPens ? 121 : result.extraTime ? 120 : 90;
+    setCurrentMinute(maxMinute);
     setIsFinished(true);
     clearTimer();
     setVisibleEvents(events);
-    setRecentEvent({ minute: 90, type: "fulltime", team: "user" });
+    const endEvent = result.decidedByPens
+      ? { minute: 121, type: "penalty_shootout" as const, team: "user" as const }
+      : result.extraTime
+        ? { minute: 120, type: "extra_time_end" as const, team: "user" as const }
+        : { minute: 90, type: "fulltime" as const, team: "user" as const };
+    setRecentEvent(endEvent);
   }
 
   function skipToNextEvent() {
-    for (let m = currentMinute + 1; m <= 91; m++) {
+    const maxMinute = result.decidedByPens ? 121 : result.extraTime ? 120 : 91;
+    for (let m = currentMinute + 1; m <= maxMinute; m++) {
       if (eventsByMinute.current.has(m)) {
         setCurrentMinute(m);
         return;
       }
     }
-    setCurrentMinute(90);
+    const finalMinute = result.decidedByPens ? 121 : result.extraTime ? 120 : 90;
+    setCurrentMinute(finalMinute);
     setIsFinished(true);
     clearTimer();
   }
 
-  const displayMinute = currentMinute > 90 ? "90+" : String(currentMinute);
+  const displayMinute = currentMinute > 120 ? "120+" : currentMinute > 90 ? `${currentMinute}' ET` : `${currentMinute}'`;
   const speeds: Speed[] = [1, 2, 5, 10];
 
   return (
@@ -166,13 +191,13 @@ export default function LiveMatch({ stage, opponent, result, events, onFinished 
       </div>
 
       {/* Speed controls */}
-      <div className="flex items-center justify-center gap-1 mb-4">
+      <div className="flex items-center justify-center gap-2 mb-4 flex-wrap">
         {speeds.map((s) => (
           <button
             key={s}
             type="button"
             onClick={() => setSpeed(s)}
-            className={`rounded-md px-2.5 py-1 text-xs font-bold transition-colors ${
+            className={`rounded-lg px-4 py-2 text-sm font-bold transition-colors min-w-[44px] ${
               speed === s
                 ? "bg-gold-600 text-white"
                 : "bg-surface-800 text-gray-500 hover:text-white"
@@ -184,21 +209,21 @@ export default function LiveMatch({ stage, opponent, result, events, onFinished 
         <button
           type="button"
           onClick={skipToNextEvent}
-          className="ml-2 rounded-md bg-surface-800 px-2.5 py-1 text-xs font-bold text-gray-500 hover:text-white"
+          className="ml-2 rounded-lg bg-surface-800 px-4 py-2 text-sm font-bold text-gray-500 hover:text-white min-w-[44px]"
         >
           Skip
         </button>
         <button
           type="button"
           onClick={skipToHalf}
-          className="rounded-md bg-surface-800 px-2.5 py-1 text-xs font-bold text-gray-500 hover:text-white"
+          className="rounded-lg bg-surface-800 px-4 py-2 text-sm font-bold text-gray-500 hover:text-white min-w-[44px]"
         >
           Half
         </button>
         <button
           type="button"
           onClick={skipToEnd}
-          className="rounded-md bg-surface-800 px-2.5 py-1 text-xs font-bold text-gray-500 hover:text-white"
+          className="rounded-lg bg-surface-800 px-4 py-2 text-sm font-bold text-gray-500 hover:text-white min-w-[44px]"
         >
           End
         </button>

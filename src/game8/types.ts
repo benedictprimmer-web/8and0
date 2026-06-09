@@ -85,9 +85,18 @@ export interface MatchResult {
   opponentGoals: number;
   result: "W" | "D" | "L";
   decidedByPens: boolean;
+  extraTime: boolean;
+  penaltyShootout?: PenaltyKick[];
 }
 
-export type MatchEventType = "kickoff" | "goal" | "halftime" | "fulltime" | "penalty_shootout" | "yellow_card" | "red_card" | "near_miss";
+export interface PenaltyKick {
+  team: "user" | "opponent";
+  scorer: string;
+  saved: boolean;
+  round: number;
+}
+
+export type MatchEventType = "kickoff" | "goal" | "halftime" | "fulltime" | "extra_time_start" | "extra_time_end" | "penalty_shootout" | "penalty_scored" | "penalty_saved" | "yellow_card" | "red_card" | "near_miss";
 
 export interface MatchEvent {
   minute: number;
@@ -119,4 +128,5 @@ export interface TournamentRun {
   picks: DraftPick[];
   matches: MatchResult[];
   goalScorers: Record<string, number>;
+  matchGoalScorers: Record<string, number>[];
 }

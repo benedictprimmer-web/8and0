@@ -384,6 +384,7 @@ describe("8-0 simulation", () => {
       stageReached: "Final",
       label: "test",
       goalScorers: {},
+      matchGoalScorers: [],
     } satisfies Partial<TournamentRun>;
     const runs = sortRuns([
       { ...base, id: "a", record: "5-0-1", wins: 5, losses: 1, grade: "B", ratings: { overall: 90, gk: 90, defence: 90, midfield: 90, attack: 90 } } as TournamentRun,
