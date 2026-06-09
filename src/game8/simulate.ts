@@ -6,6 +6,7 @@ import type {
   DraftMode,
   DraftPick,
   EightZeroTeam,
+  MatchEvent,
   MatchResult,
   TeamRatings,
   TournamentRun,
@@ -210,4 +211,48 @@ export function simulateTournamentRun(args: {
     picks: args.picks,
     matches,
   };
+}
+
+export function distributeGoalMinutes(totalGoals: number, random: () => number): number[] {
+  if (totalGoals <= 0) return [];
+  const times = Array.from({ length: totalGoals }, () => Math.floor(random() * 90) + 1);
+  return times.sort((a, b) => a - b);
+}
+
+function pickScorer(picks: DraftPick[], random: () => number): string {
+  const attackers = picks.filter((p) => p.category === "FWD" || p.category === "MID");
+  const pool = attackers.length > 0 ? attackers : picks;
+  const index = Math.floor(random() * pool.length);
+  return pool[index]?.player.name ?? "Unknown";
+}
+
+export function buildMatchEvents(
+  result: MatchResult,
+  picks: DraftPick[],
+  seed: string
+): MatchEvent[] {
+  const random = seededRandom(seed);
+  const events: MatchEvent[] = [];
+
+  events.push({ minute: 0, type: "kickoff", team: "user" });
+
+  const userGoalMinutes = distributeGoalMinutes(result.userGoals, random);
+  for (const minute of userGoalMinutes) {
+    const playerName = pickScorer(picks, random);
+    events.push({ minute, type: "goal", team: "user", playerName });
+  }
+
+  const oppGoalMinutes = distributeGoalMinutes(result.opponentGoals, random);
+  for (const minute of oppGoalMinutes) {
+    events.push({ minute, type: "goal", team: "opponent" });
+  }
+
+  events.push({ minute: 45, type: "halftime", team: "user" });
+  events.push({ minute: 90, type: "fulltime", team: "user" });
+
+  if (result.decidedByPens) {
+    events.push({ minute: 91, type: "penalty_shootout", team: "user" });
+  }
+
+  return events.sort((a, b) => a.minute - b.minute);
 }

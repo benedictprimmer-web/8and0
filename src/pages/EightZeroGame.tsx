@@ -4,6 +4,7 @@ import {
   ArrowLeft,
   Copy,
   Medal,
+  Play,
   RefreshCw,
   Share2,
   Shield,
@@ -12,6 +13,7 @@ import {
 } from "lucide-react";
 import { api } from "../api/client";
 import Flag from "../components/Flag";
+import LiveMatch from "../components/LiveMatch";
 import { buildEightZeroData, type RawPlayer, type RawTeam } from "../game8/data";
 import {
   canPickPlayer,
@@ -27,7 +29,7 @@ import {
 import { FORMATIONS, getFormation } from "../game8/formations";
 import { calculateTeamRatings } from "../game8/ratings";
 import { shareText, loadHistory, saveRun, sortRuns } from "../game8/storage";
-import { simulateTournamentRun } from "../game8/simulate";
+import { buildMatchEvents, simulateTournamentRun } from "../game8/simulate";
 import type {
   DraftDifficulty,
   DraftMode,
@@ -37,6 +39,7 @@ import type {
   EightZeroPlayer,
   EightZeroTeam,
   FormationSlot,
+  MatchEvent,
   SlotCategory,
   TournamentRun,
 } from "../game8/types";
@@ -645,6 +648,9 @@ export default function EightZeroGame() {
   const [reelTeam, setReelTeam] = useState<EightZeroTeam | null>(null);
   const [categoryFilter, setCategoryFilter] = useState<SlotCategory | "ALL">("ALL");
   const [showLeaderboard, setShowLeaderboard] = useState(false);
+  const [tournamentPhase, setTournamentPhase] = useState<"idle" | "ready" | "live" | "complete">("idle");
+  const [currentMatchIndex, setCurrentMatchIndex] = useState(0);
+  const [allMatchEvents, setAllMatchEvents] = useState<MatchEvent[][]>([]);
   const draftControlsRef = useRef<HTMLDivElement | null>(null);
   const spinIntervalRef = useRef<number | null>(null);
   const spinTimeoutRef = useRef<number | null>(null);
@@ -727,6 +733,9 @@ export default function EightZeroGame() {
     setReelTeam(null);
     setCategoryFilter("ALL");
     setShowLeaderboard(false);
+    setTournamentPhase("idle");
+    setCurrentMatchIndex(0);
+    setAllMatchEvents([]);
     window.requestAnimationFrame(() => window.scrollTo({ top: 0, behavior: "smooth" }));
   }
 
@@ -740,6 +749,9 @@ export default function EightZeroGame() {
     setReelTeam(null);
     setCategoryFilter("ALL");
     setShowLeaderboard(false);
+    setTournamentPhase("idle");
+    setCurrentMatchIndex(0);
+    setAllMatchEvents([]);
     window.requestAnimationFrame(() => window.scrollTo({ top: 0, behavior: "smooth" }));
   }
 
@@ -758,6 +770,13 @@ export default function EightZeroGame() {
     });
     setRun(nextRun);
     setHistory(saveRun(nextRun));
+
+    const events = nextRun.matches.map((match, index) =>
+      buildMatchEvents(match, next.picks, `${next.seed}:events:${index}`)
+    );
+    setAllMatchEvents(events);
+    setCurrentMatchIndex(0);
+    setTournamentPhase("ready");
     window.requestAnimationFrame(() => window.scrollTo({ top: 0, behavior: "smooth" }));
   }
 
@@ -818,6 +837,23 @@ export default function EightZeroGame() {
       setCopied(true);
       window.setTimeout(() => setCopied(false), 1800);
     });
+  }
+
+  function startNextMatch() {
+    setTournamentPhase("live");
+    window.requestAnimationFrame(() => window.scrollTo({ top: 0, behavior: "smooth" }));
+  }
+
+  function handleMatchFinished() {
+    if (!run) return;
+    const nextIndex = currentMatchIndex + 1;
+    if (nextIndex >= run.matches.length) {
+      setTournamentPhase("complete");
+    } else {
+      setCurrentMatchIndex(nextIndex);
+      setTournamentPhase("ready");
+    }
+    window.requestAnimationFrame(() => window.scrollTo({ top: 0, behavior: "smooth" }));
   }
 
   if (error) {
@@ -898,7 +934,56 @@ export default function EightZeroGame() {
 
       <div className="grid gap-6 xl:grid-cols-[1fr_420px]">
         <section className="stat-card">
-          {run ? (
+          {run && tournamentPhase === "ready" && (
+            <div className="space-y-5">
+              <div className="text-center">
+                <p className="section-label">Tournament</p>
+                <h2 className="mt-2 text-3xl font-black text-white">
+                  {run.matches[currentMatchIndex]?.stage}
+                </h2>
+                <p className="mt-2 text-sm text-gray-400">
+                  Match {currentMatchIndex + 1} of {run.matches.length}
+                </p>
+              </div>
+
+              <div className="flex items-center justify-center gap-6">
+                <div className="flex flex-col items-center">
+                  <div className="flex h-14 w-14 items-center justify-center rounded-full bg-gold-500/20 text-2xl font-black text-gold-400">
+                    XI
+                  </div>
+                  <p className="mt-2 text-sm font-bold text-white">You</p>
+                </div>
+                <span className="text-2xl font-bold text-gray-600">vs</span>
+                <div className="flex flex-col items-center">
+                  <Flag fifaCode={run.matches[currentMatchIndex]?.opponent.fifaCode ?? "FIFA"} size={56} />
+                  <p className="mt-2 text-sm font-bold text-white">
+                    {run.matches[currentMatchIndex]?.opponent.name}
+                  </p>
+                </div>
+              </div>
+
+              <button
+                type="button"
+                onClick={startNextMatch}
+                className="inline-flex w-full items-center justify-center gap-2 rounded-xl bg-gold-500 px-6 py-4 text-lg font-black text-black transition-colors hover:bg-gold-400"
+              >
+                <Play size={20} />
+                Play Match
+              </button>
+            </div>
+          )}
+
+          {run && tournamentPhase === "live" && (
+            <LiveMatch
+              stage={run.matches[currentMatchIndex]?.stage ?? ""}
+              opponent={run.matches[currentMatchIndex]?.opponent ?? run.matches[0].opponent}
+              result={run.matches[currentMatchIndex]}
+              events={allMatchEvents[currentMatchIndex] ?? []}
+              onFinished={handleMatchFinished}
+            />
+          )}
+
+          {run && tournamentPhase === "complete" && (
             <ResultPanel
               run={run}
               onCopy={handleCopy}
@@ -906,7 +991,9 @@ export default function EightZeroGame() {
               onPlayAgain={() => startDraft(run.formationId, options)}
               onLeaderboard={() => setShowLeaderboard(true)}
             />
-          ) : (
+          )}
+
+          {!run && (
             <div className="space-y-5">
               <div
                 ref={draftControlsRef}

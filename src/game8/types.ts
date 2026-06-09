@@ -87,6 +87,15 @@ export interface MatchResult {
   decidedByPens: boolean;
 }
 
+export type MatchEventType = "kickoff" | "goal" | "halftime" | "fulltime" | "penalty_shootout";
+
+export interface MatchEvent {
+  minute: number;
+  type: MatchEventType;
+  team: "user" | "opponent";
+  playerName?: string;
+}
+
 export interface TournamentRun {
   id: string;
   createdAt: string;
