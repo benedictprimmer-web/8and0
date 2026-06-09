@@ -38,8 +38,8 @@ const STAGE_PRESSURE: Record<string, number> = {
   "Group match 1": 1.0,
   "Group match 2": 1.0,
   "Group match 3": 1.0,
-  "Round of 32": 1.03,
-  "Round of 16": 1.06,
+  "Round of 32": 1.0,
+  "Round of 16": 1.02,
   "Quarter-final": 1.10,
   "Semi-final": 1.15,
   Final: 1.20,
@@ -155,7 +155,7 @@ export function simulateTournamentRun(args: {
     }
   }
 
-  if (groupPoints < 4) {
+  if (groupPoints < 3) {
     stageReached = "Group stage";
   } else {
     for (let index = 0; index < KNOCKOUT_STAGES.length; index += 1) {
