@@ -8,6 +8,7 @@ import type {
   EightZeroTeam,
   MatchEvent,
   MatchResult,
+  PenaltyKick,
   TeamRatings,
   TournamentRun,
 } from "./types";
@@ -64,19 +65,81 @@ function scoreMatch(
   let userGoals = poisson(userLambda, random);
   let opponentGoals = poisson(opponentLambda, random);
   let decidedByPens = false;
+  let extraTime = false;
+  let penaltyShootout: PenaltyKick[] | undefined;
 
   if (knockout && userGoals === opponentGoals) {
-    decidedByPens = true;
-    const edge = clamp(0.48 + ratingEdge * 0.010, 0.18, 0.75);
-    if (random() <= edge) {
-      userGoals += 1;
-    } else {
-      opponentGoals += 1;
+    // Extra time
+    extraTime = true;
+    const etUserLambda = userLambda * 0.35;
+    const etOppLambda = opponentLambda * 0.35;
+    userGoals += poisson(etUserLambda, random);
+    opponentGoals += poisson(etOppLambda, random);
+
+    if (userGoals === opponentGoals) {
+      // Penalties
+      decidedByPens = true;
+      penaltyShootout = simulatePenalties(ratings, opponent, random);
+      const userPenGoals = penaltyShootout.filter((k) => k.team === "user" && !k.saved).length;
+      const oppPenGoals = penaltyShootout.filter((k) => k.team === "opponent" && !k.saved).length;
+      if (userPenGoals > oppPenGoals) {
+        userGoals += 1;
+      } else if (oppPenGoals > userPenGoals) {
+        opponentGoals += 1;
+      } else {
+        // Safety: if somehow tied, force a winner
+        userGoals += 1;
+      }
     }
   }
 
   const result = userGoals > opponentGoals ? "W" : userGoals < opponentGoals ? "L" : "D";
-  return { stage, opponent, userGoals, opponentGoals, result, decidedByPens };
+  return { stage, opponent, userGoals, opponentGoals, result, decidedByPens, extraTime, penaltyShootout };
+}
+
+function simulatePenalties(
+  ratings: TeamRatings,
+  opponent: EightZeroTeam,
+  random: () => number
+): PenaltyKick[] {
+  const kicks: PenaltyKick[] = [];
+  const userPenRating = clamp(0.55 + (ratings.attack - 75) * 0.005, 0.35, 0.85);
+  const oppPenRating = clamp(0.55 + (80 - ratings.defence) * 0.003, 0.35, 0.80);
+  let userScored = 0;
+  let oppScored = 0;
+  let round = 1;
+
+  // 5 rounds each
+  for (let i = 0; i < 5; i++) {
+    const userSaved = random() > userPenRating;
+    kicks.push({ team: "user", scorer: "Player", saved: userSaved, round });
+    if (!userSaved) userScored++;
+
+    const oppSaved = random() > oppPenRating;
+    kicks.push({ team: "opponent", scorer: opponent.name, saved: oppSaved, round });
+    if (!oppSaved) oppScored++;
+
+    // Check if decided early
+    const remaining = 5 - i - 1;
+    if (userScored > oppScored + remaining || oppScored > userScored + remaining) {
+      break;
+    }
+    round++;
+  }
+
+  // Sudden death if still tied
+  while (userScored === oppScored) {
+    round++;
+    const userSaved = random() > userPenRating;
+    kicks.push({ team: "user", scorer: "Player", saved: userSaved, round });
+    if (!userSaved) userScored++;
+
+    const oppSaved = random() > oppPenRating;
+    kicks.push({ team: "opponent", scorer: opponent.name, saved: oppSaved, round });
+    if (!oppSaved) oppScored++;
+  }
+
+  return kicks;
 }
 
 function recordLabel(wins: number, draws: number, losses: number): string {
@@ -327,8 +390,38 @@ export function buildMatchEvents(
   events.push({ minute: 45, type: "halftime", team: "user" });
   events.push({ minute: 90, type: "fulltime", team: "user" });
 
-  if (result.decidedByPens) {
-    events.push({ minute: 91, type: "penalty_shootout", team: "user" });
+  if (result.extraTime) {
+    events.push({ minute: 91, type: "extra_time_start", team: "user" });
+    // Distribute extra time goals (91-120)
+    const etUserGoals = result.userGoals - userGoalMinutes.length;
+    const etOppGoals = result.opponentGoals - oppGoalMinutes.length;
+    if (etUserGoals > 0) {
+      const etMinutes = distributeGoalMinutes(etUserGoals, random).map((m) => m + 90);
+      for (const minute of etMinutes) {
+        const scorer = pickRandomPlayer(picks, random);
+        events.push({ minute, type: "goal", team: "user", playerName: scorer.name, playerRating: scorer.rating });
+        scorers[scorer.name] = (scorers[scorer.name] ?? 0) + 1;
+      }
+    }
+    if (etOppGoals > 0) {
+      const etMinutes = distributeGoalMinutes(etOppGoals, random).map((m) => m + 90);
+      for (const minute of etMinutes) {
+        events.push({ minute, type: "goal", team: "opponent", playerName: result.opponent.name, playerRating: 0 });
+      }
+    }
+    events.push({ minute: 120, type: "extra_time_end", team: "user" });
+  }
+
+  if (result.decidedByPens && result.penaltyShootout) {
+    events.push({ minute: 121, type: "penalty_shootout", team: "user" });
+    for (const kick of result.penaltyShootout) {
+      events.push({
+        minute: 121 + kick.round,
+        type: kick.saved ? "penalty_saved" : "penalty_scored",
+        team: kick.team,
+        playerName: kick.scorer,
+      });
+    }
   }
 
   return { events: events.sort((a, b) => a.minute - b.minute), scorers };

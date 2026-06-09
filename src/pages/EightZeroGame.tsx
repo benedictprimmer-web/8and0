@@ -14,6 +14,7 @@ import {
 import { api } from "../api/client";
 import Flag from "../components/Flag";
 import LiveMatch from "../components/LiveMatch";
+import PenaltyShootout from "../components/PenaltyShootout";
 import TournamentBracket from "../components/TournamentBracket";
 import { buildEightZeroData, type RawPlayer, type RawTeam } from "../game8/data";
 import {
@@ -439,7 +440,7 @@ function SquadPanel({
   showPitch: boolean;
   matchGoalScorers?: Record<string, number>[];
   currentMatchIndex?: number;
-  tournamentPhase?: "idle" | "ready" | "live" | "complete";
+  tournamentPhase?: "idle" | "ready" | "live" | "penalties" | "complete";
 }) {
   // Accumulate goals only from completed matches
   const goalScorers: Record<string, number> = {};
@@ -677,7 +678,7 @@ export default function EightZeroGame() {
   const [reelTeam, setReelTeam] = useState<EightZeroTeam | null>(null);
   const [categoryFilter, setCategoryFilter] = useState<SlotCategory | "ALL">("ALL");
   const [showLeaderboard, setShowLeaderboard] = useState(false);
-  const [tournamentPhase, setTournamentPhase] = useState<"idle" | "ready" | "live" | "complete">("idle");
+  const [tournamentPhase, setTournamentPhase] = useState<"idle" | "ready" | "live" | "penalties" | "complete">("idle");
   const [currentMatchIndex, setCurrentMatchIndex] = useState(0);
   const [allMatchEvents, setAllMatchEvents] = useState<MatchEvent[][]>([]);
   const draftControlsRef = useRef<HTMLDivElement | null>(null);
@@ -1023,6 +1024,22 @@ export default function EightZeroGame() {
               opponent={run.matches[currentMatchIndex]?.opponent ?? run.matches[0].opponent}
               result={run.matches[currentMatchIndex]}
               events={allMatchEvents[currentMatchIndex] ?? []}
+              onFinished={() => {
+                const match = run.matches[currentMatchIndex];
+                if (match.decidedByPens && match.penaltyShootout) {
+                  setTournamentPhase("penalties");
+                } else {
+                  handleMatchFinished();
+                }
+              }}
+            />
+          )}
+
+          {run && tournamentPhase === "penalties" && (
+            <PenaltyShootout
+              opponent={run.matches[currentMatchIndex]?.opponent ?? run.matches[0].opponent}
+              kicks={run.matches[currentMatchIndex]?.penaltyShootout ?? []}
+              userWon={run.matches[currentMatchIndex]?.result === "W"}
               onFinished={handleMatchFinished}
             />
           )}

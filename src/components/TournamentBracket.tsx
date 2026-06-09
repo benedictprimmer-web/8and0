@@ -4,7 +4,7 @@ import type { TournamentRun } from "../game8/types";
 interface TournamentBracketProps {
   run: TournamentRun;
   currentMatchIndex: number;
-  tournamentPhase: "idle" | "ready" | "live" | "complete";
+  tournamentPhase: "idle" | "ready" | "live" | "penalties" | "complete";
 }
 
 export default function TournamentBracket({ run, currentMatchIndex, tournamentPhase }: TournamentBracketProps) {
@@ -14,11 +14,7 @@ export default function TournamentBracket({ run, currentMatchIndex, tournamentPh
   return (
     <div className="stat-card">
       <div className="mb-4">
-        <p className="section-label">Tournament</p>
-        <h2 className="mt-1 text-lg font-extrabold text-white">{run.stageReached}</h2>
-        <p className="text-sm text-gray-400">
-          {run.record} · {run.grade}
-        </p>
+        <p className="section-label">Tournament Progress</p>
       </div>
 
       {/* Group Stage */}
@@ -44,21 +40,25 @@ export default function TournamentBracket({ run, currentMatchIndex, tournamentPh
                   <Flag fifaCode={match.opponent.fifaCode} size={16} />
                   <span className="font-bold text-white">{match.opponent.name}</span>
                 </div>
-                <span className="font-black tabular-nums text-gold-400">
-                  {isPast ? `${match.userGoals}-${match.opponentGoals}` : "vs"}
-                </span>
-                {isPast && (
-                  <span
-                    className={`rounded px-1.5 py-0.5 text-[10px] font-bold ${
-                      match.result === "W"
-                        ? "bg-green-500/20 text-green-400"
-                        : match.result === "L"
-                          ? "bg-red-500/20 text-red-400"
-                          : "bg-gray-500/20 text-gray-300"
-                    }`}
-                  >
-                    {match.result}
-                  </span>
+                {isPast ? (
+                  <>
+                    <span className="font-black tabular-nums text-gold-400">
+                      {match.userGoals}-{match.opponentGoals}
+                    </span>
+                    <span
+                      className={`rounded px-1.5 py-0.5 text-[10px] font-bold ${
+                        match.result === "W"
+                          ? "bg-green-500/20 text-green-400"
+                          : match.result === "L"
+                            ? "bg-red-500/20 text-red-400"
+                            : "bg-gray-500/20 text-gray-300"
+                      }`}
+                    >
+                      {match.result}
+                    </span>
+                  </>
+                ) : (
+                  <span className="text-gray-600">vs</span>
                 )}
               </div>
             );
@@ -91,21 +91,25 @@ export default function TournamentBracket({ run, currentMatchIndex, tournamentPh
                     <Flag fifaCode={match.opponent.fifaCode} size={16} />
                     <span className="font-bold text-white">{match.opponent.name}</span>
                   </div>
-                  <span className="font-black tabular-nums text-gold-400">
-                    {isPast ? `${match.userGoals}-${match.opponentGoals}` : "vs"}
-                  </span>
-                  {isPast && (
-                    <span
-                      className={`rounded px-1.5 py-0.5 text-[10px] font-bold ${
-                        match.result === "W"
-                          ? "bg-green-500/20 text-green-400"
-                          : match.result === "L"
-                            ? "bg-red-500/20 text-red-400"
-                            : "bg-gray-500/20 text-gray-300"
-                      }`}
-                    >
-                      {match.result}
-                    </span>
+                  {isPast ? (
+                    <>
+                      <span className="font-black tabular-nums text-gold-400">
+                        {match.userGoals}-{match.opponentGoals}
+                      </span>
+                      <span
+                        className={`rounded px-1.5 py-0.5 text-[10px] font-bold ${
+                          match.result === "W"
+                            ? "bg-green-500/20 text-green-400"
+                            : match.result === "L"
+                              ? "bg-red-500/20 text-red-400"
+                              : "bg-gray-500/20 text-gray-300"
+                        }`}
+                      >
+                        {match.result}
+                      </span>
+                    </>
+                  ) : (
+                    <span className="text-gray-600">vs</span>
                   )}
                 </div>
               );
