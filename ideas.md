@@ -273,6 +273,33 @@ For the MVP, skip the bracket and fancy animations:
 
 ---
 
+## Phase 3: Tactical Modes (future)
+
+Add tactical choice that affects probability values:
+
+### Options
+- **"Park the Bus"** — defensive
+  - Lower userLambda (score less)
+  - Lower opponentLambda (concede less)
+  - Higher penalty win chance (defensive teams are better at pens?)
+  - More draws in group stage
+
+- **"Normal"** — current balanced values
+
+- **"All Out Attack"** — offensive
+  - Higher userLambda (score more)
+  - Higher opponentLambda (concede more)
+  - Lower penalty win chance (tired attackers miss pens?)
+  - More high-scoring games, fewer draws
+
+### Implementation
+- Add `TacticalMode` type to `types.ts`
+- Pass to `scoreMatch()` and adjust lambdas
+- Could be a setup screen option like difficulty
+- Would need re-tuning with batch sim for each mode
+
+---
+
 ## All-Time Mode (deferred)
 
 Left for later — needs historical data pipeline. Will plan separately when we get to it.
