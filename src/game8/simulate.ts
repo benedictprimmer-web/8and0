@@ -191,8 +191,10 @@ export function simulateTournamentRun(args: {
   });
 
   const goalScorers: Record<string, number> = {};
+  const matchGoalScorers: Record<string, number>[] = [];
   for (const match of matches) {
     const { scorers } = buildMatchEvents(match, args.picks, `${args.seed}:events:${matches.indexOf(match)}`);
+    matchGoalScorers.push(scorers);
     for (const [name, count] of Object.entries(scorers)) {
       goalScorers[name] = (goalScorers[name] ?? 0) + count;
     }
@@ -219,6 +221,7 @@ export function simulateTournamentRun(args: {
     picks: args.picks,
     matches,
     goalScorers,
+    matchGoalScorers,
   };
 }
 

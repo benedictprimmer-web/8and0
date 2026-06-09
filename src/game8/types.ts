@@ -119,4 +119,5 @@ export interface TournamentRun {
   picks: DraftPick[];
   matches: MatchResult[];
   goalScorers: Record<string, number>;
+  matchGoalScorers: Record<string, number>[];
 }

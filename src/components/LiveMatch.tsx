@@ -166,13 +166,13 @@ export default function LiveMatch({ stage, opponent, result, events, onFinished 
       </div>
 
       {/* Speed controls */}
-      <div className="flex items-center justify-center gap-1 mb-4">
+      <div className="flex items-center justify-center gap-2 mb-4 flex-wrap">
         {speeds.map((s) => (
           <button
             key={s}
             type="button"
             onClick={() => setSpeed(s)}
-            className={`rounded-md px-2.5 py-1 text-xs font-bold transition-colors ${
+            className={`rounded-lg px-4 py-2 text-sm font-bold transition-colors min-w-[44px] ${
               speed === s
                 ? "bg-gold-600 text-white"
                 : "bg-surface-800 text-gray-500 hover:text-white"
@@ -184,21 +184,21 @@ export default function LiveMatch({ stage, opponent, result, events, onFinished 
         <button
           type="button"
           onClick={skipToNextEvent}
-          className="ml-2 rounded-md bg-surface-800 px-2.5 py-1 text-xs font-bold text-gray-500 hover:text-white"
+          className="ml-2 rounded-lg bg-surface-800 px-4 py-2 text-sm font-bold text-gray-500 hover:text-white min-w-[44px]"
         >
           Skip
         </button>
         <button
           type="button"
           onClick={skipToHalf}
-          className="rounded-md bg-surface-800 px-2.5 py-1 text-xs font-bold text-gray-500 hover:text-white"
+          className="rounded-lg bg-surface-800 px-4 py-2 text-sm font-bold text-gray-500 hover:text-white min-w-[44px]"
         >
           Half
         </button>
         <button
           type="button"
           onClick={skipToEnd}
-          className="rounded-md bg-surface-800 px-2.5 py-1 text-xs font-bold text-gray-500 hover:text-white"
+          className="rounded-lg bg-surface-800 px-4 py-2 text-sm font-bold text-gray-500 hover:text-white min-w-[44px]"
         >
           End
         </button>

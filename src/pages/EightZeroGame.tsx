@@ -429,14 +429,30 @@ function SquadPanel({
   state,
   hideRatings,
   showPitch,
-  goalScorers = {},
+  matchGoalScorers = [],
+  currentMatchIndex = 0,
+  tournamentPhase = "idle",
 }: {
   picks: DraftPick[];
   state: DraftState;
   hideRatings: boolean;
   showPitch: boolean;
-  goalScorers?: Record<string, number>;
+  matchGoalScorers?: Record<string, number>[];
+  currentMatchIndex?: number;
+  tournamentPhase?: "idle" | "ready" | "live" | "complete";
 }) {
+  // Accumulate goals only from completed matches
+  const goalScorers: Record<string, number> = {};
+  const matchesToShow = tournamentPhase === "complete"
+    ? matchGoalScorers.length
+    : currentMatchIndex;
+  for (let i = 0; i < matchesToShow; i++) {
+    const scorers = matchGoalScorers[i] ?? {};
+    for (const [name, count] of Object.entries(scorers)) {
+      goalScorers[name] = (goalScorers[name] ?? 0) + count;
+    }
+  }
+
   const ratings = picks.length ? calculateTeamRatings(picks) : null;
 
   return (
@@ -972,9 +988,6 @@ export default function EightZeroGame() {
                 <h2 className="mt-2 text-3xl font-black text-white">
                   {run.matches[currentMatchIndex]?.stage}
                 </h2>
-                <p className="mt-2 text-sm text-gray-400">
-                  Match {currentMatchIndex + 1} of {run.matches.length}
-                </p>
               </div>
 
               <div className="flex items-center justify-center gap-6">
@@ -1179,7 +1192,9 @@ export default function EightZeroGame() {
             state={draftState}
             hideRatings={hideDraftRatings && !run}
             showPitch={Boolean(run)}
-            goalScorers={run?.goalScorers ?? {}}
+            matchGoalScorers={run?.matchGoalScorers ?? []}
+            currentMatchIndex={currentMatchIndex}
+            tournamentPhase={tournamentPhase}
           />
           {run && (tournamentPhase === "ready" || tournamentPhase === "live" || tournamentPhase === "complete") && (
             <TournamentBracket
