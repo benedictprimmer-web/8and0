@@ -19,7 +19,7 @@ function normalizeOpponentStrength(team: EightZeroTeam, teams: EightZeroTeam[]):
   const min = Math.min(...elos);
   const max = Math.max(...elos);
   const normalized = (team.elo - min) / Math.max(1, max - min);
-  return 62 + normalized * 27;
+  return 70 + normalized * 22;
 }
 
 function pickOpponent(teams: EightZeroTeam[], seed: string, excludeIds: Set<number>): EightZeroTeam {
@@ -32,6 +32,17 @@ function pickOpponent(teams: EightZeroTeam[], seed: string, excludeIds: Set<numb
   const index = Math.floor(Math.pow(random(), 1.3) * sorted.length);
   return sorted[clamp(index, 0, sorted.length - 1)];
 }
+
+const STAGE_PRESSURE: Record<string, number> = {
+  "Group match 1": 1.0,
+  "Group match 2": 1.0,
+  "Group match 3": 1.0,
+  "Round of 32": 1.03,
+  "Round of 16": 1.06,
+  "Quarter-final": 1.10,
+  "Semi-final": 1.15,
+  Final: 1.20,
+};
 
 function scoreMatch(
   stage: string,
@@ -46,15 +57,16 @@ function scoreMatch(
   const ratingEdge = ratings.overall - opponentStrength;
   const attackEdge = (ratings.attack + ratings.midfield) / 2 - opponentStrength;
   const defenceEdge = (ratings.defence + ratings.gk) / 2 - opponentStrength;
-  const userLambda = clamp(1.35 + ratingEdge * 0.045 + attackEdge * 0.025, 0.2, 4.6);
-  const opponentLambda = clamp(1.1 - ratingEdge * 0.035 - defenceEdge * 0.02, 0.1, 3.6);
+  const pressure = STAGE_PRESSURE[stage] ?? 1.0;
+  const userLambda = clamp(1.18 + ratingEdge * 0.020 + attackEdge * 0.013, 0.22, 3.5);
+  const opponentLambda = clamp((1.18 - ratingEdge * 0.016 - defenceEdge * 0.011) * pressure, 0.2, 3.4);
   let userGoals = poisson(userLambda, random);
   let opponentGoals = poisson(opponentLambda, random);
   let decidedByPens = false;
 
   if (knockout && userGoals === opponentGoals) {
     decidedByPens = true;
-    const edge = clamp(0.5 + ratingEdge * 0.015, 0.18, 0.82);
+    const edge = clamp(0.48 + ratingEdge * 0.010, 0.18, 0.75);
     if (random() <= edge) {
       userGoals += 1;
     } else {
