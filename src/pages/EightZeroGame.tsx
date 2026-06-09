@@ -228,8 +228,8 @@ function PitchXI({
                     >
                       <ShirtIcon code={pick?.player.teamCode ?? slot.category} empty={!pick} />
                       {goals > 0 && (
-                        <span className="absolute -top-1 -right-1 flex h-5 w-5 items-center justify-center rounded-full bg-gold-500 text-[10px] font-black text-black">
-                          {goals}
+                        <span className="absolute -top-1 -right-1 text-xs">
+                          {"⚽".repeat(goals)}
                         </span>
                       )}
                     </div>

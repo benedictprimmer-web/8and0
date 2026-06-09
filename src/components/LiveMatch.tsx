@@ -14,15 +14,58 @@ const BASE_TICK_MS = 600;
 
 type Speed = 1 | 2 | 5 | 10;
 
+function EventRow({ event }: { event: MatchEvent }) {
+  return (
+    <div className="flex items-center gap-2 text-xs">
+      <span className="w-8 text-right font-mono font-bold text-gold-400">{event.minute}&apos;</span>
+      {event.type === "goal" && (
+        <span className="text-sm font-bold text-white">
+          &#9917; {event.playerName}
+          {event.playerRating ? ` (${event.playerRating})` : ""}
+        </span>
+      )}
+      {event.type === "kickoff" && (
+        <span className="text-gray-500">Kick off</span>
+      )}
+      {event.type === "halftime" && (
+        <span className="text-gray-500">Half time</span>
+      )}
+      {event.type === "fulltime" && (
+        <span className="text-gray-500">Full time</span>
+      )}
+      {event.type === "penalty_shootout" && (
+        <span className="text-yellow-400 font-semibold">Penalties!</span>
+      )}
+      {event.type === "yellow_card" && (
+        <span className="text-yellow-400">
+          &#128993; {event.playerName}
+        </span>
+      )}
+      {event.type === "red_card" && (
+        <span className="text-red-400">
+          &#128308; {event.playerName}
+        </span>
+      )}
+      {event.type === "near_miss" && (
+        <span className="text-gray-400">
+          {event.playerName} {event.flavorText}
+        </span>
+      )}
+    </div>
+  );
+}
+
 export default function LiveMatch({ stage, opponent, result, events, onFinished }: LiveMatchProps) {
   const [currentMinute, setCurrentMinute] = useState(0);
   const [userScore, setUserScore] = useState(0);
   const [oppScore, setOppScore] = useState(0);
   const [recentEvent, setRecentEvent] = useState<MatchEvent | null>(null);
+  const [visibleEvents, setVisibleEvents] = useState<MatchEvent[]>([]);
   const [isFinished, setIsFinished] = useState(false);
   const [speed, setSpeed] = useState<Speed>(1);
   const [goalFlash, setGoalFlash] = useState(false);
   const intervalRef = useRef<number | null>(null);
+  const logRef = useRef<HTMLDivElement | null>(null);
 
   const eventsByMinute = useRef(new Map<number, MatchEvent[]>());
 
@@ -35,6 +78,12 @@ export default function LiveMatch({ stage, opponent, result, events, onFinished 
     }
     eventsByMinute.current = map;
   }, [events]);
+
+  useEffect(() => {
+    if (logRef.current) {
+      logRef.current.scrollTop = logRef.current.scrollHeight;
+    }
+  }, [visibleEvents]);
 
   const clearTimer = useCallback(() => {
     if (intervalRef.current !== null) {
@@ -61,6 +110,7 @@ export default function LiveMatch({ stage, opponent, result, events, onFinished 
             window.setTimeout(() => setGoalFlash(false), 800);
           }
           setRecentEvent(event);
+          setVisibleEvents((prev) => [...prev, event]);
         }
       }
 
@@ -81,6 +131,8 @@ export default function LiveMatch({ stage, opponent, result, events, onFinished 
 
   function skipToHalf() {
     setCurrentMinute(45);
+    const halfEvents = events.filter((e) => e.minute <= 45);
+    setVisibleEvents(halfEvents);
     setRecentEvent({ minute: 45, type: "halftime", team: "user" });
   }
 
@@ -88,6 +140,7 @@ export default function LiveMatch({ stage, opponent, result, events, onFinished 
     setCurrentMinute(90);
     setIsFinished(true);
     clearTimer();
+    setVisibleEvents(events);
     setRecentEvent({ minute: 90, type: "fulltime", team: "user" });
   }
 
@@ -222,7 +275,7 @@ export default function LiveMatch({ stage, opponent, result, events, onFinished 
               <>
                 <span className="text-base">&#128993;</span>
                 <span className="text-sm font-semibold text-yellow-400">
-                  Yellow card - {recentEvent.playerName}
+                  {recentEvent.playerName}
                 </span>
               </>
             )}
@@ -230,7 +283,7 @@ export default function LiveMatch({ stage, opponent, result, events, onFinished 
               <>
                 <span className="text-base">&#128308;</span>
                 <span className="text-sm font-semibold text-red-400">
-                  Red card - {recentEvent.playerName}
+                  {recentEvent.playerName}
                 </span>
               </>
             )}
@@ -239,6 +292,23 @@ export default function LiveMatch({ stage, opponent, result, events, onFinished 
                 {recentEvent.playerName} {recentEvent.flavorText}
               </span>
             )}
+          </div>
+        </div>
+      )}
+
+      {/* Full match log */}
+      {visibleEvents.length > 0 && (
+        <div className="mb-4 rounded-lg border border-surface-700 bg-surface-800/50 overflow-hidden">
+          <div className="px-3 py-2 border-b border-surface-700">
+            <p className="section-label">Match Log</p>
+          </div>
+          <div
+            ref={logRef}
+            className="max-h-48 overflow-y-auto space-y-1 p-3"
+          >
+            {visibleEvents.map((event, index) => (
+              <EventRow key={index} event={event} />
+            ))}
           </div>
         </div>
       )}
