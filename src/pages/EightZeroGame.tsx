@@ -326,13 +326,13 @@ function SetupScreen({
             <ArrowLeft size={16} />
             Home
           </button>
-          <h1 className="mt-7 font-serif text-6xl font-black tracking-normal text-white">8-0</h1>
+          <h1 className="mt-7 font-serif text-4xl sm:text-6xl font-black tracking-normal text-white">8-0</h1>
           <p className="mt-2 text-lg leading-7 text-gray-400">
             Draft the greatest World Cup XI. Go unbeaten - can you lift the trophy?
           </p>
         </div>
         <div className="text-right">
-          <p className="text-5xl font-black text-gold-400 tabular-nums">{bestRun?.score ?? 0}</p>
+          <p className="text-3xl sm:text-5xl font-black text-gold-400 tabular-nums">{bestRun?.score ?? 0}</p>
           <p className="section-label">Best</p>
         </div>
       </div>
@@ -345,7 +345,7 @@ function SetupScreen({
               key={formation.id}
               active={formationId === formation.id}
               onClick={() => onFormationChange(formation.id)}
-              className="min-w-[110px] text-xl"
+              className="min-w-[110px] text-lg sm:text-xl"
             >
               {formation.label}
             </OptionButton>
@@ -363,7 +363,7 @@ function SetupScreen({
               onClick={() => updateOptions({ difficulty: difficulty.id })}
               className="min-h-[92px]"
             >
-              <span className="block text-xl">{difficulty.label}</span>
+              <span className="block text-lg">{difficulty.label}</span>
               <span className={`mt-1 block text-sm ${options.difficulty === difficulty.id ? "text-black/70" : "text-gray-500"}`}>
                 {difficulty.detail}
               </span>
@@ -945,7 +945,7 @@ export default function EightZeroGame() {
                   <ArrowLeft size={16} />
                   Options
                 </button>
-                <h1 className="mt-4 font-serif text-5xl font-black tracking-normal text-white">8-0</h1>
+                <h1 className="mt-4 font-serif text-3xl sm:text-5xl font-black tracking-normal text-white">8-0</h1>
                 <p className="mt-2 max-w-2xl text-sm leading-6 text-gray-400">
                   {getFormation(draftState.formationId).label} · {titleCase(draftState.difficulty)} ·{" "}
                   {draftState.draftMode === "squad-first" ? "Squad first" : "Position first"}
@@ -965,7 +965,7 @@ export default function EightZeroGame() {
 
           <div className="border-t border-surface-700 bg-surface-950/60 p-5 lg:border-l lg:border-t-0">
             <div className="text-right">
-              <p className="text-5xl font-black text-gold-400 tabular-nums">{bestRun?.score ?? 0}</p>
+              <p className="text-3xl sm:text-5xl font-black text-gold-400 tabular-nums">{bestRun?.score ?? 0}</p>
               <p className="section-label">Best</p>
             </div>
           </div>
@@ -986,7 +986,7 @@ export default function EightZeroGame() {
             <div className="space-y-5">
               <div className="text-center">
                 <p className="section-label">Tournament</p>
-                <h2 className="mt-2 text-3xl font-black text-white">
+                <h2 className="mt-2 text-2xl sm:text-3xl font-black text-white">
                   {run.matches[currentMatchIndex]?.stage}
                 </h2>
               </div>

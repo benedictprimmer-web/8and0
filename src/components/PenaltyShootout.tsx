@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Flag from "../components/Flag";
 import type { EightZeroTeam, PenaltyKick } from "../game8/types";
 
@@ -13,6 +13,8 @@ export default function PenaltyShootout({ opponent, kicks, onFinished, userWon }
   const [currentKickIndex, setCurrentKickIndex] = useState(0);
   const [userScore, setUserScore] = useState(0);
   const [oppScore, setOppScore] = useState(0);
+  const [kickPhase, setKickPhase] = useState<"waiting" | "stepping" | "revealed">("waiting");
+  const [autoPlay, setAutoPlay] = useState(true);
 
   const visibleKicks = kicks.slice(0, currentKickIndex);
   const isFinished = currentKickIndex >= kicks.length;
@@ -30,13 +32,33 @@ export default function PenaltyShootout({ opponent, kicks, onFinished, userWon }
     setCurrentKickIndex((i) => i + 1);
   }
 
-  const lastKick = visibleKicks[visibleKicks.length - 1];
+  useEffect(() => {
+    if (!autoPlay || isFinished) return;
+
+    if (kickPhase === "waiting") {
+      const timer = setTimeout(() => setKickPhase("stepping"), 100);
+      return () => clearTimeout(timer);
+    }
+
+    if (kickPhase === "stepping") {
+      const timer = setTimeout(() => setKickPhase("revealed"), 1500);
+      return () => clearTimeout(timer);
+    }
+
+    if (kickPhase === "revealed") {
+      const timer = setTimeout(() => {
+        takeNextKick();
+        setKickPhase("waiting");
+      }, 2000);
+      return () => clearTimeout(timer);
+    }
+  }, [kickPhase, autoPlay, isFinished]);
 
   return (
     <div className="stat-card animate-fade-up">
       <div className="text-center mb-6">
         <p className="section-label">Penalty Shootout</p>
-        <h2 className="mt-2 text-2xl font-black text-white">Sudden Death</h2>
+        <h2 className="mt-2 text-xl sm:text-2xl font-black text-white">Sudden Death</h2>
       </div>
 
       <div className="flex items-center justify-between gap-4 mb-6">
@@ -45,7 +67,7 @@ export default function PenaltyShootout({ opponent, kicks, onFinished, userWon }
             XI
           </div>
           <p className="mt-2 text-sm font-bold text-white">You</p>
-          <p className="text-3xl font-black text-white tabular-nums mt-1">{userScore}</p>
+          <p className="text-2xl sm:text-3xl font-black text-white tabular-nums mt-1">{userScore}</p>
         </div>
 
         <div className="text-center">
@@ -56,7 +78,7 @@ export default function PenaltyShootout({ opponent, kicks, onFinished, userWon }
         <div className="flex flex-col items-center flex-1">
           <Flag fifaCode={opponent.fifaCode} size={48} />
           <p className="mt-2 text-sm font-bold text-white">{opponent.name}</p>
-          <p className="text-3xl font-black text-white tabular-nums mt-1">{oppScore}</p>
+          <p className="text-2xl sm:text-3xl font-black text-white tabular-nums mt-1">{oppScore}</p>
         </div>
       </div>
 
@@ -85,14 +107,21 @@ export default function PenaltyShootout({ opponent, kicks, onFinished, userWon }
       </div>
 
       {/* Current kick drama */}
-      {!isFinished && lastKick && (
-        <div className="mb-4 rounded-lg border border-gold-600/50 bg-surface-800 p-4 text-center animate-goal-pop">
-          <p className="text-sm text-gray-400 mb-1">
-            {lastKick.team === "user" ? "Your player" : opponent.name} steps up...
-          </p>
-          <p className="text-lg font-black text-white">
-            {lastKick.saved ? "SAVED!" : "SCORES!"}
-          </p>
+      {!isFinished && currentKickIndex < kicks.length && (
+        <div className="mb-4 rounded-lg border border-gold-600/50 bg-surface-800 p-6 text-center animate-goal-pop">
+          {kickPhase === "stepping" && (
+            <p className="text-xl font-black text-white animate-pulse">
+              {kicks[currentKickIndex].team === "user" ? "Your player" : kicks[currentKickIndex].scorer} steps up.....
+            </p>
+          )}
+          {kickPhase === "revealed" && (
+            <p className={`text-2xl font-black ${kicks[currentKickIndex].saved ? "text-red-400" : "text-green-400"}`}>
+              {kicks[currentKickIndex].saved ? "SAVED!" : "SCORES!"}
+            </p>
+          )}
+          {kickPhase === "waiting" && (
+            <p className="text-lg font-bold text-gray-500">Get ready...</p>
+          )}
         </div>
       )}
 
@@ -112,7 +141,7 @@ export default function PenaltyShootout({ opponent, kicks, onFinished, userWon }
           <button
             type="button"
             onClick={onFinished}
-            className="rounded-xl bg-gold-500 px-6 py-3 text-base font-black text-black transition-colors hover:bg-gold-400"
+            className="rounded-xl bg-gold-500 px-6 py-3 text-sm sm:text-lg font-black text-black transition-colors hover:bg-gold-400"
           >
             Continue
           </button>
@@ -120,13 +149,35 @@ export default function PenaltyShootout({ opponent, kicks, onFinished, userWon }
       )}
 
       {!isFinished && (
-        <button
-          type="button"
-          onClick={takeNextKick}
-          className="w-full rounded-xl bg-gold-500 px-6 py-4 text-lg font-black text-black transition-colors hover:bg-gold-400"
-        >
-          {currentKickIndex === 0 ? "Start Penalties" : "Next Kick"}
-        </button>
+        <div className="flex gap-3">
+          <button
+            type="button"
+            onClick={() => setAutoPlay(!autoPlay)}
+            className={`rounded-xl border px-4 py-4 text-sm font-black transition-colors ${
+              autoPlay
+                ? "border-gold-600 bg-gold-500/10 text-gold-400"
+                : "border-surface-700 bg-surface-800 text-gray-500 hover:text-white"
+            }`}
+          >
+            {autoPlay ? "Auto" : "Manual"}
+          </button>
+          <button
+            type="button"
+            onClick={() => {
+              if (kickPhase === "waiting") {
+                setKickPhase("stepping");
+              } else if (kickPhase === "stepping") {
+                setKickPhase("revealed");
+              } else if (kickPhase === "revealed") {
+                takeNextKick();
+                setKickPhase("waiting");
+              }
+            }}
+            className="flex-1 rounded-xl bg-gold-500 px-6 py-4 text-sm sm:text-lg font-black text-black transition-colors hover:bg-gold-400"
+          >
+            {currentKickIndex === 0 ? "Start Penalties" : "Next Kick"}
+          </button>
+        </div>
       )}
     </div>
   );
