@@ -21,7 +21,7 @@ function normalizeOpponentStrength(team: EightZeroTeam, teams: EightZeroTeam[]):
   const min = Math.min(...elos);
   const max = Math.max(...elos);
   const normalized = (team.elo - min) / Math.max(1, max - min);
-  return 70 + normalized * 22;
+  return 64 + normalized * 32;
 }
 
 function pickOpponent(teams: EightZeroTeam[], seed: string, excludeIds: Set<number>): EightZeroTeam {
@@ -60,8 +60,8 @@ function scoreMatch(
   const attackEdge = (ratings.attack + ratings.midfield) / 2 - opponentStrength;
   const defenceEdge = (ratings.defence + ratings.gk) / 2 - opponentStrength;
   const pressure = STAGE_PRESSURE[stage] ?? 1.0;
-  const userLambda = clamp(1.40 + ratingEdge * 0.020 + attackEdge * 0.013, 0.22, 3.5);
-  const opponentLambda = clamp((1.35 - ratingEdge * 0.016 - defenceEdge * 0.011) * pressure, 0.2, 3.4);
+  const userLambda = clamp(1.30 + ratingEdge * 0.025 + attackEdge * 0.015, 0.20, 3.2);
+  const opponentLambda = clamp((1.40 - ratingEdge * 0.020 - defenceEdge * 0.013) * pressure, 0.25, 3.6);
   let userGoals = poisson(userLambda, random);
   let opponentGoals = poisson(opponentLambda, random);
   let decidedByPens = false;

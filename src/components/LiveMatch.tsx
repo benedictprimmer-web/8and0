@@ -110,7 +110,7 @@ export default function LiveMatch({ stage, opponent, result, events, onFinished 
 
   const tick = useCallback(() => {
     setCurrentMinute((prev) => {
-      const maxMinute = result.decidedByPens ? 121 : result.extraTime ? 120 : 91;
+      const maxMinute = result.decidedByPens ? 121 : result.extraTime ? 120 : 90;
       const next = prev + 1;
       if (next > maxMinute) return prev;
 
@@ -150,7 +150,12 @@ export default function LiveMatch({ stage, opponent, result, events, onFinished 
     setCurrentMinute(45);
     const halfEvents = events.filter((e) => e.minute <= 45);
     setVisibleEvents(halfEvents);
+    const uGoals = halfEvents.filter(e => e.type === "goal" && e.team === "user").length;
+    const oGoals = halfEvents.filter(e => e.type === "goal" && e.team === "opponent").length;
+    setUserScore(uGoals);
+    setOppScore(oGoals);
     setRecentEvent({ minute: 45, type: "halftime", team: "user" });
+    clearTimer();
   }
 
   function skipToEnd() {
@@ -159,6 +164,10 @@ export default function LiveMatch({ stage, opponent, result, events, onFinished 
     setIsFinished(true);
     clearTimer();
     setVisibleEvents(events);
+    const uGoals = events.filter(e => e.type === "goal" && e.team === "user").length;
+    const oGoals = events.filter(e => e.type === "goal" && e.team === "opponent").length;
+    setUserScore(uGoals);
+    setOppScore(oGoals);
     const endEvent = result.decidedByPens
       ? { minute: 121, type: "penalty_shootout" as const, team: "user" as const }
       : result.extraTime
@@ -168,26 +177,34 @@ export default function LiveMatch({ stage, opponent, result, events, onFinished 
   }
 
   function skipToNextEvent() {
-    const maxMinute = result.decidedByPens ? 121 : result.extraTime ? 120 : 91;
+    const maxMinute = result.decidedByPens ? 121 : result.extraTime ? 120 : 90;
+    let targetMinute = maxMinute;
     for (let m = currentMinute + 1; m <= maxMinute; m++) {
       if (eventsByMinute.current.has(m)) {
-        setCurrentMinute(m);
-        return;
+        targetMinute = m;
+        break;
       }
     }
-    const finalMinute = result.decidedByPens ? 121 : result.extraTime ? 120 : 90;
-    setCurrentMinute(finalMinute);
-    setIsFinished(true);
-    clearTimer();
+    setCurrentMinute(targetMinute);
+    const eventsUpToTarget = events.filter(e => e.minute <= targetMinute);
+    setVisibleEvents(eventsUpToTarget);
+    const uGoals = eventsUpToTarget.filter(e => e.type === "goal" && e.team === "user").length;
+    const oGoals = eventsUpToTarget.filter(e => e.type === "goal" && e.team === "opponent").length;
+    setUserScore(uGoals);
+    setOppScore(oGoals);
+    if (targetMinute >= maxMinute) {
+      setIsFinished(true);
+      clearTimer();
+    }
   }
 
-  const displayMinute = currentMinute > 120 ? "120+" : currentMinute > 90 ? `${currentMinute}' ET` : `${currentMinute}'`;
+  const displayMinute = currentMinute > 120 ? "120+" : (result.extraTime && currentMinute > 90) ? `${currentMinute}' ET` : `${currentMinute}'`;
   const speeds: Speed[] = [1, 2, 5, 10];
 
   return (
     <div className="stat-card animate-fade-up">
       <div className="text-center mb-4">
-        <p className="section-label">{stage}</p>
+        <p className="section-label text-sm">{stage}</p>
       </div>
 
       {/* Speed controls */}
@@ -197,7 +214,7 @@ export default function LiveMatch({ stage, opponent, result, events, onFinished 
             key={s}
             type="button"
             onClick={() => setSpeed(s)}
-            className={`rounded-lg px-4 py-2 text-sm font-bold transition-colors min-w-[44px] ${
+            className={`rounded-lg px-4 py-2 text-xs sm:text-sm font-bold transition-colors min-w-[44px] ${
               speed === s
                 ? "bg-gold-600 text-white"
                 : "bg-surface-800 text-gray-500 hover:text-white"
@@ -209,21 +226,21 @@ export default function LiveMatch({ stage, opponent, result, events, onFinished 
         <button
           type="button"
           onClick={skipToNextEvent}
-          className="ml-2 rounded-lg bg-surface-800 px-4 py-2 text-sm font-bold text-gray-500 hover:text-white min-w-[44px]"
+          className="ml-2 rounded-lg bg-surface-800 px-4 py-2 text-xs sm:text-sm font-bold text-gray-500 hover:text-white min-w-[44px]"
         >
           Skip
         </button>
         <button
           type="button"
           onClick={skipToHalf}
-          className="rounded-lg bg-surface-800 px-4 py-2 text-sm font-bold text-gray-500 hover:text-white min-w-[44px]"
+          className="rounded-lg bg-surface-800 px-4 py-2 text-xs sm:text-sm font-bold text-gray-500 hover:text-white min-w-[44px]"
         >
           Half
         </button>
         <button
           type="button"
           onClick={skipToEnd}
-          className="rounded-lg bg-surface-800 px-4 py-2 text-sm font-bold text-gray-500 hover:text-white min-w-[44px]"
+          className="rounded-lg bg-surface-800 px-4 py-2 text-xs sm:text-sm font-bold text-gray-500 hover:text-white min-w-[44px]"
         >
           End
         </button>
@@ -240,7 +257,7 @@ export default function LiveMatch({ stage, opponent, result, events, onFinished 
         <div className="flex flex-col items-center">
           <div className="flex items-center gap-3">
             <span
-              className={`text-5xl font-black tabular-nums transition-colors ${
+              className={`text-4xl sm:text-5xl font-black tabular-nums transition-colors ${
                 goalFlash ? "text-gold-400" : "text-white"
               }`}
             >
@@ -248,7 +265,7 @@ export default function LiveMatch({ stage, opponent, result, events, onFinished 
             </span>
             <span className="text-2xl font-bold text-gray-600">-</span>
             <span
-              className={`text-5xl font-black tabular-nums transition-colors ${
+              className={`text-4xl sm:text-5xl font-black tabular-nums transition-colors ${
                 goalFlash ? "text-gold-400" : "text-white"
               }`}
             >
@@ -278,28 +295,28 @@ export default function LiveMatch({ stage, opponent, result, events, onFinished 
             {recentEvent.type === "goal" && (
               <>
                 <span className="text-lg">&#9917;</span>
-                <span className="text-sm font-bold text-white">
+                <span className="text-xs sm:text-sm font-bold text-white">
                   GOAL! {recentEvent.playerName}
                   {recentEvent.playerRating ? ` (${recentEvent.playerRating})` : ""}
                 </span>
               </>
             )}
             {recentEvent.type === "kickoff" && (
-              <span className="text-sm font-semibold text-gray-400">Kick off</span>
+              <span className="text-xs sm:text-sm font-semibold text-gray-400">Kick off</span>
             )}
             {recentEvent.type === "halftime" && (
-              <span className="text-sm font-semibold text-gray-400">Half time</span>
+              <span className="text-xs sm:text-sm font-semibold text-gray-400">Half time</span>
             )}
             {recentEvent.type === "fulltime" && (
-              <span className="text-sm font-semibold text-gray-400">Full time</span>
+              <span className="text-xs sm:text-sm font-semibold text-gray-400">Full time</span>
             )}
             {recentEvent.type === "penalty_shootout" && (
-              <span className="text-sm font-semibold text-yellow-400">Penalties!</span>
+              <span className="text-xs sm:text-sm font-semibold text-yellow-400">Penalties!</span>
             )}
             {recentEvent.type === "yellow_card" && (
               <>
                 <span className="text-base">&#128993;</span>
-                <span className="text-sm font-semibold text-yellow-400">
+                <span className="text-xs sm:text-sm font-semibold text-yellow-400">
                   {recentEvent.playerName}
                 </span>
               </>
@@ -307,13 +324,13 @@ export default function LiveMatch({ stage, opponent, result, events, onFinished 
             {recentEvent.type === "red_card" && (
               <>
                 <span className="text-base">&#128308;</span>
-                <span className="text-sm font-semibold text-red-400">
+                <span className="text-xs sm:text-sm font-semibold text-red-400">
                   {recentEvent.playerName}
                 </span>
               </>
             )}
             {recentEvent.type === "near_miss" && (
-              <span className="text-sm font-semibold text-gray-300">
+              <span className="text-xs sm:text-sm font-semibold text-gray-300">
                 {recentEvent.playerName} {recentEvent.flavorText}
               </span>
             )}
@@ -356,7 +373,7 @@ export default function LiveMatch({ stage, opponent, result, events, onFinished 
           <button
             type="button"
             onClick={onFinished}
-            className="rounded-xl bg-gold-500 px-6 py-3 text-base font-black text-black transition-colors hover:bg-gold-400"
+            className="rounded-xl bg-gold-500 px-6 py-3 text-sm sm:text-base font-black text-black transition-colors hover:bg-gold-400"
           >
             Continue
           </button>
