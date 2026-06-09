@@ -323,6 +323,33 @@ Track assists alongside goals for more depth.
 
 ---
 
+## Phase 5: Penalty Taker Selection (future)
+
+Let users choose their penalty takers before the shootout.
+
+### How it works
+- Before penalties start, show a "Select 5 Penalty Takers" screen
+- User picks 5 players from their XI (or fewer if red cards)
+- Show each player's attack rating as a guide
+- During shootout, use selected players instead of generic "Player"
+- Could add pressure factor: lower-rated players more likely to miss under pressure
+
+### Implementation
+- Add `penaltyTakers: string[]` to `TournamentRun` or `MatchResult`
+- New component: `PenaltyTakerSelection` - shows XI with checkboxes
+- Update `simulatePenalties()` to accept taker list
+- Update `PenaltyShootout` component to show taker names
+- Store selections in state before shootout begins
+
+### UI Flow
+```
+Extra time ends → "Select your 5 penalty takers" → 
+Show XI with attack ratings → User selects 5 → 
+Confirm → Shootout begins with named players
+```
+
+---
+
 ## All-Time Mode (deferred)
 
 Left for later — needs historical data pipeline. Will plan separately when we get to it.
