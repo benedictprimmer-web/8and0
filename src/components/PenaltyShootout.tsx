@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import Flag from "../components/Flag";
 import type { EightZeroTeam, PenaltyKick } from "../game8/types";
 
@@ -19,7 +19,7 @@ export default function PenaltyShootout({ opponent, kicks, onFinished, userWon }
   const visibleKicks = kicks.slice(0, currentKickIndex);
   const isFinished = currentKickIndex >= kicks.length;
 
-  function takeNextKick() {
+  const takeNextKick = useCallback(() => {
     if (currentKickIndex >= kicks.length) return;
     const kick = kicks[currentKickIndex];
     if (!kick.saved) {
@@ -30,7 +30,7 @@ export default function PenaltyShootout({ opponent, kicks, onFinished, userWon }
       }
     }
     setCurrentKickIndex((i) => i + 1);
-  }
+  }, [currentKickIndex, kicks]);
 
   useEffect(() => {
     if (!autoPlay || isFinished) return;
@@ -52,7 +52,7 @@ export default function PenaltyShootout({ opponent, kicks, onFinished, userWon }
       }, 2000);
       return () => clearTimeout(timer);
     }
-  }, [kickPhase, autoPlay, isFinished]);
+  }, [kickPhase, autoPlay, isFinished, takeNextKick]);
 
   return (
     <div className="stat-card animate-fade-up">
