@@ -166,3 +166,67 @@ export function selectPlayer(
     complete: !nextSlot,
   };
 }
+
+export function autofillDraft(
+  data: EightZeroData,
+  state: DraftState
+): DraftState {
+  let current = state;
+  const formation = getFormation(state.formationId);
+
+  for (const slot of formation.slots) {
+    if (current.picks.some((p) => p.slotId === slot.id)) continue;
+
+    current = { ...current, activeSlotId: slot.id };
+
+    // Spin a team
+    const eligibleTeams = data.teams.filter((team) =>
+      getAvailablePlayers(data, current, team).some(
+        (player) => player.category === slot.category
+      )
+    );
+    if (eligibleTeams.length === 0) break;
+
+    const spinIndex = current.spinCount + 1;
+    const seedKey = `${current.seed}:autofill:spin:${spinIndex}`;
+    const team = pickSeeded(eligibleTeams, seedKey);
+    current = {
+      ...current,
+      currentSpin: { team, spinIndex },
+      spinCount: spinIndex,
+    };
+
+    // Pick best available player for this slot's category
+    const available = getAvailablePlayers(data, current, team).filter(
+      (p) => p.category === slot.category
+    );
+    if (available.length === 0) break;
+
+    const best = [...available].sort((a, b) => b.rating - a.rating)[0];
+
+    const pick: DraftPick = {
+      slotId: slot.id,
+      slotLabel: slot.label,
+      category: slot.category,
+      player: best,
+      spinTeam: team,
+      round: current.picks.length + 1,
+    };
+
+    current = {
+      ...current,
+      picks: [...current.picks, pick],
+      currentSpin: null,
+    };
+  }
+
+  const nextSlot = formation.slots.find(
+    (candidate) => !current.picks.some((filled) => filled.slotId === candidate.id)
+  );
+
+  return {
+    ...current,
+    activeSlotId: nextSlot?.id ?? current.activeSlotId,
+    complete: !nextSlot,
+  };
+}

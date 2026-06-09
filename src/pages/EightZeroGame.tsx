@@ -17,6 +17,7 @@ import LiveMatch from "../components/LiveMatch";
 import TournamentBracket from "../components/TournamentBracket";
 import { buildEightZeroData, type RawPlayer, type RawTeam } from "../game8/data";
 import {
+  autofillDraft,
   canPickPlayer,
   createDraftState,
   getActiveSlot,
@@ -868,6 +869,15 @@ export default function EightZeroGame() {
     window.requestAnimationFrame(() => window.scrollTo({ top: 0, behavior: "smooth" }));
   }
 
+  function handleAutofill() {
+    if (!gameData || isSpinning || draftState.picks.length > 0) return;
+    const next = autofillDraft(gameData, draftState);
+    setDraftState(next);
+    if (next.complete) {
+      finishDraftIfComplete(next);
+    }
+  }
+
   if (error) {
     return (
       <div className="stat-card animate-fade-up">
@@ -896,6 +906,15 @@ export default function EightZeroGame() {
 
   return (
     <div className="space-y-6 animate-fade-up">
+      {/* Version badge */}
+      <div className="fixed top-3 right-3 z-50 rounded-md border border-surface-700 bg-surface-900/90 px-2.5 py-1.5 text-[10px] font-mono text-gray-500 backdrop-blur">
+        <span className="font-bold text-gold-400">v0.2.0</span>
+        <span className="mx-1.5 text-surface-700">·</span>
+        <span className="text-gray-600">8bbec5e</span>
+        <span className="mx-1.5 text-surface-700">·</span>
+        <span className="hidden sm:inline text-gray-600">fix: remove '(pens)'</span>
+      </div>
+
       <section className="overflow-hidden rounded-xl border border-surface-700 bg-surface-900">
         <div className="grid gap-0 lg:grid-cols-[1fr_260px]">
           <div className="p-5 sm:p-6">
@@ -1021,6 +1040,16 @@ export default function EightZeroGame() {
                   </p>
                 </div>
                 <div className="flex gap-2">
+                  {draftState.picks.length === 0 && (
+                    <button
+                      type="button"
+                      onClick={handleAutofill}
+                      disabled={isSpinning || !gameData}
+                      className="inline-flex items-center gap-2 rounded-lg border border-surface-700 bg-surface-800 px-4 py-2 text-sm font-bold text-white transition-colors hover:border-gold-600/40 disabled:cursor-not-allowed disabled:opacity-40"
+                    >
+                      Auto-fill
+                    </button>
+                  )}
                   <button
                     type="button"
                     onClick={handleSpin}
