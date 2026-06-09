@@ -1,0 +1,2506 @@
+{
+  "generated_at": "2026-06-09T14:08:55.611Z",
+  "final_roster_source": "https://www.nbcsports.com/soccer/news/2026-world-cup-squads-confirmed-rosters-for-all-48-teams",
+  "cross_check_source": "https://worldcupranking.com/world-cup-2026/squads/",
+  "notes": [
+    "NBC rosters are used as the final generated player list.",
+    "WorldCupRanking shirt names are matched against NBC full names by normalized token containment, so report entries are source-review hints rather than hard failures."
+  ],
+  "teams": [
+    {
+      "team_id": 5,
+      "team_name": "Mexico",
+      "fifa_code": "MEX",
+      "generated_count": 26,
+      "nbc_count": 26,
+      "worldcupranking_count": 26,
+      "matched_count": 24,
+      "nbc_only": [
+        {
+          "name": "Edson Alvarez",
+          "position": "MF",
+          "club_name": "Fenerbahce"
+        },
+        {
+          "name": "Cesar Huerta",
+          "position": "MF",
+          "club_name": "Anderlecht"
+        }
+      ],
+      "worldcupranking_only": [
+        {
+          "name": "E. ÁLVAREZ",
+          "position": "DF",
+          "club_name": "Fenerbahçe SK (TUR)"
+        },
+        {
+          "name": "C. HUERTA",
+          "position": "FW",
+          "club_name": "RSC Anderlecht (BEL)"
+        }
+      ]
+    },
+    {
+      "team_id": 23,
+      "team_name": "South Korea",
+      "fifa_code": "KOR",
+      "generated_count": 26,
+      "nbc_count": 26,
+      "worldcupranking_count": 26,
+      "matched_count": 22,
+      "nbc_only": [
+        {
+          "name": "Kim Seung-gyu",
+          "position": "GK",
+          "club_name": "FC Tokyo"
+        },
+        {
+          "name": "Lee Kihyuk",
+          "position": "DF",
+          "club_name": "Gangwon"
+        },
+        {
+          "name": "Cho Yumin",
+          "position": "DF",
+          "club_name": "Sharjah"
+        },
+        {
+          "name": "Cho Guesung",
+          "position": "FW",
+          "club_name": "Midtjylland"
+        }
+      ],
+      "worldcupranking_only": [
+        {
+          "name": "SEUNGGYU",
+          "position": "GK",
+          "club_name": "FC Tokyo (JPN)"
+        },
+        {
+          "name": "GIHYUK",
+          "position": "MF",
+          "club_name": "Gangwon FC (KOR)"
+        },
+        {
+          "name": "GUSEUNG",
+          "position": "FW",
+          "club_name": "FC Midtjylland (DEN)"
+        },
+        {
+          "name": "WIJE",
+          "position": "DF",
+          "club_name": "Jeonbuk Hyundai Motors FC (KOR)"
+        }
+      ]
+    },
+    {
+      "team_id": 8,
+      "team_name": "Czechia",
+      "fifa_code": "CZE",
+      "generated_count": 26,
+      "nbc_count": 26,
+      "worldcupranking_count": 26,
+      "matched_count": 24,
+      "nbc_only": [
+        {
+          "name": "Pavel Sulc",
+          "position": "MF",
+          "club_name": "Olympique Lyonnais"
+        },
+        {
+          "name": "Denis Visinsky",
+          "position": "MF",
+          "club_name": "Viktoria Plzen"
+        }
+      ],
+      "worldcupranking_only": [
+        {
+          "name": "SULC",
+          "position": "FW",
+          "club_name": "Olympique Lyonnais (FRA)"
+        },
+        {
+          "name": "VISINSKY",
+          "position": "FW",
+          "club_name": "FC Viktoria Plze ň (CZE)"
+        }
+      ]
+    },
+    {
+      "team_id": 31,
+      "team_name": "South Africa",
+      "fifa_code": "RSA",
+      "generated_count": 26,
+      "nbc_count": 26,
+      "worldcupranking_count": 26,
+      "matched_count": 24,
+      "nbc_only": [
+        {
+          "name": "Kamogelo Sebelebele",
+          "position": "MF",
+          "club_name": "Orlando Pirates"
+        },
+        {
+          "name": "Themba Zwane",
+          "position": "FW",
+          "club_name": "Mamelodi Sundowns"
+        }
+      ],
+      "worldcupranking_only": [
+        {
+          "name": "ZWANE",
+          "position": "MF",
+          "club_name": "Mamelodi Sundowns FC (RSA)"
+        },
+        {
+          "name": "SEBELEBELE",
+          "position": "FW",
+          "club_name": "Orlando Pirates FC (RSA)"
+        }
+      ]
+    },
+    {
+      "team_id": 14,
+      "team_name": "Switzerland",
+      "fifa_code": "SUI",
+      "generated_count": 26,
+      "nbc_count": 26,
+      "worldcupranking_count": 26,
+      "matched_count": 25,
+      "nbc_only": [
+        {
+          "name": "Johan Manzambi",
+          "position": "FW",
+          "club_name": "SC Freiburg"
+        }
+      ],
+      "worldcupranking_only": [
+        {
+          "name": "MANZAMBI",
+          "position": "MF",
+          "club_name": "SC Freiburg (GER)"
+        }
+      ]
+    },
+    {
+      "team_id": 9,
+      "team_name": "Canada",
+      "fifa_code": "CAN",
+      "generated_count": 26,
+      "nbc_count": 26,
+      "worldcupranking_count": 26,
+      "matched_count": 21,
+      "nbc_only": [
+        {
+          "name": "Alistair Johnson",
+          "position": "DF",
+          "club_name": "Celtic"
+        },
+        {
+          "name": "Tajon Buchanan",
+          "position": "MF",
+          "club_name": "Villarreal"
+        },
+        {
+          "name": "Ali Ahmed",
+          "position": "MF",
+          "club_name": "Norwich City"
+        },
+        {
+          "name": "Liam Miller",
+          "position": "MF",
+          "club_name": "Hull City"
+        },
+        {
+          "name": "Jonathan Osario",
+          "position": "MF",
+          "club_name": "Toronto"
+        }
+      ],
+      "worldcupranking_only": [
+        {
+          "name": "JOHNSTON",
+          "position": "DF",
+          "club_name": "Celtic FC (SCO)"
+        },
+        {
+          "name": "MILLAR",
+          "position": "MF",
+          "club_name": "Hull City FC (ENG)"
+        },
+        {
+          "name": "BUCHANAN",
+          "position": "FW",
+          "club_name": "Villarreal CF (ESP)"
+        },
+        {
+          "name": "AHMED",
+          "position": "FW",
+          "club_name": "Norwich City FC (ENG)"
+        },
+        {
+          "name": "OSORIO",
+          "position": "MF",
+          "club_name": "Toronto FC (CAN)"
+        }
+      ]
+    },
+    {
+      "team_id": 12,
+      "team_name": "Qatar",
+      "fifa_code": "QAT",
+      "generated_count": 26,
+      "nbc_count": 26,
+      "worldcupranking_count": 26,
+      "matched_count": 15,
+      "nbc_only": [
+        {
+          "name": "Hashmi Hussein",
+          "position": "DF",
+          "club_name": "Al Arabi"
+        },
+        {
+          "name": "Issa Laaye",
+          "position": "DF",
+          "club_name": "Al Arabi"
+        },
+        {
+          "name": "Mohammed Al-Manai",
+          "position": "MF",
+          "club_name": "Al Shamal"
+        },
+        {
+          "name": "Jassem Jaber",
+          "position": "MF",
+          "club_name": "Al Arabi"
+        },
+        {
+          "name": "Ahmed Fathi",
+          "position": "MF",
+          "club_name": "Al Arabi"
+        },
+        {
+          "name": "Tahseen Mohammed",
+          "position": "FW",
+          "club_name": "Al-Duhail"
+        },
+        {
+          "name": "Edmilson Junior",
+          "position": "FW",
+          "club_name": "Al-Duhail"
+        },
+        {
+          "name": "Youssef Abdulrazzaq",
+          "position": "FW",
+          "club_name": "Al-Wakrah"
+        },
+        {
+          "name": "Ahmed Alaa",
+          "position": "FW",
+          "club_name": "Al Rayyan"
+        },
+        {
+          "name": "Hassan Al-Haydos",
+          "position": "FW",
+          "club_name": "Al-Sadd"
+        },
+        {
+          "name": "Ahmed Al-Janahi",
+          "position": "FW",
+          "club_name": "Al Gharafa"
+        }
+      ],
+      "worldcupranking_only": [
+        {
+          "name": "GUEYE",
+          "position": "DF",
+          "club_name": "Al Arabi SC (QAT)"
+        },
+        {
+          "name": "JASSEM",
+          "position": "DF",
+          "club_name": "Al Rayyan SC (QAT)"
+        },
+        {
+          "name": "ALAEDDIN",
+          "position": "FW",
+          "club_name": "Al Rayyan SC (QAT)"
+        },
+        {
+          "name": "EDMILSON JR.",
+          "position": "FW",
+          "club_name": "Al Duhail SC (QAT)"
+        },
+        {
+          "name": "ALHAYDOS",
+          "position": "FW",
+          "club_name": "Al Sadd SC (QAT)"
+        },
+        {
+          "name": "YUSUF",
+          "position": "FW",
+          "club_name": "Al Wakrah SC (QAT)"
+        },
+        {
+          "name": "A. ALGANEHI",
+          "position": "MF",
+          "club_name": "Al Gharafa SC (QAT)"
+        },
+        {
+          "name": "A. FATHY",
+          "position": "MF",
+          "club_name": "Al Arabi SC (QAT)"
+        },
+        {
+          "name": "TAHSIN",
+          "position": "FW",
+          "club_name": "Al Duhail SC (QAT)"
+        },
+        {
+          "name": "ALHASHMI",
+          "position": "DF",
+          "club_name": "Al Arabi SC (QAT)"
+        },
+        {
+          "name": "MANAI",
+          "position": "FW",
+          "club_name": "Al Shamal SC (QAT)"
+        }
+      ]
+    },
+    {
+      "team_id": 11,
+      "team_name": "Bosnia and Herzegovina",
+      "fifa_code": "BIH",
+      "generated_count": 26,
+      "nbc_count": 26,
+      "worldcupranking_count": 26,
+      "matched_count": 25,
+      "nbc_only": [
+        {
+          "name": "Osman Hadzikic",
+          "position": "GK",
+          "club_name": "Slaven Belupo"
+        }
+      ],
+      "worldcupranking_only": [
+        {
+          "name": "JURKAS",
+          "position": "GK",
+          "club_name": "FK Borac Banja Luka (BIH)"
+        }
+      ]
+    },
+    {
+      "team_id": 13,
+      "team_name": "Brazil",
+      "fifa_code": "BRA",
+      "generated_count": 26,
+      "nbc_count": 26,
+      "worldcupranking_count": 26,
+      "matched_count": 22,
+      "nbc_only": [
+        {
+          "name": "Alisson",
+          "position": "GK",
+          "club_name": "Liverpool"
+        },
+        {
+          "name": "Raphinha",
+          "position": "MF",
+          "club_name": "Barcelona"
+        },
+        {
+          "name": "Neymar",
+          "position": "MF",
+          "club_name": "Santos"
+        },
+        {
+          "name": "Vinicius Junior",
+          "position": "FW",
+          "club_name": "Real Madrid"
+        }
+      ],
+      "worldcupranking_only": [
+        {
+          "name": "A. BECKER",
+          "position": "GK",
+          "club_name": "Liverpool FC (ENG)"
+        },
+        {
+          "name": "VINI JR.",
+          "position": "FW",
+          "club_name": "Real Madrid C. F. (ESP)"
+        },
+        {
+          "name": "NEYMAR JR",
+          "position": "FW",
+          "club_name": "Santos FC (BRA)"
+        },
+        {
+          "name": "RAPHINHA",
+          "position": "FW",
+          "club_name": "FC Barcelona (ESP)"
+        }
+      ]
+    },
+    {
+      "team_id": 16,
+      "team_name": "Morocco",
+      "fifa_code": "MAR",
+      "generated_count": 26,
+      "nbc_count": 26,
+      "worldcupranking_count": 26,
+      "matched_count": 22,
+      "nbc_only": [
+        {
+          "name": "Yassine Bounou",
+          "position": "GK",
+          "club_name": "Al Hilal"
+        },
+        {
+          "name": "Azzedine Ounahi",
+          "position": "MF",
+          "club_name": "Girone"
+        },
+        {
+          "name": "Chemsdine Talbi",
+          "position": "FW",
+          "club_name": "Sunderland"
+        },
+        {
+          "name": "Yassine Gessime",
+          "position": "FW",
+          "club_name": "Strasbourg"
+        }
+      ],
+      "worldcupranking_only": [
+        {
+          "name": "BONO",
+          "position": "GK",
+          "club_name": "Al Hilal SC (KSA)"
+        },
+        {
+          "name": "TALBI",
+          "position": "MF",
+          "club_name": "Sunderland AFC (ENG)"
+        },
+        {
+          "name": "OUAHI",
+          "position": "MF",
+          "club_name": "Girona FC (ESP)"
+        },
+        {
+          "name": "YASSINE",
+          "position": "MF",
+          "club_name": "RC Strasbourg (FRA)"
+        }
+      ]
+    },
+    {
+      "team_id": 28,
+      "team_name": "Scotland",
+      "fifa_code": "SCO",
+      "generated_count": 26,
+      "nbc_count": 26,
+      "worldcupranking_count": 26,
+      "matched_count": 24,
+      "nbc_only": [
+        {
+          "name": "Findlay Curtis",
+          "position": "MF",
+          "club_name": "Kilmarnock"
+        },
+        {
+          "name": "Ben Gannon-Doak",
+          "position": "MF",
+          "club_name": "Bournemouth"
+        }
+      ],
+      "worldcupranking_only": [
+        {
+          "name": "GANNON DOAK",
+          "position": "FW",
+          "club_name": "AFC Bournemouth (ENG)"
+        },
+        {
+          "name": "CURTIS",
+          "position": "FW",
+          "club_name": "Kilmarnock FC (SCO)"
+        }
+      ]
+    },
+    {
+      "team_id": 18,
+      "team_name": "Haiti",
+      "fifa_code": "HTI",
+      "generated_count": 26,
+      "nbc_count": 26,
+      "worldcupranking_count": 26,
+      "matched_count": 23,
+      "nbc_only": [
+        {
+          "name": "Wilguens Paugain",
+          "position": "DF",
+          "club_name": "SV Zulte Waregem"
+        },
+        {
+          "name": "Carl-Fred Sainthe",
+          "position": "MF",
+          "club_name": "El Paso Locomotive FC"
+        },
+        {
+          "name": "Derrick Etienne",
+          "position": "FW",
+          "club_name": "Toronto FC"
+        }
+      ],
+      "worldcupranking_only": [
+        {
+          "name": "SAINTE",
+          "position": "MF",
+          "club_name": "El Paso Locomotive FC (USA)"
+        },
+        {
+          "name": "ETIENNE JR",
+          "position": "FW",
+          "club_name": "Toronto FC (CAN)"
+        },
+        {
+          "name": "PAUGIN",
+          "position": "DF",
+          "club_name": "SV Zulte Waregem (BEL)"
+        }
+      ]
+    },
+    {
+      "team_id": 1,
+      "team_name": "United States",
+      "fifa_code": "USA",
+      "generated_count": 26,
+      "nbc_count": 26,
+      "worldcupranking_count": 26,
+      "matched_count": 22,
+      "nbc_only": [
+        {
+          "name": "Brenden Aaronson",
+          "position": "MF",
+          "club_name": "Leeds United"
+        },
+        {
+          "name": "Christian Pulisic",
+          "position": "MF",
+          "club_name": "AC Milan"
+        },
+        {
+          "name": "Tim Weah",
+          "position": "MF",
+          "club_name": "Marseille"
+        },
+        {
+          "name": "Alejandro Zendejas",
+          "position": "MF",
+          "club_name": "Club America"
+        }
+      ],
+      "worldcupranking_only": [
+        {
+          "name": "PULISIC",
+          "position": "FW",
+          "club_name": "AC Milan (ITA)"
+        },
+        {
+          "name": "AARONSON",
+          "position": "FW",
+          "club_name": "Leeds United FC (ENG)"
+        },
+        {
+          "name": "WEAH",
+          "position": "FW",
+          "club_name": "Olympique Marseille (FRA)"
+        },
+        {
+          "name": "ZENDEJAS",
+          "position": "FW",
+          "club_name": "Club América (MEX)"
+        }
+      ]
+    },
+    {
+      "team_id": 22,
+      "team_name": "Australia",
+      "fifa_code": "AUS",
+      "generated_count": 26,
+      "nbc_count": 26,
+      "worldcupranking_count": 26,
+      "matched_count": 23,
+      "nbc_only": [
+        {
+          "name": "Hrustic",
+          "position": "MF",
+          "club_name": "Heracles Almelo"
+        },
+        {
+          "name": "Okon-Englster",
+          "position": "MF",
+          "club_name": "Sydney"
+        },
+        {
+          "name": "Velupilly",
+          "position": "FW",
+          "club_name": "Melbourne City"
+        }
+      ],
+      "worldcupranking_only": [
+        {
+          "name": "HRUSTIC",
+          "position": "FW",
+          "club_name": "SC Heracles Almelo (NED)"
+        },
+        {
+          "name": "VELUPILLAY",
+          "position": "FW",
+          "club_name": "Melbourne Victory FC (AUS)"
+        },
+        {
+          "name": "OKON-ENGSTLER",
+          "position": "MF",
+          "club_name": "Sydney FC (AUS)"
+        }
+      ]
+    },
+    {
+      "team_id": 46,
+      "team_name": "Turkey",
+      "fifa_code": "TUR",
+      "generated_count": 26,
+      "nbc_count": 26,
+      "worldcupranking_count": 26,
+      "matched_count": 24,
+      "nbc_only": [
+        {
+          "name": "Eren Elmalı",
+          "position": "DF",
+          "club_name": "Galatasaray"
+        },
+        {
+          "name": "Barış Alper Yilmaz",
+          "position": "FW",
+          "club_name": "Galatasaray"
+        }
+      ],
+      "worldcupranking_only": [
+        {
+          "name": "EREN ELMALI",
+          "position": "DF",
+          "club_name": "Galatasaray SK (TUR)"
+        },
+        {
+          "name": "BARIŞ",
+          "position": "FW",
+          "club_name": "Galatasaray SK (TUR)"
+        }
+      ]
+    },
+    {
+      "team_id": 39,
+      "team_name": "Paraguay",
+      "fifa_code": "PAR",
+      "generated_count": 26,
+      "nbc_count": 26,
+      "worldcupranking_count": 26,
+      "matched_count": 23,
+      "nbc_only": [
+        {
+          "name": "Gaston Olveira",
+          "position": "GK",
+          "club_name": "Olimpia"
+        },
+        {
+          "name": "Kaku",
+          "position": "MF",
+          "club_name": "Al-Ain"
+        },
+        {
+          "name": "Gustavo Caballero",
+          "position": "FW",
+          "club_name": "Portsmouth"
+        }
+      ],
+      "worldcupranking_only": [
+        {
+          "name": "R. GAMARRA",
+          "position": "FW",
+          "club_name": "Al Ain FC (UAE)"
+        },
+        {
+          "name": "OLIVEIRA",
+          "position": "GK",
+          "club_name": "Club Olimpia (PAR)"
+        },
+        {
+          "name": "CABALLERO",
+          "position": "MF",
+          "club_name": "Portsmouth FC (ENG)"
+        }
+      ]
+    },
+    {
+      "team_id": 41,
+      "team_name": "Germany",
+      "fifa_code": "GER",
+      "generated_count": 26,
+      "nbc_count": 26,
+      "worldcupranking_count": 26,
+      "matched_count": 25,
+      "nbc_only": [
+        {
+          "name": "Leroy Sane",
+          "position": "FW",
+          "club_name": "Galatasaray"
+        }
+      ],
+      "worldcupranking_only": [
+        {
+          "name": "SANÉ",
+          "position": "MF",
+          "club_name": "Galatasaray SK (TUR)"
+        }
+      ]
+    },
+    {
+      "team_id": 19,
+      "team_name": "Ivory Coast",
+      "fifa_code": "CIV",
+      "generated_count": 26,
+      "nbc_count": 26,
+      "worldcupranking_count": 26,
+      "matched_count": 25,
+      "nbc_only": [
+        {
+          "name": "Clement Akpa",
+          "position": "DF",
+          "club_name": "AJ Auxerre"
+        }
+      ],
+      "worldcupranking_only": [
+        {
+          "name": "OPERI",
+          "position": "DF",
+          "club_name": "Ba ş ak ş ehir FK (TUR)"
+        }
+      ]
+    },
+    {
+      "team_id": 6,
+      "team_name": "Ecuador",
+      "fifa_code": "ECU",
+      "generated_count": 26,
+      "nbc_count": 26,
+      "worldcupranking_count": 26,
+      "matched_count": 22,
+      "nbc_only": [
+        {
+          "name": "Yaimar Medina",
+          "position": "MF",
+          "club_name": "KRC Genk"
+        },
+        {
+          "name": "Enner Valencia",
+          "position": "FW",
+          "club_name": "Pachuca"
+        },
+        {
+          "name": "Alan Minda",
+          "position": "FW",
+          "club_name": "Atletico Mineiro"
+        },
+        {
+          "name": "John Yeboah",
+          "position": "FW",
+          "club_name": "Venezia"
+        }
+      ],
+      "worldcupranking_only": [
+        {
+          "name": "A. VALENCIA",
+          "position": "MF",
+          "club_name": "Royal Antwerp FC (BEL)"
+        },
+        {
+          "name": "YEBOAH ZAMORA",
+          "position": "FW",
+          "club_name": "Venezia FC (ITA)"
+        },
+        {
+          "name": "MINDA",
+          "position": "MF",
+          "club_name": "Atlético Mineiro (BRA)"
+        },
+        {
+          "name": "MEDINA",
+          "position": "DF",
+          "club_name": "KRC Genk (BEL)"
+        }
+      ]
+    },
+    {
+      "team_id": 30,
+      "team_name": "Curaçao",
+      "fifa_code": "CUR",
+      "generated_count": 26,
+      "nbc_count": 26,
+      "worldcupranking_count": 26,
+      "matched_count": 24,
+      "nbc_only": [
+        {
+          "name": "Tyrese Noslin",
+          "position": "MF",
+          "club_name": "SC Telstar"
+        },
+        {
+          "name": "Tahith Chong",
+          "position": "FW",
+          "club_name": "Sheffield United"
+        }
+      ],
+      "worldcupranking_only": [
+        {
+          "name": "NOSLIN",
+          "position": "FW",
+          "club_name": "SC Telstar (NED)"
+        },
+        {
+          "name": "CHONG",
+          "position": "MF",
+          "club_name": "She\u0000eld United FC (ENG)"
+        }
+      ]
+    },
+    {
+      "team_id": 37,
+      "team_name": "Netherlands",
+      "fifa_code": "NED",
+      "generated_count": 26,
+      "nbc_count": 26,
+      "worldcupranking_count": 26,
+      "matched_count": 23,
+      "nbc_only": [
+        {
+          "name": "Noa Lang",
+          "position": "MF",
+          "club_name": "Galatasaray"
+        },
+        {
+          "name": "Mats Wieffer",
+          "position": "MF",
+          "club_name": "Brighton & Hove Albion"
+        },
+        {
+          "name": "Justin Kluivert",
+          "position": "FW",
+          "club_name": "Bournemouth"
+        }
+      ],
+      "worldcupranking_only": [
+        {
+          "name": "KLUIVERT",
+          "position": "MF",
+          "club_name": "AFC Bournemouth (ENG)"
+        },
+        {
+          "name": "WIEFFER",
+          "position": "DF",
+          "club_name": "Brighton & Hove Albion FC (ENG)"
+        },
+        {
+          "name": "LANG",
+          "position": "FW",
+          "club_name": "Galatasaray SK (TUR)"
+        }
+      ]
+    },
+    {
+      "team_id": 15,
+      "team_name": "Japan",
+      "fifa_code": "JPN",
+      "generated_count": 26,
+      "nbc_count": 26,
+      "worldcupranking_count": 26,
+      "matched_count": 22,
+      "nbc_only": [
+        {
+          "name": "Ito Junya",
+          "position": "FW",
+          "club_name": "Genk"
+        },
+        {
+          "name": "Kubo Takefusa",
+          "position": "FW",
+          "club_name": "Real Sociedad"
+        },
+        {
+          "name": "Suzuki Yuito",
+          "position": "FW",
+          "club_name": "Freiburg"
+        },
+        {
+          "name": "Maeda Daizen",
+          "position": "FW",
+          "club_name": "Celtic"
+        }
+      ],
+      "worldcupranking_only": [
+        {
+          "name": "KUBO",
+          "position": "MF",
+          "club_name": "Real Sociedad (ESP)"
+        },
+        {
+          "name": "DAIZEN",
+          "position": "MF",
+          "club_name": "Celtic FC (SCO)"
+        },
+        {
+          "name": "ITO",
+          "position": "MF",
+          "club_name": "KRC Genk (BEL)"
+        },
+        {
+          "name": "Y. SUZUKI",
+          "position": "MF",
+          "club_name": "SC Freiburg (GER)"
+        }
+      ]
+    },
+    {
+      "team_id": 34,
+      "team_name": "Sweden",
+      "fifa_code": "SWE",
+      "generated_count": 26,
+      "nbc_count": 26,
+      "worldcupranking_count": 26,
+      "matched_count": 21,
+      "nbc_only": [
+        {
+          "name": "Emil Holm",
+          "position": "DF",
+          "club_name": "Juventus"
+        },
+        {
+          "name": "Jesper Kalstrom",
+          "position": "MF",
+          "club_name": "Udinese"
+        },
+        {
+          "name": "Alexander Bernhardsson",
+          "position": "FW",
+          "club_name": "Holstein Kiel"
+        },
+        {
+          "name": "Benjamin Nygren",
+          "position": "FW",
+          "club_name": "Celtic"
+        },
+        {
+          "name": "Ken Sema",
+          "position": "FW",
+          "club_name": "Pafos"
+        }
+      ],
+      "worldcupranking_only": [
+        {
+          "name": "H. JOHANSSON",
+          "position": "DF",
+          "club_name": "FC Dallas (USA)"
+        },
+        {
+          "name": "NYGREN",
+          "position": "MF",
+          "club_name": "Celtic FC (SCO)"
+        },
+        {
+          "name": "SEMA",
+          "position": "MF",
+          "club_name": "Pafos FC (CYP)"
+        },
+        {
+          "name": "KARLSTRÖM",
+          "position": "MF",
+          "club_name": "Udinese (ITA)"
+        },
+        {
+          "name": "BERNHARDSSON",
+          "position": "DF",
+          "club_name": "Holstein Kiel (GER)"
+        }
+      ]
+    },
+    {
+      "team_id": 36,
+      "team_name": "Tunisia",
+      "fifa_code": "TUN",
+      "generated_count": 26,
+      "nbc_count": 26,
+      "worldcupranking_count": 26,
+      "matched_count": 19,
+      "nbc_only": [
+        {
+          "name": "Sabri Ben Hessen",
+          "position": "GK",
+          "club_name": "Etoile Sahel"
+        },
+        {
+          "name": "Aymen Dahman",
+          "position": "GK",
+          "club_name": "CS Sfaxien"
+        },
+        {
+          "name": "Mohamed Amine Ben Hamida",
+          "position": "DF",
+          "club_name": "Esperance"
+        },
+        {
+          "name": "Mortadha Ben Ouanes",
+          "position": "MF",
+          "club_name": "Kasimpasa"
+        },
+        {
+          "name": "Mohamed Hadj Mahmoud",
+          "position": "MF",
+          "club_name": "Lugano"
+        },
+        {
+          "name": "Khalil Ayari",
+          "position": "FW",
+          "club_name": "Paris St Germain"
+        },
+        {
+          "name": "Sebastian Tounekti",
+          "position": "FW",
+          "club_name": "Celtic"
+        }
+      ],
+      "worldcupranking_only": [
+        {
+          "name": "BEN OUANES",
+          "position": "DF",
+          "club_name": "Kasımpa ş a SK (TUR)"
+        },
+        {
+          "name": "AYARI",
+          "position": "MF",
+          "club_name": "Paris Saint-Germain (FRA)"
+        },
+        {
+          "name": "BELHADJ MAHMOUD",
+          "position": "MF",
+          "club_name": "FC Lugano (SUI)"
+        },
+        {
+          "name": "DAHMEN",
+          "position": "GK",
+          "club_name": "CS Sfaxien (TUN)"
+        },
+        {
+          "name": "BEN HMIDA",
+          "position": "DF",
+          "club_name": "Espérance De Tunisie (TUN)"
+        },
+        {
+          "name": "BEN HSAN",
+          "position": "GK",
+          "club_name": "Étoile Du Sahel (TUN)"
+        },
+        {
+          "name": "TOUNEKTI",
+          "position": "MF",
+          "club_name": "Celtic FC (SCO)"
+        }
+      ]
+    },
+    {
+      "team_id": 45,
+      "team_name": "Belgium",
+      "fifa_code": "BEL",
+      "generated_count": 26,
+      "nbc_count": 26,
+      "worldcupranking_count": 26,
+      "matched_count": 23,
+      "nbc_only": [
+        {
+          "name": "Arthur Theate",
+          "position": "DF",
+          "club_name": "Eintracht Frankfurt"
+        },
+        {
+          "name": "Diego Moreira",
+          "position": "FW",
+          "club_name": "Strasbourg"
+        },
+        {
+          "name": "Alexis Saelemaekers",
+          "position": "FW",
+          "club_name": "AC Milan"
+        }
+      ],
+      "worldcupranking_only": [
+        {
+          "name": "THIATE",
+          "position": "DF",
+          "club_name": "Eintracht Frankfurt (GER)"
+        },
+        {
+          "name": "MOREIRA",
+          "position": "MF",
+          "club_name": "RC Strasbourg (FRA)"
+        },
+        {
+          "name": "SAELEMAEKERS",
+          "position": "MF",
+          "club_name": "AC Milan (ITA)"
+        }
+      ]
+    },
+    {
+      "team_id": 26,
+      "team_name": "Iran",
+      "fifa_code": "IRN",
+      "generated_count": 26,
+      "nbc_count": 26,
+      "worldcupranking_count": 26,
+      "matched_count": 19,
+      "nbc_only": [
+        {
+          "name": "Ehsan Hajsafi",
+          "position": "DF",
+          "club_name": "Sepahan"
+        },
+        {
+          "name": "Hossein Kanaani",
+          "position": "DF",
+          "club_name": "Persepolis"
+        },
+        {
+          "name": "Rouzbeh Cheshmi",
+          "position": "MF",
+          "club_name": "Esteghlal"
+        },
+        {
+          "name": "Mehdi Ghaedi",
+          "position": "MF",
+          "club_name": "Al-Nasr"
+        },
+        {
+          "name": "Saman Ghoddos",
+          "position": "MF",
+          "club_name": "Kalba"
+        },
+        {
+          "name": "Amir Mohammad Razzaghinia",
+          "position": "MF",
+          "club_name": "Esteghlal"
+        },
+        {
+          "name": "Aria Yousefi",
+          "position": "MF",
+          "club_name": "Sepahan"
+        }
+      ],
+      "worldcupranking_only": [
+        {
+          "name": "E. HAJISAFI",
+          "position": "DF",
+          "club_name": "Sepahan SC (IRN)"
+        },
+        {
+          "name": "MEHDI GHAYEDI",
+          "position": "FW",
+          "club_name": "Al Nasr SC (UAE)"
+        },
+        {
+          "name": "KANANI",
+          "position": "DF",
+          "club_name": "Persepolis FC (IRN)"
+        },
+        {
+          "name": "GHODDOOS",
+          "position": "MF",
+          "club_name": "Al Ittihad Kalba SCC (UAE)"
+        },
+        {
+          "name": "ROOZBEH",
+          "position": "MF",
+          "club_name": "Esteghlal Tehran FC (IRN)"
+        },
+        {
+          "name": "ARYA",
+          "position": "DF",
+          "club_name": "Sepahan SC (IRN)"
+        },
+        {
+          "name": "RAZAGH",
+          "position": "MF",
+          "club_name": "Esteghlal Tehran FC (IRN)"
+        }
+      ]
+    },
+    {
+      "team_id": 42,
+      "team_name": "Egypt",
+      "fifa_code": "EGY",
+      "generated_count": 26,
+      "nbc_count": 26,
+      "worldcupranking_count": 26,
+      "matched_count": 11,
+      "nbc_only": [
+        {
+          "name": "Mohamed El Shenawy",
+          "position": "GK",
+          "club_name": "Al Ahly"
+        },
+        {
+          "name": "Mostafa Shobeir",
+          "position": "GK",
+          "club_name": "Al Ahly"
+        },
+        {
+          "name": "Mohamed Hani",
+          "position": "DF",
+          "club_name": "Al Ahly"
+        },
+        {
+          "name": "Hamdy Fathy",
+          "position": "DF",
+          "club_name": "Al Wakrah"
+        },
+        {
+          "name": "Rami Rabia",
+          "position": "DF",
+          "club_name": "Al Ain"
+        },
+        {
+          "name": "Mohamed Abdelmonem",
+          "position": "DF",
+          "club_name": "Nice"
+        },
+        {
+          "name": "Ahmed Fotouh",
+          "position": "DF",
+          "club_name": "Zamalek"
+        },
+        {
+          "name": "Mohanad Lasheen",
+          "position": "MF",
+          "club_name": "Pyramids"
+        },
+        {
+          "name": "Nabil Emad",
+          "position": "MF",
+          "club_name": "Al Najma"
+        },
+        {
+          "name": "Ahmed Zizo",
+          "position": "MF",
+          "club_name": "Al Ahly"
+        },
+        {
+          "name": "Mostafa Ziko",
+          "position": "MF",
+          "club_name": "Pyramids"
+        },
+        {
+          "name": "Mahmoud Trezeguet",
+          "position": "MF",
+          "club_name": "Al Ahly"
+        },
+        {
+          "name": "Ibrahim Adel",
+          "position": "MF",
+          "club_name": "Nordsjaelland"
+        },
+        {
+          "name": "Haissem Hassan",
+          "position": "MF",
+          "club_name": "Real Ovideo"
+        },
+        {
+          "name": "Aqtay Abdallah",
+          "position": "FW",
+          "club_name": "Enppi"
+        }
+      ],
+      "worldcupranking_only": [
+        {
+          "name": "M. ELSHENAWY",
+          "position": "GK",
+          "club_name": "Al Ahly FC (EGY)"
+        },
+        {
+          "name": "M. HANY",
+          "position": "DF",
+          "club_name": "Al Ahly FC (EGY)"
+        },
+        {
+          "name": "R. RABIAA",
+          "position": "DF",
+          "club_name": "Al Ain FC (UAE)"
+        },
+        {
+          "name": "M. ABDELMONEIM",
+          "position": "DF",
+          "club_name": "OGC Nice (FRA)"
+        },
+        {
+          "name": "M. TREZEGUET",
+          "position": "FW",
+          "club_name": "Al Ahly FC (EGY)"
+        },
+        {
+          "name": "ZICO",
+          "position": "MF",
+          "club_name": "Pyramids FC (EGY)"
+        },
+        {
+          "name": "H. HASSAN",
+          "position": "FW",
+          "club_name": "Real Oviedo (ESP)"
+        },
+        {
+          "name": "A. FATOUH",
+          "position": "DF",
+          "club_name": "Zamalek SC (EGY)"
+        },
+        {
+          "name": "H. FATHY",
+          "position": "MF",
+          "club_name": "Al Wakrah SC (QAT)"
+        },
+        {
+          "name": "M. SOLIMAN",
+          "position": "GK",
+          "club_name": "Zamalek SC (EGY)"
+        },
+        {
+          "name": "M. LASHIN",
+          "position": "MF",
+          "club_name": "Pyramids FC (EGY)"
+        },
+        {
+          "name": "DONGA",
+          "position": "MF",
+          "club_name": "Al Najmah SC (KSA)"
+        },
+        {
+          "name": "I. ADEL",
+          "position": "FW",
+          "club_name": "FC Nordsjælland (DEN)"
+        },
+        {
+          "name": "SHOUBIR",
+          "position": "GK",
+          "club_name": "Al Ahly FC (EGY)"
+        },
+        {
+          "name": "ZIZO",
+          "position": "FW",
+          "club_name": "Al Ahly FC (EGY)"
+        }
+      ]
+    },
+    {
+      "team_id": 7,
+      "team_name": "New Zealand",
+      "fifa_code": "NZL",
+      "generated_count": 26,
+      "nbc_count": 26,
+      "worldcupranking_count": 26,
+      "matched_count": 21,
+      "nbc_only": [
+        {
+          "name": "Matt Garbett",
+          "position": "FW",
+          "club_name": "Peterborough United"
+        },
+        {
+          "name": "Sarpreet Singh",
+          "position": "FW",
+          "club_name": "Wellington Phoenix"
+        },
+        {
+          "name": "Eli Just",
+          "position": "FW",
+          "club_name": "Motherwell FC"
+        },
+        {
+          "name": "Ben Old",
+          "position": "FW",
+          "club_name": "Saint-Étienne"
+        },
+        {
+          "name": "Callum McCowatt",
+          "position": "FW",
+          "club_name": "Silkeborg"
+        }
+      ],
+      "worldcupranking_only": [
+        {
+          "name": "GARBETT",
+          "position": "MF",
+          "club_name": "Peterborough United FC (ENG)"
+        },
+        {
+          "name": "SINGH",
+          "position": "MF",
+          "club_name": "Wellington Phoenix FC (NZL)"
+        },
+        {
+          "name": "JUST",
+          "position": "MF",
+          "club_name": "Motherwell FC (SCO)"
+        },
+        {
+          "name": "OLD",
+          "position": "MF",
+          "club_name": "AS Saint-Etienne (FRA)"
+        },
+        {
+          "name": "MCCOWATT",
+          "position": "MF",
+          "club_name": "Silkeborg IF (DEN)"
+        }
+      ]
+    },
+    {
+      "team_id": 29,
+      "team_name": "Spain",
+      "fifa_code": "ESP",
+      "generated_count": 26,
+      "nbc_count": 26,
+      "worldcupranking_count": 26,
+      "matched_count": 22,
+      "nbc_only": [
+        {
+          "name": "Eric Garcia",
+          "position": "DF",
+          "club_name": "Barcelona"
+        },
+        {
+          "name": "Rodri",
+          "position": "MF",
+          "club_name": "Manchester City"
+        },
+        {
+          "name": "Nico Williams",
+          "position": "FW",
+          "club_name": "Athletic Bilbao"
+        },
+        {
+          "name": "Yeremy Pino",
+          "position": "FW",
+          "club_name": "Crystal Palace"
+        }
+      ],
+      "worldcupranking_only": [
+        {
+          "name": "JEREMY",
+          "position": "FW",
+          "club_name": "Crystal Palace FC (ENG)"
+        },
+        {
+          "name": "LAPORTE",
+          "position": "DF",
+          "club_name": "Athletic Club (ESP)"
+        },
+        {
+          "name": "RODRIGO",
+          "position": "MF",
+          "club_name": "Manchester City FC (ENG)"
+        },
+        {
+          "name": "WILLIAMS JR",
+          "position": "FW",
+          "club_name": "Athletic Club (ESP)"
+        }
+      ]
+    },
+    {
+      "team_id": 24,
+      "team_name": "Uruguay",
+      "fifa_code": "URU",
+      "generated_count": 26,
+      "nbc_count": 26,
+      "worldcupranking_count": 26,
+      "matched_count": 23,
+      "nbc_only": [
+        {
+          "name": "Joaquin Piquerez",
+          "position": "DF",
+          "club_name": "Palmeiras"
+        },
+        {
+          "name": "Facundo Pellistri",
+          "position": "MF",
+          "club_name": "Panathinaikos"
+        },
+        {
+          "name": "Brian Rodriguez",
+          "position": "MF",
+          "club_name": "CF America"
+        }
+      ],
+      "worldcupranking_only": [
+        {
+          "name": "F. PELLISTRI",
+          "position": "FW",
+          "club_name": "Panathinaikos FC (GRE)"
+        },
+        {
+          "name": "B. RODRÍGUEZ",
+          "position": "FW",
+          "club_name": "Club América (MEX)"
+        },
+        {
+          "name": "J. PIQUEREZ",
+          "position": "MF",
+          "club_name": "SE Palmeiras (BRA)"
+        }
+      ]
+    },
+    {
+      "team_id": 10,
+      "team_name": "Saudi Arabia",
+      "fifa_code": "KSA",
+      "generated_count": 26,
+      "nbc_count": 26,
+      "worldcupranking_count": 26,
+      "matched_count": 14,
+      "nbc_only": [
+        {
+          "name": "Nawaf Al Aqidi",
+          "position": "GK",
+          "club_name": "Al-Nassr"
+        },
+        {
+          "name": "Mohamed Al Owais",
+          "position": "GK",
+          "club_name": "Al-Ula"
+        },
+        {
+          "name": "Abdulelah Al Amri",
+          "position": "DF",
+          "club_name": "Al-Nassr"
+        },
+        {
+          "name": "Hassan Tambakti",
+          "position": "DF",
+          "club_name": "Al-Hilal"
+        },
+        {
+          "name": "Hassan Kadesh",
+          "position": "DF",
+          "club_name": "Al-Ittihad"
+        },
+        {
+          "name": "Abdullah Al Khaibari",
+          "position": "MF",
+          "club_name": "Al-Nassr"
+        },
+        {
+          "name": "Alaa ⁠Al Hejji",
+          "position": "MF",
+          "club_name": "Neom"
+        },
+        {
+          "name": "Sultan Mandash",
+          "position": "MF",
+          "club_name": "Al-Hilal"
+        },
+        {
+          "name": "Ayman Yahya",
+          "position": "MF",
+          "club_name": "Al-Nassr"
+        },
+        {
+          "name": "Khalid Al Ghannam",
+          "position": "MF",
+          "club_name": "Al-Ettifaq"
+        },
+        {
+          "name": "Abdullah Al Hamdan",
+          "position": "FW",
+          "club_name": "Al-Nassr"
+        },
+        {
+          "name": "Saleh Al Shehri",
+          "position": "FW",
+          "club_name": "Al-Ittihad"
+        }
+      ],
+      "worldcupranking_only": [
+        {
+          "name": "ALAQIDI",
+          "position": "GK",
+          "club_name": "Al Nassr FC (KSA)"
+        },
+        {
+          "name": "ALAMRI",
+          "position": "DF",
+          "club_name": "Al Nassr FC (KSA)"
+        },
+        {
+          "name": "ALTAMBAKTI",
+          "position": "DF",
+          "club_name": "Al Hilal SC (KSA)"
+        },
+        {
+          "name": "AIMAN",
+          "position": "FW",
+          "club_name": "Al Nassr FC (KSA)"
+        },
+        {
+          "name": "ALSHEHRI",
+          "position": "FW",
+          "club_name": "Al Ittihad (KSA)"
+        },
+        {
+          "name": "KADISH",
+          "position": "DF",
+          "club_name": "Al Ittihad (KSA)"
+        },
+        {
+          "name": "ALKHAIBARI",
+          "position": "MF",
+          "club_name": "Al Nassr FC (KSA)"
+        },
+        {
+          "name": "KHALID",
+          "position": "FW",
+          "club_name": "Al Ettifaq FC (KSA)"
+        },
+        {
+          "name": "ALHAJJI",
+          "position": "MF",
+          "club_name": "Neom SC (KSA)"
+        },
+        {
+          "name": "ALHAMDDAN",
+          "position": "FW",
+          "club_name": "Al Nassr FC (KSA)"
+        },
+        {
+          "name": "MANDASH",
+          "position": "FW",
+          "club_name": "Al Hilal SC (KSA)"
+        },
+        {
+          "name": "ALOWAIS",
+          "position": "GK",
+          "club_name": "Al Ula Saudi FC (KSA)"
+        }
+      ]
+    },
+    {
+      "team_id": 35,
+      "team_name": "Cape Verde",
+      "fifa_code": "CPV",
+      "generated_count": 26,
+      "nbc_count": 26,
+      "worldcupranking_count": 26,
+      "matched_count": 18,
+      "nbc_only": [
+        {
+          "name": "Carlos Santos",
+          "position": "GK",
+          "club_name": "San Diego"
+        },
+        {
+          "name": "Joao Paulo Fernandes",
+          "position": "DF",
+          "club_name": "FCSB"
+        },
+        {
+          "name": "Roberto Lopes “Pico”",
+          "position": "DF",
+          "club_name": "Shamrock Rovers"
+        },
+        {
+          "name": "Willy Semedo",
+          "position": "FW",
+          "club_name": "Omonia"
+        },
+        {
+          "name": "Garry Rodrigues",
+          "position": "FW",
+          "club_name": "Apollon Limassol"
+        },
+        {
+          "name": "Jovane Cabral",
+          "position": "FW",
+          "club_name": "Estrela Amadora"
+        },
+        {
+          "name": "Nuno Da Costa",
+          "position": "FW",
+          "club_name": "İstanbul Basaksehir"
+        },
+        {
+          "name": "Helio Varela",
+          "position": "FW",
+          "club_name": "Maccabi Tel Aviv"
+        }
+      ],
+      "worldcupranking_only": [
+        {
+          "name": "JOVANE",
+          "position": "MF",
+          "club_name": "CF Estrela Da Amadora (POR)"
+        },
+        {
+          "name": "JOAO PAULO",
+          "position": "MF",
+          "club_name": "FC FCSB (ROU)"
+        },
+        {
+          "name": "RODRIGUES",
+          "position": "MF",
+          "club_name": "Apollon Limassol (CYP)"
+        },
+        {
+          "name": "LOPES CABRAL",
+          "position": "DF",
+          "club_name": "SL Ben\u0000ca (POR)"
+        },
+        {
+          "name": "SEMEDO",
+          "position": "MF",
+          "club_name": "AC Omonia (CYP)"
+        },
+        {
+          "name": "DA COSTA",
+          "position": "MF",
+          "club_name": "Ba ş ak ş ehir FK (TUR)"
+        },
+        {
+          "name": "DOS SANTOS",
+          "position": "GK",
+          "club_name": "San Diego FC (USA)"
+        },
+        {
+          "name": "HÉLIO",
+          "position": "MF",
+          "club_name": "Maccabi Tel-Aviv FC (ISR)"
+        }
+      ]
+    },
+    {
+      "team_id": 21,
+      "team_name": "France",
+      "fifa_code": "FRA",
+      "generated_count": 26,
+      "nbc_count": 26,
+      "worldcupranking_count": 26,
+      "matched_count": 24,
+      "nbc_only": [
+        {
+          "name": "Maghnes Akliouche",
+          "position": "FW",
+          "club_name": "Monaco"
+        },
+        {
+          "name": "Rayan Cherki",
+          "position": "FW",
+          "club_name": "Manchester City"
+        }
+      ],
+      "worldcupranking_only": [
+        {
+          "name": "CHERKI",
+          "position": "MF",
+          "club_name": "Manchester City FC (ENG)"
+        },
+        {
+          "name": "AKLIOUCHE",
+          "position": "MF",
+          "club_name": "AS Monaco (FRA)"
+        }
+      ]
+    },
+    {
+      "team_id": 4,
+      "team_name": "Senegal",
+      "fifa_code": "SEN",
+      "generated_count": 26,
+      "nbc_count": 28,
+      "worldcupranking_count": 26,
+      "matched_count": 26,
+      "nbc_only": [
+        {
+          "name": "Moustapha Mbow",
+          "position": "DF",
+          "club_name": "Paris FC"
+        },
+        {
+          "name": "Ilay Camara",
+          "position": "DF",
+          "club_name": "Anderlecht"
+        }
+      ],
+      "worldcupranking_only": []
+    },
+    {
+      "team_id": 47,
+      "team_name": "Norway",
+      "fifa_code": "NOR",
+      "generated_count": 26,
+      "nbc_count": 26,
+      "worldcupranking_count": 26,
+      "matched_count": 21,
+      "nbc_only": [
+        {
+          "name": "Julian Ryerson",
+          "position": "DF",
+          "club_name": "Borussia Dortmund"
+        },
+        {
+          "name": "Kristoffer Ajer",
+          "position": "DF",
+          "club_name": "Brentford"
+        },
+        {
+          "name": "Patrick Berg",
+          "position": "MF",
+          "club_name": "Bodo/Glimt"
+        },
+        {
+          "name": "Erling Haaland",
+          "position": "FW",
+          "club_name": "Manchester City"
+        },
+        {
+          "name": "Oscar Bobb",
+          "position": "FW",
+          "club_name": "Fulham"
+        }
+      ],
+      "worldcupranking_only": [
+        {
+          "name": "VASSBAKK AJER",
+          "position": "DF",
+          "club_name": "Brentford FC (ENG)"
+        },
+        {
+          "name": "BERGE",
+          "position": "MF",
+          "club_name": "Fulham FC (ENG)"
+        },
+        {
+          "name": "BRAUT HAALAND",
+          "position": "FW",
+          "club_name": "Manchester City FC (ENG)"
+        },
+        {
+          "name": "BOBB",
+          "position": "MF",
+          "club_name": "Fulham FC (ENG)"
+        },
+        {
+          "name": "RYERSON",
+          "position": "FW",
+          "club_name": "Borussia Dortmund (GER)"
+        }
+      ]
+    },
+    {
+      "team_id": 38,
+      "team_name": "Iraq",
+      "fifa_code": "IRQ",
+      "generated_count": 26,
+      "nbc_count": 26,
+      "worldcupranking_count": 26,
+      "matched_count": 22,
+      "nbc_only": [
+        {
+          "name": "Manaf Younis",
+          "position": "DF",
+          "club_name": "Al-Shorta"
+        },
+        {
+          "name": "Zaid ⁠Ismail",
+          "position": "DF",
+          "club_name": "Al-Talaba"
+        },
+        {
+          "name": "Ahmed Qasem",
+          "position": "MF",
+          "club_name": "Nashville SC"
+        },
+        {
+          "name": "Marko ⁠Farji",
+          "position": "MF",
+          "club_name": "Venezia"
+        }
+      ],
+      "worldcupranking_only": [
+        {
+          "name": "MUNAF",
+          "position": "DF",
+          "club_name": "Al Shorta SC (IRQ)"
+        },
+        {
+          "name": "AHMED Q.",
+          "position": "FW",
+          "club_name": "Nashville SC (USA)"
+        },
+        {
+          "name": "MARKO",
+          "position": "FW",
+          "club_name": "Venezia FC (ITA)"
+        },
+        {
+          "name": "ZAID I.",
+          "position": "MF",
+          "club_name": "Al Talaba SC (IRQ)"
+        }
+      ]
+    },
+    {
+      "team_id": 17,
+      "team_name": "Argentina",
+      "fifa_code": "ARG",
+      "generated_count": 26,
+      "nbc_count": 26,
+      "worldcupranking_count": 26,
+      "matched_count": 25,
+      "nbc_only": [
+        {
+          "name": "Nicolas Gonzalez",
+          "position": "FW",
+          "club_name": "Atletico de Madrid"
+        }
+      ],
+      "worldcupranking_only": [
+        {
+          "name": "N. GONZÁLEZ",
+          "position": "MF",
+          "club_name": "Atlético De Madrid (ESP)"
+        }
+      ]
+    },
+    {
+      "team_id": 32,
+      "team_name": "Austria",
+      "fifa_code": "AUT",
+      "generated_count": 26,
+      "nbc_count": 26,
+      "worldcupranking_count": 26,
+      "matched_count": 24,
+      "nbc_only": [
+        {
+          "name": "Alexander Prass",
+          "position": "DF",
+          "club_name": "TSG Hoffenheim"
+        },
+        {
+          "name": "Patrick Wimmer",
+          "position": "MF",
+          "club_name": "VfL Wolfsburg"
+        }
+      ],
+      "worldcupranking_only": [
+        {
+          "name": "WIMMER",
+          "position": "FW",
+          "club_name": "VfL Wolfsburg (GER)"
+        },
+        {
+          "name": "PRASS",
+          "position": "MF",
+          "club_name": "TSG Hoffenheim (GER)"
+        }
+      ]
+    },
+    {
+      "team_id": 3,
+      "team_name": "Algeria",
+      "fifa_code": "ALG",
+      "generated_count": 26,
+      "nbc_count": 26,
+      "worldcupranking_count": 26,
+      "matched_count": 25,
+      "nbc_only": [
+        {
+          "name": "Amine Gouiri",
+          "position": "FW",
+          "club_name": "Olympique Marseilla"
+        }
+      ],
+      "worldcupranking_only": [
+        {
+          "name": "GHOURI",
+          "position": "FW",
+          "club_name": "Olympique Marseille (FRA)"
+        }
+      ]
+    },
+    {
+      "team_id": 43,
+      "team_name": "Jordan",
+      "fifa_code": "JOR",
+      "generated_count": 26,
+      "nbc_count": 26,
+      "worldcupranking_count": 26,
+      "matched_count": 10,
+      "nbc_only": [
+        {
+          "name": "Yazid Abulaila",
+          "position": "GK",
+          "club_name": "Al-Hussein"
+        },
+        {
+          "name": "Abdallah Al Fakhouri",
+          "position": "GK",
+          "club_name": "Al-Wehdat"
+        },
+        {
+          "name": "Nour Bani Attiah",
+          "position": "GK",
+          "club_name": "Al-Faisaly"
+        },
+        {
+          "name": "Mohammad Abualnadi",
+          "position": "DF",
+          "club_name": "Selangor"
+        },
+        {
+          "name": "Husam Abu Dahab",
+          "position": "DF",
+          "club_name": "Al-Samiya"
+        },
+        {
+          "name": "Mohammad Abu Hashish",
+          "position": "DF",
+          "club_name": "Al-Karma"
+        },
+        {
+          "name": "Yazan Al Arab",
+          "position": "DF",
+          "club_name": "Seoul"
+        },
+        {
+          "name": "Saleem Obaid",
+          "position": "DF",
+          "club_name": "Al-Hussein"
+        },
+        {
+          "name": "Saed Al-Rosan",
+          "position": "DF",
+          "club_name": null
+        },
+        {
+          "name": "Anas Banawi",
+          "position": "DF",
+          "club_name": "Al-Faisaly"
+        },
+        {
+          "name": "Mohannad Abu Taha",
+          "position": "DF",
+          "club_name": "Al-Quwa Al-Jawiya"
+        },
+        {
+          "name": "Mohammad Al Dawoud",
+          "position": "MF",
+          "club_name": "Al-Wehdat"
+        },
+        {
+          "name": "Noor Al Rawabdeh",
+          "position": "MF",
+          "club_name": "Selangor"
+        },
+        {
+          "name": "Mahmoud Al-Mardi",
+          "position": "MF",
+          "club_name": "Al-Hussein"
+        },
+        {
+          "name": "Mousa Al Tamari",
+          "position": "FW",
+          "club_name": "Rennes"
+        },
+        {
+          "name": "Mohammad Abu Zrayq",
+          "position": "FW",
+          "club_name": "Raja Casablanca"
+        }
+      ],
+      "worldcupranking_only": [
+        {
+          "name": "YAZEED",
+          "position": "GK",
+          "club_name": "Al Hussein SC (JOR)"
+        },
+        {
+          "name": "ABU HASHEESH",
+          "position": "DF",
+          "club_name": "Al Karma SC (IRQ)"
+        },
+        {
+          "name": "ABU DHAB",
+          "position": "DF",
+          "club_name": "Al Faisaly SC (JOR)"
+        },
+        {
+          "name": "ALARAB",
+          "position": "DF",
+          "club_name": "FC Seoul (KOR)"
+        },
+        {
+          "name": "ABU ZRAIQ",
+          "position": "FW",
+          "club_name": "Raja Casablanca (MAR)"
+        },
+        {
+          "name": "ALRAWABDEH",
+          "position": "MF",
+          "club_name": "Selangor FC (MAS)"
+        },
+        {
+          "name": "ALTAMARI",
+          "position": "FW",
+          "club_name": "Stade Rennais FC (FRA)"
+        },
+        {
+          "name": "BANI ATEYAH",
+          "position": "GK",
+          "club_name": "Al Faisaly SC (JOR)"
+        },
+        {
+          "name": "ALMARDI",
+          "position": "FW",
+          "club_name": "Al Hussein SC (JOR)"
+        },
+        {
+          "name": "ABULNADI",
+          "position": "DF",
+          "club_name": "Selangor FC (MAS)"
+        },
+        {
+          "name": "SALEM",
+          "position": "DF",
+          "club_name": "Al Hussein SC (JOR)"
+        },
+        {
+          "name": "SAEED",
+          "position": "DF",
+          "club_name": "Al Hussein SC (JOR)"
+        },
+        {
+          "name": "ABU TAHA",
+          "position": "MF",
+          "club_name": "Al-Quwa Al-Jawiya (IRQ)"
+        },
+        {
+          "name": "ALFAKHORI",
+          "position": "GK",
+          "club_name": "Al Wahdat SC (JOR)"
+        },
+        {
+          "name": "ALDAOUD",
+          "position": "MF",
+          "club_name": "Al Wahdat SC (JOR)"
+        },
+        {
+          "name": "BADAWI",
+          "position": "DF",
+          "club_name": "Al Faisaly SC (JOR)"
+        }
+      ]
+    },
+    {
+      "team_id": 33,
+      "team_name": "Portugal",
+      "fifa_code": "POR",
+      "generated_count": 26,
+      "nbc_count": 26,
+      "worldcupranking_count": 26,
+      "matched_count": 24,
+      "nbc_only": [
+        {
+          "name": "Matheus Nunes",
+          "position": "DF",
+          "club_name": "Manchester City"
+        },
+        {
+          "name": "Samuel Costa",
+          "position": "MF",
+          "club_name": "Mallorca"
+        }
+      ],
+      "worldcupranking_only": [
+        {
+          "name": "MATHEUS N.",
+          "position": "MF",
+          "club_name": "Manchester City FC (ENG)"
+        },
+        {
+          "name": "SAMU",
+          "position": "DF",
+          "club_name": "RCD Mallorca (ESP)"
+        }
+      ]
+    },
+    {
+      "team_id": 27,
+      "team_name": "Colombia",
+      "fifa_code": "COL",
+      "generated_count": 26,
+      "nbc_count": 23,
+      "worldcupranking_count": 26,
+      "matched_count": 21,
+      "nbc_only": [
+        {
+          "name": "Jaminton Campaz",
+          "position": "MF",
+          "club_name": "Rosario Central"
+        },
+        {
+          "name": "Jhon Arias",
+          "position": "FW",
+          "club_name": "Wolverhampton Wanderers"
+        }
+      ],
+      "worldcupranking_only": [
+        {
+          "name": "J. ARIAS",
+          "position": "MF",
+          "club_name": "SE Palmeiras (BRA)"
+        },
+        {
+          "name": "PUERTA",
+          "position": "DF",
+          "club_name": "Racing Santander (ESP)"
+        },
+        {
+          "name": "PORTILLA",
+          "position": "MF",
+          "club_name": "Athletico Paranaense (BRA)"
+        },
+        {
+          "name": "CAMPAZ",
+          "position": "FW",
+          "club_name": "CA Rosario Central (ARG)"
+        },
+        {
+          "name": "SUAREZ",
+          "position": "FW",
+          "club_name": "Sporting CP (POR)"
+        }
+      ]
+    },
+    {
+      "team_id": 40,
+      "team_name": "DR Congo",
+      "fifa_code": "COD",
+      "generated_count": 26,
+      "nbc_count": 26,
+      "worldcupranking_count": 26,
+      "matched_count": 23,
+      "nbc_only": [
+        {
+          "name": "Rocky Bushiri",
+          "position": "DF",
+          "club_name": "Hibernian"
+        },
+        {
+          "name": "Brian Cipenga",
+          "position": "MF",
+          "club_name": "Castellón"
+        },
+        {
+          "name": "Gael Kakuta",
+          "position": "MF",
+          "club_name": "Larissa"
+        }
+      ],
+      "worldcupranking_only": [
+        {
+          "name": "CIPENGA",
+          "position": "FW",
+          "club_name": "CD Castellón (ESP)"
+        },
+        {
+          "name": "KAKUTA",
+          "position": "FW",
+          "club_name": "AEL FC (GRE)"
+        },
+        {
+          "name": "TSHIBOLA",
+          "position": "MF",
+          "club_name": "Kilmarnock FC (SCO)"
+        }
+      ]
+    },
+    {
+      "team_id": 48,
+      "team_name": "Uzbekistan",
+      "fifa_code": "UZB",
+      "generated_count": 26,
+      "nbc_count": 26,
+      "worldcupranking_count": 26,
+      "matched_count": 24,
+      "nbc_only": [
+        {
+          "name": "Avazbek Ulmasaliev",
+          "position": "DF",
+          "club_name": "AGMK"
+        },
+        {
+          "name": "Odiljon Hamrobekov",
+          "position": "MF",
+          "club_name": "Tractor"
+        }
+      ],
+      "worldcupranking_only": [
+        {
+          "name": "XAMROBEKOV",
+          "position": "MF",
+          "club_name": "Tractor Sazi Tabriz FC (IRN)"
+        },
+        {
+          "name": "ULMASALIYEV",
+          "position": "DF",
+          "club_name": "OKMK FK (UZB)"
+        }
+      ]
+    },
+    {
+      "team_id": 20,
+      "team_name": "Croatia",
+      "fifa_code": "HRV",
+      "generated_count": 26,
+      "nbc_count": 26,
+      "worldcupranking_count": 26,
+      "matched_count": 25,
+      "nbc_only": [
+        {
+          "name": "Kristijan Jakic",
+          "position": "MF",
+          "club_name": "Augsburg"
+        }
+      ],
+      "worldcupranking_only": [
+        {
+          "name": "JAKIC",
+          "position": "DF",
+          "club_name": "FC Augsburg (GER)"
+        }
+      ]
+    },
+    {
+      "team_id": 2,
+      "team_name": "Panama",
+      "fifa_code": "PAN",
+      "generated_count": 26,
+      "nbc_count": 26,
+      "worldcupranking_count": 26,
+      "matched_count": 23,
+      "nbc_only": [
+        {
+          "name": "Carlos Harvey",
+          "position": "MF",
+          "club_name": "Minnesota United FC"
+        },
+        {
+          "name": "Azarias Londono",
+          "position": "MF",
+          "club_name": "CD Universidad Catolica"
+        },
+        {
+          "name": "Ismael Diaz",
+          "position": "FW",
+          "club_name": "Club Leon FC"
+        }
+      ],
+      "worldcupranking_only": [
+        {
+          "name": "ISMAEL",
+          "position": "MF",
+          "club_name": "Club León (MEX)"
+        },
+        {
+          "name": "HARVEY",
+          "position": "DF",
+          "club_name": "Minnesota United FC (USA)"
+        },
+        {
+          "name": "LONDONO",
+          "position": "FW",
+          "club_name": "CD Universidad Católica (ECU)"
+        }
+      ]
+    },
+    {
+      "team_id": 44,
+      "team_name": "Ghana",
+      "fifa_code": "GHA",
+      "generated_count": 26,
+      "nbc_count": 26,
+      "worldcupranking_count": 26,
+      "matched_count": 21,
+      "nbc_only": [
+        {
+          "name": "Marvin Senaya",
+          "position": "DF",
+          "club_name": "Auxerre"
+        },
+        {
+          "name": "Abdul Mumin",
+          "position": "DF",
+          "club_name": "Rayo Vallecano"
+        },
+        {
+          "name": "Kamaldeen Sulemana",
+          "position": "MF",
+          "club_name": "Atalanta BC"
+        },
+        {
+          "name": "Abdul Fatawu Issahaku",
+          "position": "MF",
+          "club_name": "Leicester City"
+        },
+        {
+          "name": "Antoine Semenyo",
+          "position": "FW",
+          "club_name": "Manchester City"
+        }
+      ],
+      "worldcupranking_only": [
+        {
+          "name": "SULEMAN",
+          "position": "DF",
+          "club_name": "Rayo Vallecano (ESP)"
+        },
+        {
+          "name": "FATAWU",
+          "position": "FW",
+          "club_name": "Leicester City FC (ENG)"
+        },
+        {
+          "name": "SEMENYO",
+          "position": "MF",
+          "club_name": "Manchester City FC (ENG)"
+        },
+        {
+          "name": "KAMALDEEN",
+          "position": "FW",
+          "club_name": "Atalanta Bergamo (ITA)"
+        },
+        {
+          "name": "SENEYA",
+          "position": "DF",
+          "club_name": "AJ Auxerre (FRA)"
+        }
+      ]
+    }
+  ]
+}
