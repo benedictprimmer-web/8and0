@@ -7,6 +7,7 @@ const BASE = import.meta.env.VITE_API_URL ?? "";
 function staticPath(apiPath: string): string | null {
   const p = apiPath.split("?")[0];
   if (p === "/api/health")                       return "/data/health.json";
+  if (p === "/api/leaderboard")                  return "/data/leaderboard.json";
   if (p === "/api/teams" || p === "/api/teams/") return "/data/teams.json";
   if (p.startsWith("/api/teams/groups"))         return "/data/groups.json";
   if (p.startsWith("/api/fixtures"))             return "/data/fixtures.json";
@@ -21,6 +22,7 @@ function staticPath(apiPath: string): string | null {
   if (p.startsWith("/api/matches/h2h"))           return "/data/h2h.json";
   if (/^\/api\/teams\/\d+\/coach$/.test(p))       return "/data/coaches.json";
   if (/^\/api\/teams\/\d+\/players$/.test(p))     return "/data/players.json";
+  if (p === "/api/leaderboard")                    return "/data/leaderboard.json";
   return null;
 }
 
