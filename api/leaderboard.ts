@@ -3,8 +3,10 @@ import { sanitiseSubmission, type LeaderboardEntry } from "../src/game8/leaderbo
 
 // ── Vercel serverless function: global leaderboard ───────────────────────────
 //
-//   GET  /api/leaderboard?limit=200   → { entries: LeaderboardEntry[], total }
-//   POST /api/leaderboard             → { entry, rank, total }
+//   GET  /api/leaderboard?limit=200&ids=seedA,seedB
+//        → { entries: LeaderboardEntry[], total, mine: RankedEntry[] }
+//   POST /api/leaderboard
+//        → { entry, rank, total }
 //
 // Storage (Upstash Redis):
 //   lb:all          sorted set, score = run score, member = entry id
@@ -55,29 +57,61 @@ function parseBody(body: unknown): unknown {
   return body;
 }
 
+function param(req: ApiRequest, key: string): string | undefined {
+  const value = req.query?.[key];
+  return Array.isArray(value) ? value[0] : value;
+}
+
+function parseEntry(raw: string | null): LeaderboardEntry | null {
+  if (!raw) return null;
+  try {
+    return JSON.parse(raw) as LeaderboardEntry;
+  } catch {
+    return null;
+  }
+}
+
+/** Look up specific entries (by id) plus their current global rank. */
+async function rankEntries(
+  ids: string[]
+): Promise<Array<{ entry: LeaderboardEntry; rank: number | null }>> {
+  const unique = Array.from(new Set(ids.filter(Boolean))).slice(0, 25);
+  if (unique.length === 0) return [];
+
+  const raw = await redis<(string | null)[]>(["MGET", ...unique.map((id) => `${ENTRY_PREFIX}${id}`)]);
+  const out: Array<{ entry: LeaderboardEntry; rank: number | null }> = [];
+  for (let i = 0; i < unique.length; i += 1) {
+    const entry = parseEntry(raw[i] ?? null);
+    if (!entry) continue;
+    const rank = await redis<number | null>(["ZREVRANK", ALL_KEY, unique[i]]);
+    out.push({ entry, rank: rank === null ? null : rank + 1 });
+  }
+  return out;
+}
+
 async function handleGet(req: ApiRequest, res: ApiResponse): Promise<void> {
-  const limitParam = req.query?.limit;
-  const limitRaw = Array.isArray(limitParam) ? limitParam[0] : limitParam;
+  const limitRaw = param(req, "limit");
   const limit = Math.max(1, Math.min(MAX_LIMIT, Number(limitRaw) || DEFAULT_LIMIT));
+
+  const idsRaw = param(req, "ids");
+  const mineIds = idsRaw ? idsRaw.split(",").map((s) => s.trim()).filter(Boolean) : [];
 
   const ids = await redis<string[]>(["ZREVRANGE", ALL_KEY, 0, limit - 1]);
   if (!ids || ids.length === 0) {
-    res.status(200).json({ entries: [], total: 0 });
+    const mine = mineIds.length > 0 ? await rankEntries(mineIds) : [];
+    res.status(200).json({ entries: [], total: 0, mine });
     return;
   }
 
   const raw = await redis<(string | null)[]>(["MGET", ...ids.map((id) => `${ENTRY_PREFIX}${id}`)]);
   const entries: LeaderboardEntry[] = [];
   for (const item of raw) {
-    if (!item) continue;
-    try {
-      entries.push(JSON.parse(item) as LeaderboardEntry);
-    } catch {
-      // skip corrupt rows
-    }
+    const entry = parseEntry(item);
+    if (entry) entries.push(entry);
   }
   const total = await redis<number>(["ZCARD", ALL_KEY]);
-  res.status(200).json({ entries, total });
+  const mine = mineIds.length > 0 ? await rankEntries(mineIds) : [];
+  res.status(200).json({ entries, total, mine });
 }
 
 async function handlePost(req: ApiRequest, res: ApiResponse): Promise<void> {
@@ -107,9 +141,17 @@ async function handlePost(req: ApiRequest, res: ApiResponse): Promise<void> {
   await pipeline([
     ["SET", `${ENTRY_PREFIX}${id}`, JSON.stringify(entry)],
     ["ZADD", ALL_KEY, entry.score, id],
-    // Keep only the top MAX_ENTRIES by score (drop lowest-ranked overflow).
-    ["ZREMRANGEBYRANK", ALL_KEY, 0, -(MAX_ENTRIES + 1)],
   ]);
+
+  // Trim to the top MAX_ENTRIES by score, deleting the orphaned entry blobs of
+  // any rows that fall off the bottom so they don't leak memory in Redis.
+  const overflowIds = await redis<string[]>(["ZRANGE", ALL_KEY, 0, -(MAX_ENTRIES + 1)]);
+  if (overflowIds.length > 0) {
+    await pipeline([
+      ["DEL", ...overflowIds.map((overflowId) => `${ENTRY_PREFIX}${overflowId}`)],
+      ["ZREMRANGEBYRANK", ALL_KEY, 0, -(MAX_ENTRIES + 1)],
+    ]);
+  }
 
   const rank = await redis<number | null>(["ZREVRANK", ALL_KEY, id]);
   const total = await redis<number>(["ZCARD", ALL_KEY]);

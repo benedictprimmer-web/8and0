@@ -36,6 +36,7 @@ import {
 import { FORMATIONS, getFormation } from "../game8/formations";
 import { calculateTeamRatings } from "../game8/ratings";
 import {
+  addMyGlobalEntry,
   shareText,
   loadHistory,
   loadPlayerName,
@@ -518,7 +519,13 @@ function GlobalSubmit({ run }: { run: TournamentRun }) {
         throw new Error(built.reason);
       }
       savePlayerName(built.submission.name);
-      return leaderboardApi.submit(built.submission);
+      const response = await leaderboardApi.submit(built.submission);
+      addMyGlobalEntry({
+        seed: built.submission.seed,
+        score: built.submission.score,
+        name: built.submission.name,
+      });
+      return response;
     },
   });
 

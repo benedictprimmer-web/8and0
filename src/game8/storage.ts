@@ -19,6 +19,40 @@ export function savePlayerName(name: string): void {
   }
 }
 
+export const MY_ENTRIES_KEY = "eightZero:myGlobalEntries:v1";
+const MY_ENTRIES_LIMIT = 50;
+
+export interface MyGlobalEntry {
+  seed: string;
+  score: number;
+  name: string;
+}
+
+/** Seeds of runs this device has submitted to the global board. */
+export function loadMyGlobalEntries(): MyGlobalEntry[] {
+  try {
+    const raw = window.localStorage.getItem(MY_ENTRIES_KEY);
+    if (!raw) return [];
+    const parsed = JSON.parse(raw);
+    return Array.isArray(parsed) ? (parsed as MyGlobalEntry[]) : [];
+  } catch {
+    return [];
+  }
+}
+
+/** Record (or update) a submitted run, de-duplicated by seed, best-first. */
+export function addMyGlobalEntry(entry: MyGlobalEntry): void {
+  try {
+    const existing = loadMyGlobalEntries().filter((item) => item.seed !== entry.seed);
+    const next = [entry, ...existing]
+      .sort((a, b) => b.score - a.score)
+      .slice(0, MY_ENTRIES_LIMIT);
+    window.localStorage.setItem(MY_ENTRIES_KEY, JSON.stringify(next));
+  } catch {
+    // ignore storage failures
+  }
+}
+
 function scoreRun(run: TournamentRun): number {
   const stageRank: Record<string, number> = {
     "Group stage": 0,

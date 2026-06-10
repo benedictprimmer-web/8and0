@@ -1,0 +1,32 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+
+      # Use `npm install` rather than `npm ci`: the committed lockfile is
+      # generated on macOS and omits some Linux-only optional deps (e.g. the
+      # @emnapi wasm fallback), which makes the stricter `npm ci` fail on CI.
+      - name: Install dependencies
+        run: npm install --no-audit --no-fund
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Type-check & build (app + API)
+        run: npm run build
+
+      - name: Test
+        run: npm test
