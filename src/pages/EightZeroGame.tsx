@@ -886,6 +886,17 @@ export default function EightZeroGame() {
     window.requestAnimationFrame(() => window.scrollTo({ top: 0, behavior: "smooth" }));
   }
 
+  function skipAllGroupStage() {
+    if (!run) return;
+    if (run.matches.length <= 3) {
+      setTournamentPhase("complete");
+    } else {
+      setCurrentMatchIndex(3);
+      setTournamentPhase("ready");
+    }
+    window.requestAnimationFrame(() => window.scrollTo({ top: 0, behavior: "smooth" }));
+  }
+
   function handleAutofill() {
     if (!gameData || isSpinning || draftState.picks.length > 0) return;
     const next = autofillDraft(gameData, draftState);
@@ -922,9 +933,9 @@ export default function EightZeroGame() {
   }
 
   return (
-    <div className="space-y-6 animate-fade-up">
+    <div className="relative space-y-6 animate-fade-up">
       {/* Version badge */}
-      <div className="fixed top-3 right-3 z-50 rounded-md border border-surface-700 bg-surface-900/90 px-2.5 py-1.5 text-[10px] font-mono text-gray-500 backdrop-blur">
+      <div className="absolute top-3 right-3 z-50 rounded-md border border-surface-700 bg-surface-900/90 px-2.5 py-1.5 text-[10px] font-mono text-gray-500 backdrop-blur">
         <span className="font-bold text-gold-400">v0.2.0</span>
         <span className="mx-1.5 text-surface-700">·</span>
         <span className="text-gray-600">8bbec5e</span>
@@ -1007,14 +1018,25 @@ export default function EightZeroGame() {
                 </div>
               </div>
 
-              <button
-                type="button"
-                onClick={startNextMatch}
-                className="inline-flex w-full items-center justify-center gap-2 rounded-xl bg-gold-500 px-6 py-4 text-lg font-black text-black transition-colors hover:bg-gold-400"
-              >
-                <Play size={20} />
-                Play Match
-              </button>
+              <div className="flex gap-3">
+                <button
+                  type="button"
+                  onClick={startNextMatch}
+                  className="inline-flex flex-1 items-center justify-center gap-2 rounded-xl bg-gold-500 px-6 py-4 text-lg font-black text-black transition-colors hover:bg-gold-400"
+                >
+                  <Play size={20} />
+                  Play Match
+                </button>
+                {currentMatchIndex < 3 && (
+                  <button
+                    type="button"
+                    onClick={skipAllGroupStage}
+                    className="inline-flex items-center justify-center rounded-xl border border-surface-700 bg-surface-950 px-5 py-4 text-sm font-black text-gray-400 transition-colors hover:border-gold-600/40 hover:text-white"
+                  >
+                    Skip Group
+                  </button>
+                )}
+              </div>
             </div>
           )}
 
