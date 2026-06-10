@@ -1041,6 +1041,8 @@ export default function EightZeroGame() {
               kicks={run.matches[currentMatchIndex]?.penaltyShootout ?? []}
               userWon={run.matches[currentMatchIndex]?.result === "W"}
               onFinished={handleMatchFinished}
+              userGkRating={run.ratings.gk}
+              oppGkRating={75}
             />
           )}
 

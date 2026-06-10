@@ -105,8 +105,8 @@ function simulatePenalties(
   random: () => number
 ): PenaltyKick[] {
   const kicks: PenaltyKick[] = [];
-  const userPenRating = clamp(0.55 + (ratings.attack - 75) * 0.005, 0.35, 0.85);
-  const oppPenRating = clamp(0.55 - (ratings.gk - 75) * 0.008, 0.25, 0.75);
+  const userPenRating = clamp(0.675 + (ratings.attack - 75) * 0.005, 0.45, 0.85);
+  const oppPenRating = clamp(0.675 - (ratings.gk - 75) * 0.008, 0.35, 0.85);
   let userScored = 0;
   let oppScored = 0;
   let round = 1;

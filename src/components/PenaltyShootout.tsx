@@ -7,9 +7,11 @@ interface PenaltyShootoutProps {
   kicks: PenaltyKick[];
   onFinished: () => void;
   userWon: boolean;
+  userGkRating: number;
+  oppGkRating: number;
 }
 
-export default function PenaltyShootout({ opponent, kicks, onFinished, userWon }: PenaltyShootoutProps) {
+export default function PenaltyShootout({ opponent, kicks, onFinished, userWon, userGkRating, oppGkRating }: PenaltyShootoutProps) {
   const [currentKickIndex, setCurrentKickIndex] = useState(0);
   const [userScore, setUserScore] = useState(0);
   const [oppScore, setOppScore] = useState(0);
@@ -56,9 +58,25 @@ export default function PenaltyShootout({ opponent, kicks, onFinished, userWon }
 
   return (
     <div className="stat-card animate-fade-up">
-      <div className="text-center mb-6">
+      <div className="text-center mb-4">
         <p className="section-label">Penalty Shootout</p>
-        <h2 className="mt-2 text-xl sm:text-2xl font-black text-white">Sudden Death</h2>
+        <h2 className="mt-1 text-xl sm:text-2xl font-black text-white">Sudden Death</h2>
+      </div>
+
+      {/* GK Ratings */}
+      <div className="flex items-center justify-center gap-6 mb-4 pb-4 border-b border-surface-700">
+        <div className="text-center">
+          <p className="text-[10px] font-bold uppercase tracking-wide text-gray-500">Your GK</p>
+          <p className="text-lg font-black text-gold-400 tabular-nums">{Math.round(userGkRating)}</p>
+        </div>
+        <div className="text-center">
+          <p className="text-[10px] font-bold uppercase tracking-wide text-gray-500">vs</p>
+          <p className="text-xs text-gray-600">GK</p>
+        </div>
+        <div className="text-center">
+          <p className="text-[10px] font-bold uppercase tracking-wide text-gray-500">Their GK</p>
+          <p className="text-lg font-black text-gold-400 tabular-nums">{Math.round(oppGkRating)}</p>
+        </div>
       </div>
 
       <div className="flex items-center justify-between gap-4 mb-6">
