@@ -944,8 +944,8 @@ export default function EightZeroGame() {
           <span className="hidden sm:inline text-gray-600">fix: remove '(pens)'</span>
         </div>
 
-        <div className="grid gap-0 lg:grid-cols-[1fr_260px]">
-          <div className="p-5 pt-10 sm:p-6 sm:pt-12">
+        <div className="grid gap-0 pt-10 sm:pt-12 lg:grid-cols-[1fr_260px]">
+          <div className="p-5 sm:p-6">
             <div className="flex flex-wrap items-start justify-between gap-4">
               <div>
                 <button

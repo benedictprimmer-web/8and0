@@ -1,6 +1,23 @@
 import type { TournamentRun } from "./types";
 
 export const HISTORY_KEY = "eightZero:history:v1";
+export const PLAYER_NAME_KEY = "eightZero:playerName";
+
+export function loadPlayerName(): string {
+  try {
+    return window.localStorage.getItem(PLAYER_NAME_KEY) ?? "";
+  } catch {
+    return "";
+  }
+}
+
+export function savePlayerName(name: string): void {
+  try {
+    window.localStorage.setItem(PLAYER_NAME_KEY, name);
+  } catch {
+    // ignore storage failures (private mode, etc.)
+  }
+}
 
 function scoreRun(run: TournamentRun): number {
   const stageRank: Record<string, number> = {
