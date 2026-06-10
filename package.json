@@ -5,7 +5,8 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "tsc && vite build",
+    "typecheck:api": "tsc -p tsconfig.api.json",
+    "build": "tsc && tsc -p tsconfig.api.json && vite build",
     "preview": "vite preview",
     "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
     "format": "prettier --write 'src/**/*.{ts,tsx,css}'",
@@ -20,6 +21,7 @@
     "react-router-dom": "^6.30.4"
   },
   "devDependencies": {
+    "@types/node": "^20.19.42",
     "@types/react": "^18.3.3",
     "@types/react-dom": "^18.3.0",
     "@typescript-eslint/eslint-plugin": "^7.13.0",

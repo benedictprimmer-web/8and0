@@ -99,7 +99,9 @@ async function handlePost(req: ApiRequest, res: ApiResponse): Promise<void> {
     return;
   }
 
-  const id = randomId();
+  // Key the entry by the run seed so re-submitting the same run (e.g. to fix a
+  // typo'd name) overwrites rather than creating a duplicate row.
+  const id = result.submission.seed || randomId();
   const entry: LeaderboardEntry = { id, ...result.submission };
 
   await pipeline([
