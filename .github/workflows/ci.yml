@@ -16,8 +16,11 @@ jobs:
           node-version: 24
           cache: npm
 
+      # Use `npm install` rather than `npm ci`: the committed lockfile is
+      # generated on macOS and omits some Linux-only optional deps (e.g. the
+      # @emnapi wasm fallback), which makes the stricter `npm ci` fail on CI.
       - name: Install dependencies
-        run: npm ci
+        run: npm install --no-audit --no-fund
 
       - name: Lint
         run: npm run lint
