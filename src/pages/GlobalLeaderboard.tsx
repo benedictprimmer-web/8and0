@@ -57,8 +57,8 @@ function Row({
         <p className="truncate text-xs text-gray-500">
           {entry.stageReached} · {entry.record} · {entry.formationLabel} · {titleCase(entry.difficulty)}
           {entry.blindMode ? " · Blind" : ""}
-          {entry.topScorer
-            ? ` · Top scorer: ${entry.topScorer.name} (${entry.topScorer.goals})`
+          {entry.topScorer?.name
+            ? ` · Top scorer: ${entry.topScorer.name} (${entry.topScorer.goals ?? 0})`
             : ""}
         </p>
       </div>
@@ -90,7 +90,8 @@ export default function GlobalLeaderboard() {
     queryKey: ["global-leaderboard", mySeeds],
     queryFn: () => leaderboardApi.list(200, mySeeds),
     staleTime: 30_000,
-    retry: 1,
+    retry: 2,
+    placeholderData: { entries: [], total: 0, mine: [] },
   });
 
   const entries = useMemo(() => query.data?.entries ?? [], [query.data]);

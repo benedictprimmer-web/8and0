@@ -35,9 +35,19 @@ interface ApiResponse {
 }
 
 function clientIp(req: ApiRequest): string {
+  // Prefer the platform-set real IP (not client-spoofable). Fall back to the
+  // LAST hop of x-forwarded-for, which the proxy appends — never the left-most
+  // value, which a caller can forge to bypass the rate limit.
+  const realIp = req.headers["x-real-ip"];
+  if (typeof realIp === "string" && realIp.trim()) return realIp.trim();
+
   const fwd = req.headers["x-forwarded-for"];
   const raw = Array.isArray(fwd) ? fwd[0] : fwd;
-  return (raw?.split(",")[0] ?? "unknown").trim() || "unknown";
+  const parts = (raw ?? "")
+    .split(",")
+    .map((part) => part.trim())
+    .filter(Boolean);
+  return parts.length > 0 ? parts[parts.length - 1] : "unknown";
 }
 
 function randomId(): string {
@@ -90,6 +100,9 @@ async function rankEntries(
 }
 
 async function handleGet(req: ApiRequest, res: ApiResponse): Promise<void> {
+  // Short shared-cache TTL to take read load off Redis without feeling stale.
+  res.setHeader("Cache-Control", "public, s-maxage=10, stale-while-revalidate=30");
+
   const limitRaw = param(req, "limit");
   const limit = Math.max(1, Math.min(MAX_LIMIT, Number(limitRaw) || DEFAULT_LIMIT));
 
