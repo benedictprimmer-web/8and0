@@ -1,8 +1,11 @@
 import { useEffect, useMemo, useRef, useState } from "react";
-import { useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery } from "@tanstack/react-query";
+import { Link } from "react-router-dom";
 import {
   ArrowLeft,
+  Check,
   Copy,
+  Globe,
   Medal,
   Play,
   RefreshCw,
@@ -11,7 +14,8 @@ import {
   Shuffle,
   Trophy,
 } from "lucide-react";
-import { api } from "../api/client";
+import { api, leaderboardApi, type SubmitResponse } from "../api/client";
+import { buildSubmission } from "../game8/leaderboard";
 import Flag from "../components/Flag";
 import LiveMatch from "../components/LiveMatch";
 import PenaltyShootout from "../components/PenaltyShootout";
@@ -31,7 +35,14 @@ import {
 } from "../game8/draft";
 import { FORMATIONS, getFormation } from "../game8/formations";
 import { calculateTeamRatings } from "../game8/ratings";
-import { shareText, loadHistory, saveRun, sortRuns } from "../game8/storage";
+import {
+  shareText,
+  loadHistory,
+  loadPlayerName,
+  savePlayerName,
+  saveRun,
+  sortRuns,
+} from "../game8/storage";
 import { buildMatchEvents, simulateTournamentRun } from "../game8/simulate";
 import type {
   DraftDifficulty,
@@ -496,6 +507,92 @@ function SquadPanel({
   );
 }
 
+function GlobalSubmit({ run }: { run: TournamentRun }) {
+  const [name, setName] = useState(() => loadPlayerName());
+  const [validationError, setValidationError] = useState<string | null>(null);
+
+  const mutation = useMutation<SubmitResponse, Error>({
+    mutationFn: async () => {
+      const built = buildSubmission(run, name);
+      if (!built.ok) {
+        throw new Error(built.reason);
+      }
+      savePlayerName(built.submission.name);
+      return leaderboardApi.submit(built.submission);
+    },
+  });
+
+  function handleSubmit() {
+    setValidationError(null);
+    const built = buildSubmission(run, name);
+    if (!built.ok) {
+      setValidationError(built.reason);
+      return;
+    }
+    mutation.mutate();
+  }
+
+  if (mutation.isSuccess) {
+    const { rank, total } = mutation.data;
+    return (
+      <div className="rounded-2xl border border-gold-600/60 bg-gold-500/10 p-5 text-center">
+        <Check className="mx-auto text-gold-400" size={28} />
+        <p className="mt-2 text-lg font-black text-white">
+          {rank ? `You're #${rank} of ${total} globally!` : "Submitted to the global board!"}
+        </p>
+        <Link
+          to="/leaderboard"
+          className="mt-4 inline-flex items-center justify-center gap-2 rounded-xl bg-gold-500 px-5 py-3 text-sm font-black text-black transition-colors hover:bg-gold-400"
+        >
+          <Globe size={16} />
+          View global leaderboard
+        </Link>
+      </div>
+    );
+  }
+
+  return (
+    <div className="rounded-2xl border border-indigo-900/70 bg-[#11111f] p-5">
+      <div className="flex items-center gap-2">
+        <Globe className="text-gold-400" size={18} />
+        <p className="section-label text-sm">Add your name to the global leaderboard</p>
+      </div>
+      <div className="mt-4 flex flex-col gap-3 sm:flex-row">
+        <input
+          value={name}
+          onChange={(event) => {
+            setName(event.target.value);
+            setValidationError(null);
+          }}
+          maxLength={20}
+          placeholder="Your name"
+          className="w-full rounded-lg border border-surface-700 bg-surface-950 px-3 py-3 text-sm text-white outline-none transition-colors placeholder:text-gray-600 focus:border-gold-600/50"
+        />
+        <button
+          type="button"
+          onClick={handleSubmit}
+          disabled={mutation.isPending}
+          className="inline-flex items-center justify-center gap-2 rounded-lg bg-gold-500 px-5 py-3 text-sm font-black text-black transition-colors hover:bg-gold-400 disabled:cursor-not-allowed disabled:opacity-60"
+        >
+          {mutation.isPending ? "Submitting…" : "Submit"}
+        </button>
+      </div>
+      {validationError && (
+        <p className="mt-3 text-xs font-semibold text-rose-400">{validationError}</p>
+      )}
+      {mutation.isError && (
+        <p className="mt-3 text-xs font-semibold text-rose-400">
+          Couldn&apos;t submit (you may be offline or the backend isn&apos;t configured). Your run is
+          still saved locally.
+        </p>
+      )}
+      <p className="mt-3 text-xs leading-5 text-gray-500">
+        Only your name, team strength and top scorer are shown publicly.
+      </p>
+    </div>
+  );
+}
+
 function ResultPanel({
   run,
   onCopy,
@@ -544,6 +641,8 @@ function ResultPanel({
           {copied ? "Copied" : "Share"}
         </button>
       </div>
+
+      <GlobalSubmit run={run} />
 
       <div className="space-y-2">
         <h3 className="text-sm font-bold text-white">World Cup path</h3>
@@ -609,16 +708,25 @@ function LeaderboardPanel({
     <section className="stat-card">
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
-          <p className="section-label">Leaderboard</p>
-          <h2 className="mt-1 text-2xl font-black text-white">Best runs</h2>
+          <p className="section-label">Local leaderboard</p>
+          <h2 className="mt-1 text-2xl font-black text-white">Best runs on this device</h2>
         </div>
-        <button
-          type="button"
-          onClick={onClose}
-          className="rounded-lg border border-surface-700 bg-surface-950 px-3 py-2 text-sm font-bold text-gray-300 hover:text-white"
-        >
-          Close
-        </button>
+        <div className="flex gap-2">
+          <Link
+            to="/leaderboard"
+            className="inline-flex items-center gap-2 rounded-lg border border-surface-700 bg-surface-950 px-3 py-2 text-sm font-bold text-gold-400 hover:border-gold-600/40"
+          >
+            <Globe size={14} />
+            Global
+          </Link>
+          <button
+            type="button"
+            onClick={onClose}
+            className="rounded-lg border border-surface-700 bg-surface-950 px-3 py-2 text-sm font-bold text-gray-300 hover:text-white"
+          >
+            Close
+          </button>
+        </div>
       </div>
       <div className="mt-4 flex flex-wrap gap-2">
         {filters.map((item) => (
@@ -934,18 +1042,19 @@ export default function EightZeroGame() {
 
   return (
     <div className="space-y-6 animate-fade-up">
-      <section className="relative overflow-hidden rounded-xl border border-surface-700 bg-surface-900">
-        {/* Version badge */}
-        <div className="absolute top-3 right-3 z-10 rounded-md border border-surface-700 bg-surface-900/90 px-2.5 py-1.5 text-[10px] font-mono text-gray-500 backdrop-blur">
-          <span className="font-bold text-gold-400">v0.2.0</span>
-          <span className="mx-1.5 text-surface-700">·</span>
-          <span className="text-gray-600">8bbec5e</span>
-          <span className="mx-1.5 text-surface-700">·</span>
-          <span className="hidden sm:inline text-gray-600">fix: remove '(pens)'</span>
+      <section className="overflow-hidden rounded-xl border border-surface-700 bg-surface-900">
+        <div className="flex items-center justify-between px-5 pt-4 sm:px-6">
+          <div className="text-[10px] font-mono text-gray-500">
+            <span className="font-bold text-gold-400">v0.2.0</span>
+            <span className="mx-1.5 text-surface-700">·</span>
+            <span className="text-gray-600">8bbec5e</span>
+            <span className="mx-1.5 text-surface-700">·</span>
+            <span className="hidden sm:inline text-gray-600">fix: remove '(pens)'</span>
+          </div>
         </div>
 
         <div className="grid gap-0 lg:grid-cols-[1fr_260px]">
-          <div className="p-5 pt-10 sm:p-6 sm:pt-12">
+          <div className="p-5 sm:p-6">
             <div className="flex flex-wrap items-start justify-between gap-4">
               <div>
                 <button
@@ -1272,13 +1381,22 @@ export default function EightZeroGame() {
                 <p className="text-sm text-gray-500">Finished runs are saved locally on this device.</p>
               )}
             </div>
-            <button
-              type="button"
-              onClick={() => setShowLeaderboard(true)}
-              className="mt-4 w-full rounded-lg border border-surface-700 bg-surface-950 px-3 py-2 text-sm font-bold text-white hover:border-gold-600/40"
-            >
-              Leaderboard
-            </button>
+            <div className="mt-4 grid grid-cols-2 gap-2">
+              <button
+                type="button"
+                onClick={() => setShowLeaderboard(true)}
+                className="rounded-lg border border-surface-700 bg-surface-950 px-3 py-2 text-sm font-bold text-white hover:border-gold-600/40"
+              >
+                Local
+              </button>
+              <Link
+                to="/leaderboard"
+                className="inline-flex items-center justify-center gap-2 rounded-lg border border-surface-700 bg-surface-950 px-3 py-2 text-sm font-bold text-gold-400 hover:border-gold-600/40"
+              >
+                <Globe size={14} />
+                Global
+              </Link>
+            </div>
           </section>
         </div>
       </div>
