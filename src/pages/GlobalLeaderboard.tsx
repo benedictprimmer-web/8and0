@@ -2,8 +2,8 @@ import { useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { ArrowLeft, Globe, RefreshCw, Trophy } from "lucide-react";
-import { leaderboardApi, type LeaderboardResponse } from "../api/client";
-import { loadPlayerName } from "../game8/storage";
+import { leaderboardApi, type LeaderboardResponse, type RankedEntry } from "../api/client";
+import { loadMyGlobalEntries } from "../game8/storage";
 import type { LeaderboardEntry } from "../game8/leaderboard";
 
 type FilterId = "all" | "easy" | "normal" | "hard" | "blind";
@@ -72,19 +72,41 @@ function Row({
   );
 }
 
+function bestRanked(mine: RankedEntry[]): RankedEntry | null {
+  let best: RankedEntry | null = null;
+  for (const item of mine) {
+    if (item.rank === null) continue;
+    if (!best || best.rank === null || item.rank < best.rank) best = item;
+  }
+  return best;
+}
+
 export default function GlobalLeaderboard() {
   const [filter, setFilter] = useState<FilterId>("all");
-  const playerName = useMemo(() => loadPlayerName().trim().toLowerCase(), []);
+  const mySeeds = useMemo(() => loadMyGlobalEntries().map((entry) => entry.seed), []);
+  const mySeedSet = useMemo(() => new Set(mySeeds), [mySeeds]);
 
   const query = useQuery<LeaderboardResponse>({
-    queryKey: ["global-leaderboard"],
-    queryFn: () => leaderboardApi.list(200),
+    queryKey: ["global-leaderboard", mySeeds],
+    queryFn: () => leaderboardApi.list(200, mySeeds),
     staleTime: 30_000,
     retry: 1,
   });
 
-  const entries = query.data?.entries ?? [];
+  const entries = useMemo(() => query.data?.entries ?? [], [query.data]);
+  // Position in the server-ordered top list == true global rank (we fetch from #1).
+  const globalRankById = useMemo(() => {
+    const map = new Map<string, number>();
+    entries.forEach((entry, index) => map.set(entry.id, index + 1));
+    return map;
+  }, [entries]);
+
   const filtered = entries.filter((entry) => matchesFilter(entry, filter));
+
+  const myBest = bestRanked(query.data?.mine ?? []);
+  // Only show the standalone banner when your best run isn't already visible above.
+  const myBestVisible =
+    myBest !== null && filtered.some((entry) => entry.id === myBest.entry.id);
 
   return (
     <div className="mx-auto max-w-3xl space-y-6 animate-fade-up">
@@ -155,14 +177,28 @@ export default function GlobalLeaderboard() {
             </div>
           )}
 
+          {!query.isLoading && !query.isError && myBest && !myBestVisible && (
+            <div className="rounded-lg border border-gold-600 bg-gold-500/10 px-3 py-3">
+              <p className="text-xs font-bold uppercase tracking-wide text-gold-400">Your best run</p>
+              <div className="mt-1 flex items-center justify-between gap-3">
+                <p className="min-w-0 truncate text-sm font-bold text-white">
+                  #{myBest.rank} · {myBest.entry.name} · {myBest.entry.stageReached}
+                </p>
+                <span className="flex-shrink-0 font-black text-gold-400 tabular-nums">
+                  {myBest.entry.score} pts
+                </span>
+              </div>
+            </div>
+          )}
+
           {!query.isLoading &&
             !query.isError &&
-            filtered.map((entry, index) => (
+            filtered.map((entry) => (
               <Row
                 key={entry.id}
                 entry={entry}
-                rank={index + 1}
-                isOwn={Boolean(playerName) && entry.name.trim().toLowerCase() === playerName}
+                rank={globalRankById.get(entry.id) ?? 0}
+                isOwn={mySeedSet.has(entry.id)}
               />
             ))}
 

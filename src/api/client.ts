@@ -104,9 +104,15 @@ export const api = {
 
 // ── Global leaderboard ────────────────────────────────────────────────────────
 
+export interface RankedEntry {
+  entry: LeaderboardEntry;
+  rank: number | null;
+}
+
 export interface LeaderboardResponse {
   entries: LeaderboardEntry[];
   total: number;
+  mine?: RankedEntry[];
 }
 
 export interface SubmitResponse {
@@ -116,8 +122,11 @@ export interface SubmitResponse {
 }
 
 export const leaderboardApi = {
-  list: (limit = 200) =>
-    api.get<LeaderboardResponse>(`/api/leaderboard?limit=${limit}`),
+  list: (limit = 200, ids: string[] = []) => {
+    const params = new URLSearchParams({ limit: String(limit) });
+    if (ids.length > 0) params.set("ids", ids.join(","));
+    return api.get<LeaderboardResponse>(`/api/leaderboard?${params.toString()}`);
+  },
   submit: (submission: LeaderboardSubmission) =>
     api.post<SubmitResponse>("/api/leaderboard", submission),
 };
