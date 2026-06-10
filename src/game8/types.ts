@@ -85,6 +85,7 @@ export interface MatchResult {
   opponentGoals: number;
   regularTimeUserGoals: number;
   regularTimeOpponentGoals: number;
+  opponentGkRating: number;
   result: "W" | "D" | "L";
   decidedByPens: boolean;
   extraTime: boolean;
