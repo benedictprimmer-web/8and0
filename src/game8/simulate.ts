@@ -24,6 +24,12 @@ function normalizeOpponentStrength(team: EightZeroTeam, teams: EightZeroTeam[]):
   return 64 + normalized * 32;
 }
 
+function calculateOpponentGkRating(team: EightZeroTeam): number {
+  // ELO typically ranges from ~1200 (weak) to ~2100 (strong)
+  // GK rating: 60-92 scale based on ELO
+  return clamp(60 + (team.elo - 1200) * 0.03, 58, 92);
+}
+
 function pickOpponent(teams: EightZeroTeam[], seed: string, excludeIds: Set<number>): EightZeroTeam {
   const pool = teams.filter((team) => !excludeIds.has(team.teamId));
   if (pool.length === 0) {
@@ -41,9 +47,9 @@ const STAGE_PRESSURE: Record<string, number> = {
   "Group match 3": 1.0,
   "Round of 32": 1.0,
   "Round of 16": 1.02,
-  "Quarter-final": 1.10,
-  "Semi-final": 1.15,
-  Final: 1.20,
+  "Quarter-final": 1.08,
+  "Semi-final": 1.12,
+  Final: 1.15,
 };
 
 function scoreMatch(
@@ -56,6 +62,7 @@ function scoreMatch(
 ): MatchResult {
   const random = seededRandom(seed);
   const opponentStrength = normalizeOpponentStrength(opponent, teams);
+  const opponentGkRating = calculateOpponentGkRating(opponent);
   const ratingEdge = ratings.overall - opponentStrength;
   const attackEdge = (ratings.attack + ratings.midfield) / 2 - opponentStrength;
   const defenceEdge = (ratings.defence + ratings.gk) / 2 - opponentStrength;
@@ -96,7 +103,7 @@ function scoreMatch(
   }
 
   const result = userGoals > opponentGoals ? "W" : userGoals < opponentGoals ? "L" : "D";
-  return { stage, opponent, userGoals, opponentGoals, regularTimeUserGoals, regularTimeOpponentGoals, result, decidedByPens, extraTime, penaltyShootout };
+  return { stage, opponent, userGoals, opponentGoals, regularTimeUserGoals, regularTimeOpponentGoals, opponentGkRating, result, decidedByPens, extraTime, penaltyShootout };
 }
 
 function simulatePenalties(
