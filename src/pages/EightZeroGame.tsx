@@ -933,19 +933,19 @@ export default function EightZeroGame() {
   }
 
   return (
-    <div className="relative space-y-6 animate-fade-up">
-      {/* Version badge */}
-      <div className="absolute top-3 right-3 z-50 rounded-md border border-surface-700 bg-surface-900/90 px-2.5 py-1.5 text-[10px] font-mono text-gray-500 backdrop-blur">
-        <span className="font-bold text-gold-400">v0.2.0</span>
-        <span className="mx-1.5 text-surface-700">·</span>
-        <span className="text-gray-600">8bbec5e</span>
-        <span className="mx-1.5 text-surface-700">·</span>
-        <span className="hidden sm:inline text-gray-600">fix: remove '(pens)'</span>
-      </div>
+    <div className="space-y-6 animate-fade-up">
+      <section className="relative overflow-hidden rounded-xl border border-surface-700 bg-surface-900">
+        {/* Version badge */}
+        <div className="absolute top-3 right-3 z-10 rounded-md border border-surface-700 bg-surface-900/90 px-2.5 py-1.5 text-[10px] font-mono text-gray-500 backdrop-blur">
+          <span className="font-bold text-gold-400">v0.2.0</span>
+          <span className="mx-1.5 text-surface-700">·</span>
+          <span className="text-gray-600">8bbec5e</span>
+          <span className="mx-1.5 text-surface-700">·</span>
+          <span className="hidden sm:inline text-gray-600">fix: remove '(pens)'</span>
+        </div>
 
-      <section className="overflow-hidden rounded-xl border border-surface-700 bg-surface-900">
         <div className="grid gap-0 lg:grid-cols-[1fr_260px]">
-          <div className="p-5 sm:p-6">
+          <div className="p-5 pt-10 sm:p-6 sm:pt-12">
             <div className="flex flex-wrap items-start justify-between gap-4">
               <div>
                 <button
