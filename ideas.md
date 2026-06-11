@@ -350,6 +350,86 @@ Confirm → Shootout begins with named players
 
 ---
 
+## Phase 6: Spin the Wheel — Random Formation Hard Mode
+
+**Status**: ✅ COMPLETED
+
+A gold-outline "Spin the Wheel" button below the Formation section triggers a slot-machine animation. It cycles through formations, slows down, lands on a random one, auto-selects Hard mode, and starts the draft.
+
+### Code Changes
+- `src/pages/EightZeroGame.tsx` — `SetupScreen` component with `spinningFormationId` state, `handleSpinWheel()` animation loop, and gold outline button with `Shuffle` icon
+
+---
+
+## Phase 7: Last Dance — Legend Mode
+
+**Status**: ✅ COMPLETED
+
+A "Last Dance" button opens a modal with three cards: Messi, Ronaldo, Neymar. Choosing one auto-locks them into your XI as the first pick. The remaining 10 players are drafted via normal spins.
+
+### Legend Data
+| Legend | Nation | Position | FIFA Code | Team ID | Rating |
+|--------|--------|----------|-----------|---------|--------|
+| Lionel Messi | Argentina | FW | ARG | 17 | 90 |
+| Cristiano Ronaldo | Portugal | FW | POR | 33 | 88 |
+| Neymar | Brazil | MF | BRA | 13 | 87 |
+
+### Code Changes
+- `src/game8/types.ts` — `LegendMode` type added to `DraftOptions` and `TournamentRun`
+- `src/game8/draft.ts` — `createDraftState()` auto-locks legend by name + FIFA code match, sets normal difficulty, 1 reroll, blind mode OFF
+- `src/pages/EightZeroGame.tsx` — `LegendModal` component with flag cards, "Last Dance" button, gold border on legend slot in `PitchXI`, "Legend" badge on `PlayerRow`, result screen label
+- `src/game8/simulate.ts` — Legend mode: easier opponent path in early rounds (reduced exponent), easier final stage (`STAGE_PRESSURE` -0.05), harder penalties (`userPenRating` -0.05)
+
+---
+
+## Phase 8: Tournament Bracket Balancing
+
+**Status**: ✅ COMPLETED
+
+Weighted opponent draw with group stage tier filtering and rating-based progression bonuses.
+
+### Stage Buckets
+| Stage | Exponent | Effect |
+|-------|----------|--------|
+| Group match | 0.8 | Uniform (balanced) |
+| Round of 32 | 2.0 | Strongly favor weaker |
+| Round of 16 | 1.5 | Favor weaker |
+| Quarter-final | 1.0 | Balanced |
+| Semi-final | 0.5 | Favor stronger |
+| Final | 0.3 | Strongly favor stronger |
+
+### Rating Edge Bonus
+- R16: +0.5 if `overall >= 85`
+- QF: +0.5 if `overall >= 86`
+- SF: +0.5 if `overall >= 88`
+
+### Group Stage Balance
+- Tier filter: only opponents within ±1 ELO tier (100-point buckets) of the user's team
+
+### Code Changes
+- `src/game8/simulate.ts` — `pickOpponent()` accepts `stage` and `userElo`, adds tier filter and stage exponent mapping
+- `src/game8/simulate.ts` — `scoreMatch()` adds `ratingEdgeBonus`
+- `scripts/batch-simulate.mjs` — Mirrored bracket balancing logic for batch testing
+
+---
+
+## Phase 9: Quick Polish (Shirt Numbers)
+
+**Status**: ✅ COMPLETED
+
+Official WC 2026 squad numbers added to:
+- `public/data/players.json` — `shirt_number` field injected for 1,220/1,248 players
+- `src/game8/data.ts` — `RawPlayer` includes `shirt_number: number | null`
+- `src/game8/types.ts` — `EightZeroPlayer` includes `shirtNumber: number | null`
+- `src/game8/data.ts` — `buildEightZeroData` passes `shirtNumber` through
+- `src/pages/EightZeroGame.tsx` — `PlayerRow` shows kit-colored badge
+- `src/pages/EightZeroGame.tsx` — `ShirtIcon` shows number on shirt
+- `src/pages/EightZeroGame.tsx` — `PitchXI` displays numbers on shirts
+
+**Unmatched players**: 28 players (mostly from preliminary squads not on Wikipedia's final 26)
+
+---
+
 ## All-Time Mode (deferred)
 
 Left for later — needs historical data pipeline. Will plan separately when we get to it.

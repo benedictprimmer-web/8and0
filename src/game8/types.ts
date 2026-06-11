@@ -1,11 +1,13 @@
 export type SlotCategory = "GK" | "DEF" | "MID" | "FWD";
 export type DraftDifficulty = "easy" | "normal" | "hard";
 export type DraftMode = "squad-first" | "position-first";
+export type LegendMode = "none" | "messi" | "ronaldo" | "neymar";
 
 export interface DraftOptions {
   difficulty: DraftDifficulty;
   blindMode: boolean;
   draftMode: DraftMode;
+  legendMode: LegendMode;
 }
 
 export interface EightZeroTeam {
@@ -28,6 +30,7 @@ export interface EightZeroPlayer {
   rating: number;
   clubName: string | null;
   aura: number | null;
+  shirtNumber: number | null;
 }
 
 export interface FormationSlot {
@@ -68,6 +71,7 @@ export interface DraftState {
   difficulty: DraftDifficulty;
   blindMode: boolean;
   draftMode: DraftMode;
+  legendMode: LegendMode;
 }
 
 export interface TeamRatings {
@@ -119,6 +123,7 @@ export interface TournamentRun {
   difficulty: DraftDifficulty;
   blindMode: boolean;
   draftMode: DraftMode;
+  legendMode: LegendMode;
   score: number;
   record: string;
   wins: number;

@@ -6,6 +6,7 @@ import type {
   DraftMode,
   DraftPick,
   EightZeroTeam,
+  LegendMode,
   MatchEvent,
   MatchResult,
   PenaltyKick,
@@ -30,14 +31,54 @@ function calculateOpponentGkRating(team: EightZeroTeam): number {
   return clamp(60 + (team.elo - 1200) * 0.03, 58, 92);
 }
 
-function pickOpponent(teams: EightZeroTeam[], seed: string, excludeIds: Set<number>): EightZeroTeam {
-  const pool = teams.filter((team) => !excludeIds.has(team.teamId));
+const STAGE_EXPONENT: Record<string, number> = {
+  "Group match": 0.8,
+  "Round of 32": 2.0,
+  "Round of 16": 1.5,
+  "Quarter-final": 1.0,
+  "Semi-final": 0.5,
+  "Final": 0.3,
+};
+
+function getStageExponent(stage: string): number {
+  const key = stage.startsWith("Group") ? "Group match" : stage;
+  return STAGE_EXPONENT[key] ?? 1.0;
+}
+
+function pickOpponent(
+  teams: EightZeroTeam[],
+  seed: string,
+  excludeIds: Set<number>,
+  stage: string,
+  userElo: number,
+  legendMode: LegendMode
+): EightZeroTeam {
+  let pool = teams.filter((team) => !excludeIds.has(team.teamId));
   if (pool.length === 0) {
     throw new Error("No opponents available");
   }
+
+  // Group stage balance: only pick from teams within ±1 tier of user
+  if (stage.startsWith("Group")) {
+    const userTier = Math.floor((userElo - 1400) / 100);
+    const balanced = pool.filter((t) => Math.abs(Math.floor((t.elo - 1400) / 100) - userTier) <= 1);
+    if (balanced.length > 0) pool = balanced;
+  }
+
   const random = seededRandom(seed);
   const sorted = [...pool].sort((a, b) => b.elo - a.elo);
-  const index = Math.floor(Math.pow(random(), 1.3) * sorted.length);
+
+  let exponent = getStageExponent(stage);
+
+  // Legend mode: easier opponents in early rounds (reduce exponent for earlier stages)
+  if (legendMode !== "none") {
+    const stageKey = stage.startsWith("Group") ? "Group match" : stage;
+    if (stageKey === "Group match" || stageKey === "Round of 32" || stageKey === "Round of 16") {
+      exponent = Math.max(0.3, exponent - 0.3);
+    }
+  }
+
+  const index = Math.floor(Math.pow(random(), exponent) * sorted.length);
   return sorted[clamp(index, 0, sorted.length - 1)];
 }
 
@@ -58,15 +99,28 @@ function scoreMatch(
   ratings: TeamRatings,
   teams: EightZeroTeam[],
   seed: string,
-  knockout: boolean
+  knockout: boolean,
+  legendMode: LegendMode
 ): MatchResult {
   const random = seededRandom(seed);
   const opponentStrength = normalizeOpponentStrength(opponent, teams);
   const opponentGkRating = calculateOpponentGkRating(opponent);
-  const ratingEdge = ratings.overall - opponentStrength;
+
+  let ratingEdgeBonus = 0;
+  if (stage === "Round of 16" && ratings.overall >= 85) ratingEdgeBonus = 0.5;
+  if (stage === "Quarter-final" && ratings.overall >= 86) ratingEdgeBonus = 0.5;
+  if (stage === "Semi-final" && ratings.overall >= 88) ratingEdgeBonus = 0.5;
+
+  const ratingEdge = (ratings.overall - opponentStrength) + ratingEdgeBonus;
   const attackEdge = (ratings.attack + ratings.midfield) / 2 - opponentStrength;
   const defenceEdge = (ratings.defence + ratings.gk) / 2 - opponentStrength;
-  const pressure = STAGE_PRESSURE[stage] ?? 1.0;
+  let pressure = STAGE_PRESSURE[stage] ?? 1.0;
+
+  // Legend mode: easier final stage
+  if (legendMode !== "none" && stage === "Final") {
+    pressure = Math.max(1.0, pressure - 0.05);
+  }
+
   const userLambda = clamp(1.30 + ratingEdge * 0.025 + attackEdge * 0.015, 0.20, 3.2);
   const opponentLambda = clamp((1.40 - ratingEdge * 0.020 - defenceEdge * 0.013) * pressure, 0.25, 3.6);
   let userGoals = poisson(userLambda, random);
@@ -88,7 +142,7 @@ function scoreMatch(
     if (userGoals === opponentGoals) {
       // Penalties
       decidedByPens = true;
-      penaltyShootout = simulatePenalties(ratings, opponent, random);
+      penaltyShootout = simulatePenalties(ratings, opponent, random, legendMode);
       const userPenGoals = penaltyShootout.filter((k) => k.team === "user" && !k.saved).length;
       const oppPenGoals = penaltyShootout.filter((k) => k.team === "opponent" && !k.saved).length;
       if (userPenGoals > oppPenGoals) {
@@ -109,11 +163,18 @@ function scoreMatch(
 function simulatePenalties(
   ratings: TeamRatings,
   opponent: EightZeroTeam,
-  random: () => number
+  random: () => number,
+  legendMode: LegendMode
 ): PenaltyKick[] {
   const kicks: PenaltyKick[] = [];
-  const userPenRating = clamp(0.675 + (ratings.attack - 75) * 0.005, 0.45, 0.85);
+  let userPenRating = clamp(0.675 + (ratings.attack - 75) * 0.005, 0.45, 0.85);
   const oppPenRating = clamp(0.675 - (ratings.gk - 75) * 0.008, 0.35, 0.85);
+
+  // Legend mode: harder to win on penalties
+  if (legendMode !== "none") {
+    userPenRating = Math.max(0.4, userPenRating - 0.05);
+  }
+
   let userScored = 0;
   let oppScored = 0;
   let round = 1;
@@ -201,6 +262,7 @@ export function simulateTournamentRun(args: {
   difficulty?: DraftDifficulty;
   blindMode?: boolean;
   draftMode?: DraftMode;
+  legendMode?: LegendMode;
 }): TournamentRun {
   const excludeIds = new Set(args.picks.map((pick) => pick.player.teamId));
   const matches: MatchResult[] = [];
@@ -209,12 +271,14 @@ export function simulateTournamentRun(args: {
   let losses = 0;
   let stageReached = "Group stage";
   let groupPoints = 0;
+  const legendMode = args.legendMode ?? "none";
+  const userElo = args.ratings.overall * 20 + 1000; // Approximate ELO from rating
 
   for (let index = 0; index < GROUP_STAGES.length; index += 1) {
     const stage = GROUP_STAGES[index];
-    const opponent = pickOpponent(args.teams, `${args.seed}:group:${index}`, excludeIds);
+    const opponent = pickOpponent(args.teams, `${args.seed}:group:${index}`, excludeIds, stage, userElo, legendMode);
     excludeIds.add(opponent.teamId);
-    const result = scoreMatch(stage, opponent, args.ratings, args.teams, `${args.seed}:${stage}`, false);
+    const result = scoreMatch(stage, opponent, args.ratings, args.teams, `${args.seed}:${stage}`, false, legendMode);
     matches.push(result);
     if (result.result === "W") {
       wins += 1;
@@ -232,9 +296,9 @@ export function simulateTournamentRun(args: {
   } else {
     for (let index = 0; index < KNOCKOUT_STAGES.length; index += 1) {
       const stage = KNOCKOUT_STAGES[index];
-      const opponent = pickOpponent(args.teams, `${args.seed}:knockout:${index}`, excludeIds);
+      const opponent = pickOpponent(args.teams, `${args.seed}:knockout:${index}`, excludeIds, stage, userElo, legendMode);
       excludeIds.add(opponent.teamId);
-      const result = scoreMatch(stage, opponent, args.ratings, args.teams, `${args.seed}:${stage}`, true);
+      const result = scoreMatch(stage, opponent, args.ratings, args.teams, `${args.seed}:${stage}`, true, legendMode);
       matches.push(result);
       if (result.result === "W") {
         wins += 1;
@@ -281,6 +345,7 @@ export function simulateTournamentRun(args: {
     difficulty,
     blindMode,
     draftMode,
+    legendMode,
     score,
     record: recordLabel(wins, draws, losses),
     wins,

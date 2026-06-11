@@ -20,6 +20,7 @@ export interface RawPlayer {
   club_name: string | null;
   ea_overall: number | null;
   aura_composite: number | null;
+  shirt_number: number | null;
 }
 
 export interface EightZeroData {
@@ -86,6 +87,7 @@ export function buildEightZeroData(rawTeams: RawTeam[], rawPlayers: RawPlayer[])
         rating: player.ea_overall,
         clubName: player.club_name,
         aura: player.aura_composite,
+        shirtNumber: player.shirt_number,
       };
     })
     .filter((player): player is EightZeroPlayer => player !== null);
