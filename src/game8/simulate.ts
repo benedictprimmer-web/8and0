@@ -58,10 +58,12 @@ function pickOpponent(
     throw new Error("No opponents available");
   }
 
-  // Group stage balance: only pick from teams within ±1 tier of user
+  // Group stage balance: rating-based tier expansion
+  // 84+ rating: ±3 tiers (easier), 76-83: ±2 tiers, <76: ±1 tier (standard)
   if (stage.startsWith("Group")) {
     const userTier = Math.floor((userElo - 1400) / 100);
-    const balanced = pool.filter((t) => Math.abs(Math.floor((t.elo - 1400) / 100) - userTier) <= 1);
+    const tierRange = userElo >= 1680 ? 3 : userElo >= 1520 ? 2 : 1;
+    const balanced = pool.filter((t) => Math.abs(Math.floor((t.elo - 1400) / 100) - userTier) <= tierRange);
     if (balanced.length > 0) pool = balanced;
   }
 
@@ -119,6 +121,12 @@ function scoreMatch(
     else if (ratings.overall >= 84) ratingEdgeBonus = 0.8;
     else if (ratings.overall >= 80) ratingEdgeBonus = 0.4;
     else if (ratings.overall >= 76) ratingEdgeBonus = 0.2;
+  }
+
+  // Group stage: bonus for high-rated teams to score more
+  if (stage.startsWith("Group")) {
+    if (ratings.overall >= 84) ratingEdgeBonus = 1.0;
+    else if (ratings.overall >= 80) ratingEdgeBonus = 0.5;
   }
 
   const ratingEdge = (ratings.overall - opponentStrength) + ratingEdgeBonus;
@@ -301,7 +309,7 @@ export function simulateTournamentRun(args: {
     }
   }
 
-  if (groupPoints < 3) {
+  if (groupPoints < 2) {
     stageReached = "Group stage";
   } else {
     for (let index = 0; index < KNOCKOUT_STAGES.length; index += 1) {
