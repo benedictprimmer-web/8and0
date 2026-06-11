@@ -135,16 +135,16 @@ function normalizeOpponentStrength(team, allTeams) {
   const min = Math.min(...elos);
   const max = Math.max(...elos);
   const normalized = (team.elo - min) / Math.max(1, max - min);
-  return 64 + normalized * 32;
+  return 64 + normalized * 29;
 }
 
 const STAGE_EXPONENT = {
-  "Group match": 0.8,
-  "Round of 32": 2.0,
-  "Round of 16": 1.5,
-  "Quarter-final": 1.0,
-  "Semi-final": 0.5,
-  "Final": 0.3,
+  "Group match": 0.5,
+  "Round of 32": 3.5,
+  "Round of 16": 0.3,
+  "Quarter-final": 0.5,
+  "Semi-final": 2.0,
+  "Final": 2.0,
 };
 
 function getStageExponent(stage) {
@@ -164,7 +164,7 @@ function pickOpponent(allTeams, seed, excludeIds, stage, userElo) {
   }
 
   const random = seededRandom(seed);
-  const sorted = [...pool].sort((a, b) => b.elo - a.elo);
+  const sorted = [...pool].sort((a, b) => a.elo - b.elo);
   const exponent = getStageExponent(stage);
   const index = Math.floor(Math.pow(random(), exponent) * sorted.length);
   return sorted[clamp(index, 0, sorted.length - 1)];
@@ -174,11 +174,11 @@ const STAGE_PRESSURE = {
   "Group match 1": 1.0,
   "Group match 2": 1.0,
   "Group match 3": 1.0,
-  "Round of 32": 1.0,
-  "Round of 16": 1.02,
-  "Quarter-final": 1.08,
-  "Semi-final": 1.12,
-  "Final": 1.15,
+  "Round of 32": 1.00,
+  "Round of 16": 1.30,
+  "Quarter-final": 1.30,
+  "Semi-final": 0.95,
+  "Final": 0.95,
 };
 
 function scoreMatch(stage, opponent, ratings, allTeams, seed, knockout) {
@@ -186,16 +186,26 @@ function scoreMatch(stage, opponent, ratings, allTeams, seed, knockout) {
   const opponentStrength = normalizeOpponentStrength(opponent, allTeams);
 
   let ratingEdgeBonus = 0;
-  if (stage === "Round of 16" && ratings.overall >= 85) ratingEdgeBonus = 0.5;
-  if (stage === "Quarter-final" && ratings.overall >= 86) ratingEdgeBonus = 0.5;
-  if (stage === "Semi-final" && ratings.overall >= 88) ratingEdgeBonus = 0.5;
+  // Aggressive bonuses for SF/Final to help high-rated teams close out
+  if (stage === "Semi-final") {
+    if (ratings.overall >= 88) ratingEdgeBonus = 2.0;
+    else if (ratings.overall >= 84) ratingEdgeBonus = 1.2;
+    else if (ratings.overall >= 80) ratingEdgeBonus = 0.6;
+    else if (ratings.overall >= 76) ratingEdgeBonus = 0.2;
+  }
+  if (stage === "Final") {
+    if (ratings.overall >= 88) ratingEdgeBonus = 1.2;
+    else if (ratings.overall >= 84) ratingEdgeBonus = 0.8;
+    else if (ratings.overall >= 80) ratingEdgeBonus = 0.4;
+    else if (ratings.overall >= 76) ratingEdgeBonus = 0.2;
+  }
 
   const ratingEdge = (ratings.overall - opponentStrength) + ratingEdgeBonus;
   const attackEdge = (ratings.attack + ratings.midfield) / 2 - opponentStrength;
   const defenceEdge = (ratings.defence + ratings.gk) / 2 - opponentStrength;
   const pressure = STAGE_PRESSURE[stage] ?? 1.0;
-  const userLambda = clamp(1.30 + ratingEdge * 0.025 + attackEdge * 0.015, 0.20, 3.2);
-  const opponentLambda = clamp((1.40 - ratingEdge * 0.020 - defenceEdge * 0.013) * pressure, 0.25, 3.6);
+  const userLambda = clamp(1.10 + ratingEdge * 0.032 + attackEdge * 0.018, 0.15, 4.0);
+  const opponentLambda = clamp((1.45 - ratingEdge * 0.025 - defenceEdge * 0.018) * pressure, 0.20, 3.8);
   let userGoals = poisson(userLambda, random);
   let opponentGoals = poisson(opponentLambda, random);
   let decidedByPens = false;

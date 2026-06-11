@@ -1,6 +1,6 @@
 import { useEffect, useState, useRef, useCallback } from "react";
 import Flag from "../components/Flag";
-import type { EightZeroTeam, MatchEvent, MatchResult } from "../game8/types";
+import type { EightZeroTeam, LegendMode, MatchEvent, MatchResult } from "../game8/types";
 
 interface LiveMatchProps {
   stage: string;
@@ -8,6 +8,7 @@ interface LiveMatchProps {
   result: MatchResult;
   events: MatchEvent[];
   onFinished: () => void;
+  legendMode?: LegendMode;
 }
 
 const BASE_TICK_MS = 600;
@@ -71,7 +72,7 @@ function EventRow({ event }: { event: MatchEvent }) {
   );
 }
 
-export default function LiveMatch({ stage, opponent, result, events, onFinished }: LiveMatchProps) {
+export default function LiveMatch({ stage, opponent, result, events, onFinished, legendMode }: LiveMatchProps) {
   const [currentMinute, setCurrentMinute] = useState(0);
   const [userScore, setUserScore] = useState(0);
   const [oppScore, setOppScore] = useState(0);
@@ -255,7 +256,11 @@ export default function LiveMatch({ stage, opponent, result, events, onFinished 
           <div className="flex h-12 w-12 items-center justify-center rounded-full bg-gold-500/20 text-2xl font-black text-gold-400">
             XI
           </div>
-          <p className="mt-2 text-sm font-bold text-white">You</p>
+          <p className="mt-2 text-sm font-bold text-white">
+            {legendMode && legendMode !== "none"
+              ? `${legendMode.charAt(0).toUpperCase() + legendMode.slice(1)} XI`
+              : "You"}
+          </p>
         </div>
 
         <div className="flex flex-col items-center">
