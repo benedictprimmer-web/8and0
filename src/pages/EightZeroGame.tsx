@@ -484,10 +484,8 @@ function SetupScreen({
       const landed = FORMATIONS[Math.floor(Math.random() * FORMATIONS.length)];
       setSpinningFormationId(landed.id);
       onFormationChange(landed.id);
-      updateOptions({ difficulty: "hard", blindMode: true });
       window.setTimeout(() => {
         setSpinningFormationId(null);
-        onStart();
       }, 500);
     }, 3000);
   }
@@ -528,8 +526,12 @@ function SetupScreen({
         <button
           type="button"
           onClick={handleSpinWheel}
-          disabled={loading || Boolean(spinningFormationId)}
-          className="mt-4 inline-flex w-full items-center justify-center gap-2 rounded-xl border border-gold-600 bg-gold-500/10 px-6 py-4 text-lg font-black text-gold-400 transition-colors hover:bg-gold-500/20 disabled:cursor-not-allowed disabled:opacity-50"
+          disabled={loading || Boolean(spinningFormationId) || options.legendMode !== "none"}
+          className={`mt-4 inline-flex w-full items-center justify-center gap-2 rounded-xl border px-6 py-4 text-lg font-black transition-colors disabled:cursor-not-allowed disabled:opacity-50 ${
+            options.legendMode !== "none"
+              ? "border-surface-800 bg-surface-950/50 text-gray-600"
+              : "border-gold-600 bg-gold-500/10 text-gold-400 hover:bg-gold-500/20"
+          }`}
         >
           <Shuffle size={20} />
           Spin the Wheel
