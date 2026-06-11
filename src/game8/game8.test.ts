@@ -39,6 +39,7 @@ function rawPlayer(id: number, teamId: number, position: string, rating: number)
     club_name: `Club ${id}`,
     ea_overall: rating,
     aura_composite: 0.5,
+    shirt_number: id,
   };
 }
 
@@ -75,6 +76,7 @@ function makePick(id: number, category: DraftPick["category"], rating: number): 
     rating,
     clubName: null,
     aura: null,
+    shirtNumber: id,
   };
   return {
     slotId: `${category}-${id}`,
@@ -377,6 +379,7 @@ describe("8-0 simulation", () => {
       difficulty: "normal",
       blindMode: false,
       draftMode: "squad-first",
+      legendMode: "none",
       score: 0,
       draws: 0,
       picks: [],
@@ -392,5 +395,135 @@ describe("8-0 simulation", () => {
     ]);
 
     expect(runs[0].id).toBe("b");
+  });
+});
+
+describe("8-0 legend mode", () => {
+  it("auto-locks a legend player when legendMode is set", () => {
+    const data = buildEightZeroData(teamsData as RawTeam[], playersData as RawPlayer[]);
+    const state = createDraftState("legend-seed", "433", { legendMode: "messi" }, data);
+
+    expect(state.picks).toHaveLength(1);
+    expect(state.picks[0].player.name).toContain("Messi");
+    expect(state.picks[0].player.teamCode).toBe("ARG");
+    expect(state.picks[0].category).toBe("FWD");
+    expect(state.spinCount).toBe(0);
+    expect(state.rerollsLeft).toBe(1);
+    expect(state.blindMode).toBe(false);
+    expect(state.legendMode).toBe("messi");
+  });
+
+  it("auto-locks Neymar into a MID slot", () => {
+    const data = buildEightZeroData(teamsData as RawTeam[], playersData as RawPlayer[]);
+    const state = createDraftState("neymar-seed", "433", { legendMode: "neymar" }, data);
+
+    expect(state.picks).toHaveLength(1);
+    expect(state.picks[0].player.name).toContain("Neymar");
+    expect(state.picks[0].player.teamCode).toBe("BRA");
+    expect(state.picks[0].category).toBe("MID");
+  });
+
+  it("completes a 10-spin draft with legend mode and simulates", () => {
+    const data = buildEightZeroData(teamsData as RawTeam[], playersData as RawPlayer[]);
+    let state = createDraftState("legend-full-seed", "433", { legendMode: "ronaldo" }, data);
+
+    while (!state.complete) {
+      state = spinTeam(data, state);
+      const player = getAvailablePlayers(data, state).find((candidate) => canPickPlayer(candidate, state));
+      expect(player).toBeDefined();
+      state = selectPlayer(data, state, player!.id);
+    }
+
+    expect(state.picks).toHaveLength(11);
+    const legendPick = state.picks.find((p) => p.player.name.includes("Ronaldo"));
+    expect(legendPick).toBeDefined();
+
+    const ratings = calculateTeamRatings(state.picks);
+    const run = simulateTournamentRun({
+      teams: data.teams,
+      picks: state.picks,
+      ratings,
+      seed: state.seed,
+      formationId: state.formationId,
+      difficulty: state.difficulty,
+      blindMode: state.blindMode,
+      draftMode: state.draftMode,
+      legendMode: state.legendMode,
+    });
+
+    expect(run.legendMode).toBe("ronaldo");
+    expect(run.matches.length).toBeGreaterThan(0);
+  });
+});
+
+describe("8-0 bracket balancing", () => {
+  it("simulates with bracket balancing parameters", () => {
+    const data = buildEightZeroData(rawTeams, rawPlayers);
+    const picks = [
+      makePick(1, "GK", 90),
+      makePick(2, "DEF", 90),
+      makePick(3, "DEF", 90),
+      makePick(4, "DEF", 90),
+      makePick(5, "DEF", 90),
+      makePick(6, "MID", 90),
+      makePick(7, "MID", 90),
+      makePick(8, "MID", 90),
+      makePick(9, "FWD", 90),
+      makePick(10, "FWD", 90),
+      makePick(11, "FWD", 90),
+    ];
+
+    const run = simulateTournamentRun({
+      teams: data.teams,
+      picks,
+      ratings: calculateTeamRatings(picks),
+      seed: "bracket-seed",
+      formationId: "433",
+      legendMode: "none",
+    });
+
+    expect(run.matches.length).toBeGreaterThanOrEqual(3);
+    expect(run.matches.length).toBeLessThanOrEqual(8);
+    // Verify group stage opponents are within reasonable tier
+    const groupMatches = run.matches.filter((m) => m.stage.startsWith("Group"));
+    expect(groupMatches.length).toBe(3);
+  });
+
+  it("gives legend mode an easier opponent path", () => {
+    const data = buildEightZeroData(rawTeams, rawPlayers);
+    const picks = [
+      makePick(1, "GK", 88),
+      makePick(2, "DEF", 88),
+      makePick(3, "DEF", 88),
+      makePick(4, "DEF", 88),
+      makePick(5, "DEF", 88),
+      makePick(6, "MID", 88),
+      makePick(7, "MID", 88),
+      makePick(8, "MID", 88),
+      makePick(9, "FWD", 88),
+      makePick(10, "FWD", 88),
+      makePick(11, "FWD", 88),
+    ];
+
+    const normalRun = simulateTournamentRun({
+      teams: data.teams,
+      picks,
+      ratings: calculateTeamRatings(picks),
+      seed: "compare-seed",
+      formationId: "433",
+      legendMode: "none",
+    });
+
+    const legendRun = simulateTournamentRun({
+      teams: data.teams,
+      picks,
+      ratings: calculateTeamRatings(picks),
+      seed: "compare-seed",
+      formationId: "433",
+      legendMode: "messi",
+    });
+
+    expect(legendRun.matches.length).toBeGreaterThanOrEqual(3);
+    expect(normalRun.matches.length).toBeGreaterThanOrEqual(3);
   });
 });

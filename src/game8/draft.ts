@@ -10,12 +10,20 @@ import type {
   EightZeroPlayer,
   EightZeroTeam,
   FormationSlot,
+  LegendMode,
 } from "./types";
 
 const DEFAULT_OPTIONS: DraftOptions = {
   difficulty: "normal",
   blindMode: false,
   draftMode: "squad-first",
+  legendMode: "none",
+};
+
+const LEGEND_CONFIG: Record<Exclude<LegendMode, "none">, { fifaCode: string; nameMatch: (name: string) => boolean; category: "FWD" | "MID" }> = {
+  messi: { fifaCode: "ARG", nameMatch: (name) => name.includes("Messi"), category: "FWD" },
+  ronaldo: { fifaCode: "POR", nameMatch: (name) => name.includes("Ronaldo"), category: "FWD" },
+  neymar: { fifaCode: "BRA", nameMatch: (name) => name.includes("Neymar"), category: "MID" },
 };
 
 export function rerollsForDifficulty(difficulty: DraftDifficulty): number {
@@ -24,25 +32,68 @@ export function rerollsForDifficulty(difficulty: DraftDifficulty): number {
   return 1;
 }
 
+function findLegendPlayer(data: EightZeroData, legendMode: LegendMode): EightZeroPlayer | null {
+  if (legendMode === "none") return null;
+  const config = LEGEND_CONFIG[legendMode];
+  for (const player of data.players) {
+    if (player.teamCode === config.fifaCode && config.nameMatch(player.name)) {
+      return player;
+    }
+  }
+  return null;
+}
+
 export function createDraftState(
   seed: string,
   formationId = "433",
-  options: Partial<DraftOptions> = {}
+  options: Partial<DraftOptions> = {},
+  data?: EightZeroData
 ): DraftState {
   const formation = getFormation(formationId);
   const resolvedOptions = { ...DEFAULT_OPTIONS, ...options };
+  const legendMode = resolvedOptions.legendMode;
+  let picks: DraftPick[] = [];
+  let activeSlotId = formation.slots[0].id;
+  let spinCount = 0;
+  let rerollsLeft = rerollsForDifficulty(resolvedOptions.difficulty);
+  let blindMode = resolvedOptions.blindMode || resolvedOptions.difficulty === "hard";
+
+  if (legendMode !== "none" && data) {
+    const legendPlayer = findLegendPlayer(data, legendMode);
+    if (legendPlayer) {
+      const compatibleSlots = formation.slots.filter((slot) => slot.category === legendPlayer.category);
+      const slot = compatibleSlots[0] ?? formation.slots[0];
+      const legendTeam = data.teamById.get(legendPlayer.teamId) ?? data.teams[0];
+      const pick: DraftPick = {
+        slotId: slot.id,
+        slotLabel: slot.label,
+        category: slot.category,
+        player: legendPlayer,
+        spinTeam: legendTeam,
+        round: 1,
+      };
+      picks = [pick];
+      const nextSlot = formation.slots.find((candidate) => !picks.some((filled) => filled.slotId === candidate.id));
+      activeSlotId = nextSlot?.id ?? slot.id;
+      spinCount = 0;
+      rerollsLeft = 1;
+      blindMode = false;
+    }
+  }
+
   return {
     seed,
     formationId: formation.id,
-    picks: [],
-    activeSlotId: formation.slots[0].id,
+    picks,
+    activeSlotId,
     currentSpin: null,
-    rerollsLeft: rerollsForDifficulty(resolvedOptions.difficulty),
-    spinCount: 0,
-    complete: false,
+    rerollsLeft,
+    spinCount,
+    complete: picks.length >= formation.slots.length,
     difficulty: resolvedOptions.difficulty,
-    blindMode: resolvedOptions.blindMode || resolvedOptions.difficulty === "hard",
+    blindMode,
     draftMode: resolvedOptions.draftMode,
+    legendMode,
   };
 }
 

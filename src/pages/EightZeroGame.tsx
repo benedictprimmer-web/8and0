@@ -64,6 +64,7 @@ const DEFAULT_OPTIONS: DraftOptions = {
   difficulty: "normal",
   blindMode: false,
   draftMode: "squad-first",
+  legendMode: "none",
 };
 
 const DIFFICULTIES: Array<{
@@ -177,9 +178,11 @@ function getKitColors(code: string): { primary: string; secondary: string } {
 function ShirtIcon({
   code,
   empty = false,
+  number,
 }: {
   code: string;
   empty?: boolean;
+  number?: number | null;
 }) {
   const colors = getKitColors(code);
   return (
@@ -191,6 +194,20 @@ function ShirtIcon({
         strokeWidth="3"
       />
       {!empty && <path d="M26 13h12l-3 8h-6l-3-8Z" fill={colors.secondary} opacity="0.85" />}
+      {number !== null && number !== undefined && (
+        <text
+          x="32"
+          y="42"
+          textAnchor="middle"
+          dominantBaseline="middle"
+          fill={colors.secondary}
+          fontSize="14"
+          fontWeight="900"
+          fontFamily="sans-serif"
+        >
+          {number}
+        </text>
+      )}
     </svg>
   );
 }
@@ -202,6 +219,7 @@ function PitchXI({
   hideRatings,
   revealRatings = false,
   goalScorers = {},
+  legendSlotId,
 }: {
   formationId: string;
   picks: DraftPick[];
@@ -209,6 +227,7 @@ function PitchXI({
   hideRatings: boolean;
   revealRatings?: boolean;
   goalScorers?: Record<string, number>;
+  legendSlotId?: string;
 }) {
   const formation = getFormation(formationId);
   const pickBySlot = new Map(picks.map((pick) => [pick.slotId, pick]));
@@ -232,14 +251,15 @@ function PitchXI({
                 const pick = pickBySlot.get(slot.id);
                 const active = activeSlotId === slot.id && !pick;
                 const goals = pick ? (goalScorers[pick.player.name] ?? 0) : 0;
+                const isLegend = legendSlotId === slot.id && pick;
                 return (
                   <div key={slot.id} className="flex min-w-0 flex-1 max-w-[116px] flex-col items-center">
                     <div
                       className={`relative rounded-xl px-2 py-1 ${
                         active ? "bg-gold-500/20 ring-2 ring-gold-400/80" : ""
-                      }`}
+                      } ${isLegend ? "ring-2 ring-gold-400" : ""}`}
                     >
-                      <ShirtIcon code={pick?.player.teamCode ?? slot.category} empty={!pick} />
+                      <ShirtIcon code={pick?.player.teamCode ?? slot.category} empty={!pick} number={pick?.player.shirtNumber} />
                       {goals > 0 && (
                         <span className="absolute -top-1 -right-1 text-xs">
                           {"⚽".repeat(goals)}
@@ -269,37 +289,129 @@ function PlayerRow({
   disabled,
   hideRating,
   onPick,
+  isLegend = false,
 }: {
   player: EightZeroPlayer;
   compatibleSlots: FormationSlot[];
   disabled: boolean;
   hideRating: boolean;
   onPick: (playerId: number) => void;
+  isLegend?: boolean;
 }) {
+  const kitColors = getKitColors(player.teamCode);
   return (
     <button
       type="button"
       onClick={() => onPick(player.id)}
       disabled={disabled}
-      className="flex w-full items-center gap-3 rounded-lg border border-surface-700 bg-surface-800 px-3 py-3 text-left transition-colors hover:border-gold-600/40 hover:bg-surface-700 disabled:cursor-not-allowed disabled:opacity-45 disabled:hover:border-surface-700 disabled:hover:bg-surface-800"
+      className={`flex w-full items-center gap-3 rounded-lg border px-3 py-3 text-left transition-colors hover:border-gold-600/40 hover:bg-surface-700 disabled:cursor-not-allowed disabled:opacity-45 disabled:hover:border-surface-700 disabled:hover:bg-surface-800 ${isLegend ? "border-gold-600/60 bg-gold-500/5" : "border-surface-700 bg-surface-800"}`}
     >
       <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-lg bg-surface-900 text-sm font-extrabold text-gold-400 tabular-nums">
         {formatRating(player.rating, hideRating)}
       </div>
       <div className="min-w-0 flex-1">
-        <p className="truncate text-sm font-bold text-white">{player.name}</p>
+        <p className="truncate text-sm font-bold text-white">
+          {player.name}
+          {isLegend && (
+            <span className="ml-2 inline-flex items-center rounded-full bg-gold-500/10 px-1.5 py-0.5 text-[10px] font-black text-gold-400">Legend</span>
+          )}
+        </p>
         <p className="truncate text-xs text-gray-500">
           {player.position} · {player.clubName ?? "Free agent"}
         </p>
       </div>
-      <div className="flex flex-shrink-0 items-center gap-1 text-xs font-semibold text-gray-400">
+      <div className="flex flex-shrink-0 items-center gap-2 text-xs font-semibold text-gray-400">
         <Flag fifaCode={player.teamCode} size={20} />
         <span>{player.teamCode}</span>
+        {player.shirtNumber !== null && (
+          <span
+            className="inline-flex h-5 min-w-[1.25rem] items-center justify-center rounded-full px-1 text-[10px] font-black tabular-nums"
+            style={{
+              backgroundColor: kitColors.primary,
+              color: kitColors.secondary,
+            }}
+          >
+            {player.shirtNumber}
+          </span>
+        )}
       </div>
       <span className="flex-shrink-0 text-xs font-bold text-gray-500">
         {compatibleSlots.length > 0 ? player.category : "Full"}
       </span>
     </button>
+  );
+}
+
+function LegendModal({
+  onSelect,
+  onClose,
+}: {
+  onSelect: (legendMode: "messi" | "ronaldo" | "neymar") => void;
+  onClose: () => void;
+}) {
+  const legends = [
+    {
+      mode: "messi" as const,
+      name: "Lionel Messi",
+      team: "Argentina",
+      code: "ARG",
+      rating: 90,
+      position: "FW",
+    },
+    {
+      mode: "ronaldo" as const,
+      name: "Cristiano Ronaldo",
+      team: "Portugal",
+      code: "POR",
+      rating: 88,
+      position: "FW",
+    },
+    {
+      mode: "neymar" as const,
+      name: "Neymar",
+      team: "Brazil",
+      code: "BRA",
+      rating: 87,
+      position: "MF",
+    },
+  ];
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4 animate-fade-up">
+      <div className="w-full max-w-2xl rounded-2xl border border-indigo-900/70 bg-[#11111f] p-6 shadow-2xl shadow-black/40">
+        <div className="mb-6 text-center">
+          <h2 className="text-2xl font-black text-white">Last Dance</h2>
+          <p className="mt-1 text-sm text-gray-400">Choose your legend. They are auto-locked as your first pick.</p>
+        </div>
+        <div className="grid gap-4 sm:grid-cols-3">
+          {legends.map((legend) => (
+            <button
+              key={legend.mode}
+              type="button"
+              onClick={() => onSelect(legend.mode)}
+              className="group flex flex-col items-center rounded-xl border border-surface-700 bg-surface-950 p-5 text-center transition-colors hover:border-gold-600/60 hover:bg-surface-900"
+            >
+              <div className="flex h-16 w-16 items-center justify-center rounded-full bg-gold-500/10 group-hover:bg-gold-500/20">
+                <Flag fifaCode={legend.code} size={48} />
+              </div>
+              <p className="mt-3 text-lg font-black text-white">{legend.name}</p>
+              <p className="text-sm text-gray-400">{legend.team}</p>
+              <div className="mt-2 flex items-center gap-2">
+                <span className="rounded-md bg-gold-500/10 px-2 py-1 text-xs font-bold text-gold-400">{legend.rating} OVR</span>
+                <span className="rounded-md bg-surface-800 px-2 py-1 text-xs font-bold text-gray-400">{legend.position}</span>
+              </div>
+            </button>
+          ))}
+        </div>
+        <button
+          type="button"
+          onClick={onClose}
+          className="mt-6 inline-flex w-full items-center justify-center rounded-xl border border-surface-700 bg-surface-950 px-4 py-3 text-sm font-bold text-gray-400 transition-colors hover:border-gold-600/40 hover:text-white"
+        >
+          Cancel
+        </button>
+      </div>
+    </div>
   );
 }
 
@@ -313,6 +425,7 @@ function SetupScreen({
   onFormationChange,
   onOptionsChange,
   onStart,
+  onLegendSelect,
 }: {
   formationId: string;
   options: DraftOptions;
@@ -323,11 +436,60 @@ function SetupScreen({
   onFormationChange: (formationId: string) => void;
   onOptionsChange: (options: DraftOptions) => void;
   onStart: () => void;
+  onLegendSelect: (legendMode: "messi" | "ronaldo" | "neymar") => void;
 }) {
+  const [spinningFormationId, setSpinningFormationId] = useState<string | null>(null);
+  const [showLegendModal, setShowLegendModal] = useState(false);
+  const spinIntervalRef = useRef<number | null>(null);
+  const spinTimeoutRef = useRef<number | null>(null);
+
   function updateOptions(next: Partial<DraftOptions>) {
     const merged = { ...options, ...next };
     if (merged.difficulty === "hard") merged.blindMode = true;
     onOptionsChange(merged);
+  }
+
+  function clearSpinTimers() {
+    if (spinIntervalRef.current) window.clearInterval(spinIntervalRef.current);
+    if (spinTimeoutRef.current) window.clearTimeout(spinTimeoutRef.current);
+    spinIntervalRef.current = null;
+    spinTimeoutRef.current = null;
+  }
+
+  function handleSpinWheel() {
+    if (loading || spinningFormationId) return;
+    clearSpinTimers();
+    let index = 0;
+    setSpinningFormationId(FORMATIONS[0].id);
+    spinIntervalRef.current = window.setInterval(() => {
+      index = (index + 1) % FORMATIONS.length;
+      setSpinningFormationId(FORMATIONS[index].id);
+    }, 150);
+    spinTimeoutRef.current = window.setTimeout(() => {
+      if (spinIntervalRef.current) window.clearInterval(spinIntervalRef.current);
+      spinIntervalRef.current = window.setInterval(() => {
+        index = (index + 1) % FORMATIONS.length;
+        setSpinningFormationId(FORMATIONS[index].id);
+      }, 300);
+    }, 1500);
+    spinTimeoutRef.current = window.setTimeout(() => {
+      if (spinIntervalRef.current) window.clearInterval(spinIntervalRef.current);
+      spinIntervalRef.current = window.setInterval(() => {
+        index = (index + 1) % FORMATIONS.length;
+        setSpinningFormationId(FORMATIONS[index].id);
+      }, 500);
+    }, 2500);
+    spinTimeoutRef.current = window.setTimeout(() => {
+      clearSpinTimers();
+      const landed = FORMATIONS[Math.floor(Math.random() * FORMATIONS.length)];
+      setSpinningFormationId(landed.id);
+      onFormationChange(landed.id);
+      updateOptions({ difficulty: "hard", blindMode: true });
+      window.setTimeout(() => {
+        setSpinningFormationId(null);
+        onStart();
+      }, 500);
+    }, 3000);
   }
 
   return (
@@ -357,12 +519,39 @@ function SetupScreen({
               key={formation.id}
               active={formationId === formation.id}
               onClick={() => onFormationChange(formation.id)}
-              className="min-w-[110px] text-lg sm:text-xl"
+              className={`min-w-[110px] text-lg sm:text-xl ${spinningFormationId === formation.id ? "animate-pulse" : ""}`}
             >
               {formation.label}
             </OptionButton>
           ))}
         </div>
+        <button
+          type="button"
+          onClick={handleSpinWheel}
+          disabled={loading || Boolean(spinningFormationId)}
+          className="mt-4 inline-flex w-full items-center justify-center gap-2 rounded-xl border border-gold-600 bg-gold-500/10 px-6 py-4 text-lg font-black text-gold-400 transition-colors hover:bg-gold-500/20 disabled:cursor-not-allowed disabled:opacity-50"
+        >
+          <Shuffle size={20} />
+          Spin the Wheel
+        </button>
+        <button
+          type="button"
+          onClick={() => setShowLegendModal(true)}
+          disabled={loading || Boolean(spinningFormationId)}
+          className="mt-3 inline-flex w-full items-center justify-center gap-2 rounded-xl border border-surface-700 bg-surface-950 px-6 py-4 text-lg font-black text-white transition-colors hover:border-gold-600/40 hover:bg-surface-900 disabled:cursor-not-allowed disabled:opacity-50"
+        >
+          <Trophy size={20} className="text-gold-400" />
+          Last Dance
+        </button>
+        {showLegendModal && (
+          <LegendModal
+            onSelect={(legendMode) => {
+              setShowLegendModal(false);
+              onLegendSelect(legendMode);
+            }}
+            onClose={() => setShowLegendModal(false)}
+          />
+        )}
       </section>
 
       <section className="rounded-2xl border border-indigo-900/70 bg-[#11111f] p-5 shadow-2xl shadow-black/20">
@@ -502,6 +691,7 @@ function SquadPanel({
           hideRatings={hideRatings}
           revealRatings
           goalScorers={goalScorers}
+          legendSlotId={state.legendMode !== "none" ? picks[0]?.slotId : undefined}
         />
       )}
     </aside>
@@ -621,6 +811,7 @@ function ResultPanel({
         <p className="mt-3 text-2xl font-bold text-gray-300">+{run.score} points</p>
         <p className="mt-2 text-sm font-bold text-gray-500">
           {run.record} · {run.grade} · {run.label}
+          {run.legendMode !== "none" && ` · Last Dance: ${titleCase(run.legendMode)}`}
         </p>
       </div>
 
@@ -702,11 +893,13 @@ function LeaderboardPanel({
     { id: "normal", label: "Normal" },
     { id: "hard", label: "Hard" },
     { id: "blind", label: "Blind" },
+    { id: "legend", label: "Last Dance" },
     { id: "formation", label: getFormation(formationId).label },
   ];
   const filtered = history.filter((run) => {
     if (filter === "all") return true;
     if (filter === "blind") return run.blindMode;
+    if (filter === "legend") return run.legendMode !== "none";
     if (filter === "formation") return run.formationId === formationId;
     return run.difficulty === filter;
   });
@@ -765,6 +958,7 @@ function LeaderboardPanel({
               <p className="truncate text-xs text-gray-500">
                 {run.formationLabel} · {titleCase(run.difficulty)} · {run.blindMode ? "Blind" : "Open ratings"} ·{" "}
                 {run.draftMode === "squad-first" ? "Squad first" : "Position first"}
+                {run.legendMode !== "none" && ` · Last Dance: ${titleCase(run.legendMode)}`}
               </p>
             </div>
             <span className="font-black text-gold-400">{Math.round(run.ratings.overall)} OVR</span>
@@ -869,7 +1063,7 @@ export default function EightZeroGame() {
     };
     setFormationId(nextFormationId);
     setOptions(resolvedOptions);
-    setDraftState(createDraftState(makeSeed(), nextFormationId, resolvedOptions));
+    setDraftState(createDraftState(makeSeed(), nextFormationId, resolvedOptions, gameData ?? undefined));
     setRun(null);
     setStarted(true);
     setSearch("");
@@ -912,6 +1106,7 @@ export default function EightZeroGame() {
       difficulty: next.difficulty,
       blindMode: next.blindMode,
       draftMode: next.draftMode,
+      legendMode: next.legendMode,
     });
     setRun(nextRun);
     setHistory(saveRun(nextRun));
@@ -1043,6 +1238,11 @@ export default function EightZeroGame() {
         onFormationChange={setFormationId}
         onOptionsChange={setOptions}
         onStart={() => startDraft()}
+        onLegendSelect={(legendMode) => {
+          const nextOptions: DraftOptions = { ...options, legendMode, difficulty: "normal", blindMode: false };
+          setOptions(nextOptions);
+          startDraft(formationId, nextOptions);
+        }}
       />
     );
   }
@@ -1077,6 +1277,9 @@ export default function EightZeroGame() {
                   {getFormation(draftState.formationId).label} · {titleCase(draftState.difficulty)} ·{" "}
                   {draftState.draftMode === "squad-first" ? "Squad first" : "Position first"}
                   {draftState.blindMode ? " · Blind ratings" : ""}
+                  {draftState.legendMode !== "none" && (
+                    <span className="ml-1 text-gold-400">· Last Dance: {titleCase(draftState.legendMode)}</span>
+                  )}
                 </p>
               </div>
               <button
@@ -1338,6 +1541,7 @@ export default function EightZeroGame() {
                 picks={draftState.picks}
                 activeSlotId={draftState.draftMode === "position-first" ? draftState.activeSlotId : undefined}
                 hideRatings={hideDraftRatings}
+                legendSlotId={draftState.legendMode !== "none" ? draftState.picks[0]?.slotId : undefined}
               />
             </div>
           )}

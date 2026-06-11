@@ -135,15 +135,38 @@ function normalizeOpponentStrength(team, allTeams) {
   const min = Math.min(...elos);
   const max = Math.max(...elos);
   const normalized = (team.elo - min) / Math.max(1, max - min);
-  return 70 + normalized * 22; // even tighter: 70-92
+  return 64 + normalized * 32;
 }
 
-function pickOpponent(allTeams, seed, excludeIds) {
-  const pool = allTeams.filter((t) => !excludeIds.has(t.teamId));
+const STAGE_EXPONENT = {
+  "Group match": 0.8,
+  "Round of 32": 2.0,
+  "Round of 16": 1.5,
+  "Quarter-final": 1.0,
+  "Semi-final": 0.5,
+  "Final": 0.3,
+};
+
+function getStageExponent(stage) {
+  const key = stage.startsWith("Group") ? "Group match" : stage;
+  return STAGE_EXPONENT[key] ?? 1.0;
+}
+
+function pickOpponent(allTeams, seed, excludeIds, stage, userElo) {
+  let pool = allTeams.filter((t) => !excludeIds.has(t.teamId));
   if (pool.length === 0) throw new Error("No opponents available");
+
+  // Group stage balance: only pick from teams within ±1 tier of user
+  if (stage.startsWith("Group")) {
+    const userTier = Math.floor((userElo - 1400) / 100);
+    const balanced = pool.filter((t) => Math.abs(Math.floor((t.elo - 1400) / 100) - userTier) <= 1);
+    if (balanced.length > 0) pool = balanced;
+  }
+
   const random = seededRandom(seed);
   const sorted = [...pool].sort((a, b) => b.elo - a.elo);
-  const index = Math.floor(Math.pow(random(), 1.3) * sorted.length);
+  const exponent = getStageExponent(stage);
+  const index = Math.floor(Math.pow(random(), exponent) * sorted.length);
   return sorted[clamp(index, 0, sorted.length - 1)];
 }
 
@@ -151,33 +174,66 @@ const STAGE_PRESSURE = {
   "Group match 1": 1.0,
   "Group match 2": 1.0,
   "Group match 3": 1.0,
-  "Round of 32": 1.03,
-  "Round of 16": 1.06,
-  "Quarter-final": 1.10,
-  "Semi-final": 1.15,
-  "Final": 1.20,
+  "Round of 32": 1.0,
+  "Round of 16": 1.02,
+  "Quarter-final": 1.08,
+  "Semi-final": 1.12,
+  "Final": 1.15,
 };
 
 function scoreMatch(stage, opponent, ratings, allTeams, seed, knockout) {
   const random = seededRandom(seed);
   const opponentStrength = normalizeOpponentStrength(opponent, allTeams);
-  const ratingEdge = ratings.overall - opponentStrength;
+
+  let ratingEdgeBonus = 0;
+  if (stage === "Round of 16" && ratings.overall >= 85) ratingEdgeBonus = 0.5;
+  if (stage === "Quarter-final" && ratings.overall >= 86) ratingEdgeBonus = 0.5;
+  if (stage === "Semi-final" && ratings.overall >= 88) ratingEdgeBonus = 0.5;
+
+  const ratingEdge = (ratings.overall - opponentStrength) + ratingEdgeBonus;
   const attackEdge = (ratings.attack + ratings.midfield) / 2 - opponentStrength;
   const defenceEdge = (ratings.defence + ratings.gk) / 2 - opponentStrength;
   const pressure = STAGE_PRESSURE[stage] ?? 1.0;
-  const userLambda = clamp(1.18 + ratingEdge * 0.020 + attackEdge * 0.013, 0.22, 3.5);
-  const opponentLambda = clamp((1.18 - ratingEdge * 0.016 - defenceEdge * 0.011) * pressure, 0.2, 3.4);
+  const userLambda = clamp(1.30 + ratingEdge * 0.025 + attackEdge * 0.015, 0.20, 3.2);
+  const opponentLambda = clamp((1.40 - ratingEdge * 0.020 - defenceEdge * 0.013) * pressure, 0.25, 3.6);
   let userGoals = poisson(userLambda, random);
   let opponentGoals = poisson(opponentLambda, random);
   let decidedByPens = false;
 
   if (knockout && userGoals === opponentGoals) {
-    decidedByPens = true;
-    const edge = clamp(0.48 + ratingEdge * 0.010, 0.18, 0.75);
-    if (random() <= edge) {
-      userGoals += 1;
-    } else {
-      opponentGoals += 1;
+    // Extra time
+    const etUserLambda = userLambda * 0.35;
+    const etOppLambda = opponentLambda * 0.35;
+    userGoals += poisson(etUserLambda, random);
+    opponentGoals += poisson(etOppLambda, random);
+
+    if (userGoals === opponentGoals) {
+      // Penalties
+      decidedByPens = true;
+      const userPenRating = clamp(0.675 + (ratings.attack - 75) * 0.005, 0.45, 0.85);
+      const oppPenRating = clamp(0.675 - (ratings.gk - 75) * 0.008, 0.35, 0.85);
+      let userScored = 0;
+      let oppScored = 0;
+      let round = 1;
+      for (let i = 0; i < 5; i++) {
+        const userSaved = random() > userPenRating;
+        if (!userSaved) userScored++;
+        const oppSaved = random() > oppPenRating;
+        if (!oppSaved) oppScored++;
+        const remaining = 5 - i - 1;
+        if (userScored > oppScored + remaining || oppScored > userScored + remaining) break;
+        round++;
+      }
+      while (userScored === oppScored) {
+        round++;
+        if (random() <= userPenRating) userScored++;
+        if (random() <= oppPenRating) oppScored++;
+      }
+      if (userScored > oppScored) {
+        userGoals += 1;
+      } else {
+        opponentGoals += 1;
+      }
     }
   }
 
@@ -191,13 +247,14 @@ function simulateTournamentRun(ratings, seed) {
   let wins = 0, draws = 0, losses = 0;
   let stageReached = "Group stage";
   let groupPoints = 0;
+  const userElo = ratings.overall * 20 + 1000;
 
   const GROUP_STAGES = ["Group match 1", "Group match 2", "Group match 3"];
   const KNOCKOUT_STAGES = ["Round of 32", "Round of 16", "Quarter-final", "Semi-final", "Final"];
 
   for (let i = 0; i < GROUP_STAGES.length; i++) {
     const stage = GROUP_STAGES[i];
-    const opponent = pickOpponent(validTeams, `${seed}:group:${i}`, excludeIds);
+    const opponent = pickOpponent(validTeams, `${seed}:group:${i}`, excludeIds, stage, userElo);
     excludeIds.add(opponent.teamId);
     const result = scoreMatch(stage, opponent, ratings, validTeams, `${seed}:${stage}`, false);
     matches.push(result);
@@ -206,12 +263,12 @@ function simulateTournamentRun(ratings, seed) {
     else { losses++; }
   }
 
-  if (groupPoints < 4) {
+  if (groupPoints < 3) {
     stageReached = "Group stage";
   } else {
     for (let i = 0; i < KNOCKOUT_STAGES.length; i++) {
       const stage = KNOCKOUT_STAGES[i];
-      const opponent = pickOpponent(validTeams, `${seed}:knockout:${i}`, excludeIds);
+      const opponent = pickOpponent(validTeams, `${seed}:knockout:${i}`, excludeIds, stage, userElo);
       excludeIds.add(opponent.teamId);
       const result = scoreMatch(stage, opponent, ratings, validTeams, `${seed}:${stage}`, true);
       matches.push(result);

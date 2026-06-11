@@ -20,6 +20,7 @@ function player(name: string): EightZeroPlayer {
     rating: 88,
     clubName: "Test FC",
     aura: null,
+    shirtNumber: null,
   };
 }
 
@@ -51,6 +52,7 @@ function makeRun(overrides: Partial<TournamentRun> = {}): TournamentRun {
     difficulty: "hard",
     blindMode: true,
     draftMode: "squad-first",
+    legendMode: "none",
     score: 42,
     record: "8-0-0",
     wins: 8,
