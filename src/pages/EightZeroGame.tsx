@@ -436,7 +436,7 @@ function SetupScreen({
   onFormationChange: (formationId: string) => void;
   onOptionsChange: (options: DraftOptions) => void;
   onStart: () => void;
-  onLegendSelect: (legendMode: "messi" | "ronaldo" | "neymar") => void;
+  onLegendSelect: (legendMode: "none" | "messi" | "ronaldo" | "neymar") => void;
 }) {
   const [spinningFormationId, setSpinningFormationId] = useState<string | null>(null);
   const [showLegendModal, setShowLegendModal] = useState(false);
@@ -536,13 +536,28 @@ function SetupScreen({
         </button>
         <button
           type="button"
-          onClick={() => setShowLegendModal(true)}
+          onClick={() => {
+            if (options.legendMode !== "none") {
+              onLegendSelect("none");
+            } else {
+              setShowLegendModal(true);
+            }
+          }}
           disabled={loading || Boolean(spinningFormationId)}
-          className="mt-3 inline-flex w-full items-center justify-center gap-2 rounded-xl border border-surface-700 bg-surface-950 px-6 py-4 text-lg font-black text-white transition-colors hover:border-gold-600/40 hover:bg-surface-900 disabled:cursor-not-allowed disabled:opacity-50"
+          className={`mt-3 inline-flex w-full items-center justify-center gap-2 rounded-xl border px-6 py-4 text-lg font-black transition-colors disabled:cursor-not-allowed disabled:opacity-50 ${
+            options.legendMode !== "none"
+              ? "border-gold-600 bg-gold-500/10 text-gold-400 hover:bg-gold-500/20"
+              : "border-surface-700 bg-surface-950 text-white hover:border-gold-600/40 hover:bg-surface-900"
+          }`}
         >
-          <Trophy size={20} className="text-gold-400" />
-          Last Dance
+          <Trophy size={20} className={options.legendMode !== "none" ? "text-gold-400" : "text-gray-400"} />
+          {options.legendMode !== "none" ? `Last Dance: ${titleCase(options.legendMode)}` : "Last Dance"}
         </button>
+        {options.legendMode !== "none" && (
+          <p className="mt-2 text-center text-xs text-gray-500">
+            Click to cancel legend mode
+          </p>
+        )}
         {showLegendModal && (
           <LegendModal
             onSelect={(legendMode) => {
@@ -1239,9 +1254,8 @@ export default function EightZeroGame() {
         onOptionsChange={setOptions}
         onStart={() => startDraft()}
         onLegendSelect={(legendMode) => {
-          const nextOptions: DraftOptions = { ...options, legendMode, difficulty: "normal", blindMode: false };
+          const nextOptions: DraftOptions = { ...options, legendMode };
           setOptions(nextOptions);
-          startDraft(formationId, nextOptions);
         }}
       />
     );
