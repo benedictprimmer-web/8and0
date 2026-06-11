@@ -134,6 +134,12 @@ function scoreMatch(
   const defenceEdge = (ratings.defence + ratings.gk) / 2 - opponentStrength;
   let pressure = STAGE_PRESSURE[stage] ?? 1.0;
 
+  // Tighten games in QF/SF/Final - less scoring = more ET and penalties
+  if (stage === "Quarter-final" || stage === "Semi-final" || stage === "Final") {
+    const tightFactor = stage === "Final" ? 1.20 : stage === "Semi-final" ? 1.15 : 1.10;
+    pressure = pressure * tightFactor;
+  }
+
   // Legend mode: easier final stage
   if (legendMode !== "none" && stage === "Final") {
     pressure = Math.max(1.0, pressure - 0.05);
@@ -150,10 +156,11 @@ function scoreMatch(
   let penaltyShootout: PenaltyKick[] | undefined;
 
   if (knockout && userGoals === opponentGoals) {
-    // Extra time
+    // Extra time - lower scoring in later rounds = more penalties
     extraTime = true;
-    const etUserLambda = userLambda * 0.35;
-    const etOppLambda = opponentLambda * 0.35;
+    const etMultiplier = stage === "Final" ? 0.10 : stage === "Semi-final" ? 0.12 : stage === "Quarter-final" ? 0.15 : 0.20;
+    const etUserLambda = userLambda * etMultiplier;
+    const etOppLambda = opponentLambda * etMultiplier;
     userGoals += poisson(etUserLambda, random);
     opponentGoals += poisson(etOppLambda, random);
 
