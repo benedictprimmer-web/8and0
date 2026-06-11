@@ -257,7 +257,7 @@ function PitchXI({
                     <div
                       className={`relative rounded-xl px-2 py-1 ${
                         active ? "bg-gold-500/20 ring-2 ring-gold-400/80" : ""
-                      } ${isLegend ? "ring-2 ring-gold-400" : ""}`}
+                      }`}
                     >
                       <ShirtIcon code={pick?.player.teamCode ?? slot.category} empty={!pick} number={pick?.player.shirtNumber} />
                       {goals > 0 && (
@@ -266,8 +266,8 @@ function PitchXI({
                         </span>
                       )}
                     </div>
-                    <div className="mt-1 w-full overflow-hidden rounded-md bg-white px-2 py-1 text-center text-xs font-black text-surface-950 shadow-sm">
-                      <p className="truncate">{pick?.player.name ?? slot.label}</p>
+                    <div className="mt-1 w-full overflow-hidden rounded-md bg-white px-2 py-1 text-center text-xs font-black shadow-sm">
+                      <p className={`truncate ${isLegend ? "text-gold-500" : "text-surface-950"}`}>{pick?.player.name ?? slot.label}</p>
                     </div>
                     <div className="w-[78%] rounded-b-md bg-surface-950 px-2 py-0.5 text-center text-xs font-black text-gold-400 tabular-nums">
                       {pick ? formatRating(pick.player.rating, hide) : "--"}
@@ -1326,7 +1326,11 @@ export default function EightZeroGame() {
                   <div className="flex h-14 w-14 items-center justify-center rounded-full bg-gold-500/20 text-2xl font-black text-gold-400">
                     XI
                   </div>
-                  <p className="mt-2 text-sm font-bold text-white">You</p>
+                  <p className="mt-2 text-sm font-bold text-white">
+                    {run.legendMode !== "none"
+                      ? `${titleCase(run.legendMode)} XI`
+                      : "You"}
+                  </p>
                 </div>
                 <span className="text-2xl font-bold text-gray-600">vs</span>
                 <div className="flex flex-col items-center">
@@ -1365,6 +1369,7 @@ export default function EightZeroGame() {
               opponent={run.matches[currentMatchIndex]?.opponent ?? run.matches[0].opponent}
               result={run.matches[currentMatchIndex]}
               events={allMatchEvents[currentMatchIndex] ?? []}
+              legendMode={run.legendMode}
               onFinished={() => {
                 const match = run.matches[currentMatchIndex];
                 if (match.decidedByPens && match.penaltyShootout) {
