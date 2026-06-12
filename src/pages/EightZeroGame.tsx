@@ -1355,6 +1355,10 @@ export default function EightZeroGame() {
                 setStarted(false);
                 setTournamentPhase("idle");
               }}
+              onStopPractice={() => {
+                setStarted(false);
+                setTournamentPhase("idle");
+              }}
             />
           )}
 
