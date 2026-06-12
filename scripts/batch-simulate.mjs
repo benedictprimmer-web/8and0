@@ -156,10 +156,12 @@ function pickOpponent(allTeams, seed, excludeIds, stage, userElo) {
   let pool = allTeams.filter((t) => !excludeIds.has(t.teamId));
   if (pool.length === 0) throw new Error("No opponents available");
 
-  // Group stage balance: only pick from teams within ±1 tier of user
+  // Group stage balance: rating-based tier expansion
+  // 84+ rating: ±3 tiers (easier), 76-83: ±2 tiers, <76: ±1 tier (standard)
   if (stage.startsWith("Group")) {
     const userTier = Math.floor((userElo - 1400) / 100);
-    const balanced = pool.filter((t) => Math.abs(Math.floor((t.elo - 1400) / 100) - userTier) <= 1);
+    const tierRange = userElo >= 1680 ? 3 : userElo >= 1520 ? 2 : 1;
+    const balanced = pool.filter((t) => Math.abs(Math.floor((t.elo - 1400) / 100) - userTier) <= tierRange);
     if (balanced.length > 0) pool = balanced;
   }
 
@@ -200,10 +202,23 @@ function scoreMatch(stage, opponent, ratings, allTeams, seed, knockout) {
     else if (ratings.overall >= 76) ratingEdgeBonus = 0.2;
   }
 
+  // Group stage: bonus for high-rated teams to score more
+  if (stage.startsWith("Group")) {
+    if (ratings.overall >= 84) ratingEdgeBonus = 1.0;
+    else if (ratings.overall >= 80) ratingEdgeBonus = 0.5;
+  }
+
   const ratingEdge = (ratings.overall - opponentStrength) + ratingEdgeBonus;
   const attackEdge = (ratings.attack + ratings.midfield) / 2 - opponentStrength;
   const defenceEdge = (ratings.defence + ratings.gk) / 2 - opponentStrength;
-  const pressure = STAGE_PRESSURE[stage] ?? 1.0;
+  let pressure = STAGE_PRESSURE[stage] ?? 1.0;
+
+  // Tighten games in QF/SF/Final
+  if (stage === "Quarter-final" || stage === "Semi-final" || stage === "Final") {
+    const tightFactor = stage === "Final" ? 1.20 : stage === "Semi-final" ? 1.15 : 1.10;
+    pressure = pressure * tightFactor;
+  }
+
   const userLambda = clamp(1.10 + ratingEdge * 0.032 + attackEdge * 0.018, 0.15, 4.0);
   const opponentLambda = clamp((1.45 - ratingEdge * 0.025 - defenceEdge * 0.018) * pressure, 0.20, 3.8);
   let userGoals = poisson(userLambda, random);
@@ -211,9 +226,10 @@ function scoreMatch(stage, opponent, ratings, allTeams, seed, knockout) {
   let decidedByPens = false;
 
   if (knockout && userGoals === opponentGoals) {
-    // Extra time
-    const etUserLambda = userLambda * 0.35;
-    const etOppLambda = opponentLambda * 0.35;
+    // Extra time - lower scoring in later rounds
+    const etMultiplier = stage === "Final" ? 0.10 : stage === "Semi-final" ? 0.12 : stage === "Quarter-final" ? 0.15 : 0.20;
+    const etUserLambda = userLambda * etMultiplier;
+    const etOppLambda = opponentLambda * etMultiplier;
     userGoals += poisson(etUserLambda, random);
     opponentGoals += poisson(etOppLambda, random);
 
@@ -273,7 +289,7 @@ function simulateTournamentRun(ratings, seed) {
     else { losses++; }
   }
 
-  if (groupPoints < 3) {
+  if (groupPoints < 2) {
     stageReached = "Group stage";
   } else {
     for (let i = 0; i < KNOCKOUT_STAGES.length; i++) {

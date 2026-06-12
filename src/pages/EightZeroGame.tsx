@@ -12,6 +12,7 @@ import {
   Share2,
   Shield,
   Shuffle,
+  Target,
   Trophy,
 } from "lucide-react";
 import { api, leaderboardApi, type SubmitResponse } from "../api/client";
@@ -426,6 +427,7 @@ function SetupScreen({
   onOptionsChange,
   onStart,
   onLegendSelect,
+  onStartPracticePenalties,
 }: {
   formationId: string;
   options: DraftOptions;
@@ -437,6 +439,7 @@ function SetupScreen({
   onOptionsChange: (options: DraftOptions) => void;
   onStart: () => void;
   onLegendSelect: (legendMode: "none" | "messi" | "ronaldo" | "neymar") => void;
+  onStartPracticePenalties?: () => void;
 }) {
   const [spinningFormationId, setSpinningFormationId] = useState<string | null>(null);
   const [showLegendModal, setShowLegendModal] = useState(false);
@@ -560,6 +563,15 @@ function SetupScreen({
             Click to cancel legend mode
           </p>
         )}
+        <button
+          type="button"
+          onClick={() => onStartPracticePenalties?.()}
+          disabled={loading || Boolean(spinningFormationId)}
+          className="mt-3 inline-flex w-full items-center justify-center gap-2 rounded-xl border border-surface-700 bg-surface-950 px-6 py-4 text-lg font-black text-white transition-colors hover:border-gold-600/40 hover:bg-surface-900 disabled:cursor-not-allowed disabled:opacity-50"
+        >
+          <Target size={20} className="text-gold-400" />
+          Practice Penalties
+        </button>
         {showLegendModal && (
           <LegendModal
             onSelect={(legendMode) => {
@@ -658,7 +670,7 @@ function SquadPanel({
   showPitch: boolean;
   matchGoalScorers?: Record<string, number>[];
   currentMatchIndex?: number;
-  tournamentPhase?: "idle" | "ready" | "live" | "penalties" | "complete";
+  tournamentPhase?: "idle" | "ready" | "live" | "penalties" | "practice_penalties" | "complete";
 }) {
   // Accumulate goals only from completed matches
   const goalScorers: Record<string, number> = {};
@@ -1004,7 +1016,7 @@ export default function EightZeroGame() {
   const [reelTeam, setReelTeam] = useState<EightZeroTeam | null>(null);
   const [categoryFilter, setCategoryFilter] = useState<SlotCategory | "ALL">("ALL");
   const [showLeaderboard, setShowLeaderboard] = useState(false);
-  const [tournamentPhase, setTournamentPhase] = useState<"idle" | "ready" | "live" | "penalties" | "complete">("idle");
+  const [tournamentPhase, setTournamentPhase] = useState<"idle" | "ready" | "live" | "penalties" | "practice_penalties" | "complete">("idle");
   const [currentMatchIndex, setCurrentMatchIndex] = useState(0);
   const [allMatchEvents, setAllMatchEvents] = useState<MatchEvent[][]>([]);
   const draftControlsRef = useRef<HTMLDivElement | null>(null);
@@ -1259,6 +1271,9 @@ export default function EightZeroGame() {
           const nextOptions: DraftOptions = { ...options, legendMode };
           setOptions(nextOptions);
         }}
+        onStartPracticePenalties={() => {
+          setTournamentPhase("practice_penalties");
+        }}
       />
     );
   }
@@ -1328,6 +1343,19 @@ export default function EightZeroGame() {
 
       <div className="grid gap-6 xl:grid-cols-[1fr_420px]">
         <section className="stat-card">
+          {tournamentPhase === "practice_penalties" && (
+            <PenaltyShootout
+              opponent={{ teamId: 0, name: "Practice Team", fifaCode: "GER", group: null, ranking: null, elo: 1600 }}
+              userGkRating={85}
+              oppGkRating={80}
+              userShooterRating={85}
+              practiceMode={true}
+              onFinished={() => {
+                setTournamentPhase("idle");
+              }}
+            />
+          )}
+
           {run && tournamentPhase === "ready" && (
             <div className="space-y-5">
               <div className="text-center">
@@ -1400,11 +1428,18 @@ export default function EightZeroGame() {
           {run && tournamentPhase === "penalties" && (
             <PenaltyShootout
               opponent={run.matches[currentMatchIndex]?.opponent ?? run.matches[0].opponent}
-              kicks={run.matches[currentMatchIndex]?.penaltyShootout ?? []}
-              userWon={run.matches[currentMatchIndex]?.result === "W"}
-              onFinished={handleMatchFinished}
               userGkRating={run.ratings.gk}
               oppGkRating={run.matches[currentMatchIndex]?.opponentGkRating ?? 75}
+              userShooterRating={run.ratings.attack}
+              onFinished={(userWon) => {
+                // Update the match result based on penalty shootout
+                const match = run.matches[currentMatchIndex];
+                if (match) {
+                  match.result = userWon ? "W" : "L";
+                  match.userGoals = userWon ? match.userGoals + 1 : match.userGoals;
+                }
+                handleMatchFinished();
+              }}
             />
           )}
 
