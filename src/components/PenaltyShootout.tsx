@@ -184,6 +184,7 @@ export default function PenaltyShootout({
           return;
         }
         setCurrentRound(r => r + 1);
+        setCurrentKick(null);
         setPhase("waiting");
       }, 1500);
     }, 1200);
@@ -212,6 +213,7 @@ export default function PenaltyShootout({
           return;
         }
         setCurrentRound(r => r + 1);
+        setCurrentKick(null);
         setPhase("waiting");
       }, 1500);
     }, 1200);
@@ -221,6 +223,7 @@ export default function PenaltyShootout({
     if (phase !== "waiting") return;
     if (!isUserTurn && practiceMode && effectiveMode !== "shooter") {
       // Practice mode with user as goalkeeper
+      setCurrentKick(null);
       setPhase("selecting_dive");
       return;
     }
@@ -243,6 +246,7 @@ export default function PenaltyShootout({
           return;
         }
         setCurrentRound(r => r + 1);
+        setCurrentKick(null);
         setPhase("waiting");
       }, 1500);
     }, 1200);
