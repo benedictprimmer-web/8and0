@@ -1272,6 +1272,7 @@ export default function EightZeroGame() {
           setOptions(nextOptions);
         }}
         onStartPracticePenalties={() => {
+          setStarted(true);
           setTournamentPhase("practice_penalties");
         }}
       />
@@ -1351,6 +1352,7 @@ export default function EightZeroGame() {
               userShooterRating={85}
               practiceMode={true}
               onFinished={() => {
+                setStarted(false);
                 setTournamentPhase("idle");
               }}
             />
@@ -1453,7 +1455,7 @@ export default function EightZeroGame() {
             />
           )}
 
-          {!run && (
+          {!run && tournamentPhase !== "practice_penalties" && (
             <div className="space-y-5">
               <div
                 ref={draftControlsRef}
