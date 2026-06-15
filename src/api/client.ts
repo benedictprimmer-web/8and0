@@ -71,7 +71,13 @@ async function fetchStatic<T>(apiPath: string): Promise<T> {
 }
 
 async function request<T>(path: string, init?: RequestInit): Promise<T> {
-  if (!BASE && (!init?.method || init.method === "GET") && staticPath(path)) {
+  const isGet = !init?.method || init.method === "GET";
+  // The leaderboard is dynamic and served by a live, same-origin API
+  // (/api/leaderboard on Vercel). Never short-circuit it to the empty static
+  // placeholder — always try the network first, falling back to static only on
+  // error. Other endpoints stay static-first in no-backend mode.
+  const isDynamic = path.startsWith("/api/leaderboard");
+  if (!BASE && isGet && !isDynamic && staticPath(path)) {
     return fetchStatic<T>(path);
   }
 
