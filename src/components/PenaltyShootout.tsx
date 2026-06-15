@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import Flag from "../components/Flag";
+import { describeGoalDirection, describeMissDirection } from "../game8/penaltyText";
 import type { EightZeroTeam, PenaltyKick } from "../game8/types";
 
 interface InteractivePenaltyKick {
@@ -143,19 +144,13 @@ export default function PenaltyShootout({
   }, [effectiveMode]);
 
   const checkFinished = useCallback((newUserScore: number, newOppScore: number, round: number, totalKicks: number) => {
-    if (round > maxRounds && totalKicks % 2 === 0) {
-      if (newUserScore !== newOppScore) {
-        setUserWon(newUserScore > newOppScore);
-        setPhase("finished");
-        return true;
-      }
-    }
-    if (round > maxRounds && totalKicks % 2 === 0) {
-      if (newUserScore !== newOppScore) {
-        setUserWon(newUserScore > newOppScore);
-        setPhase("finished");
-        return true;
-      }
+    // Decide a winner once both teams have taken an equal number of kicks and
+    // they are past the opening rounds (covers regulation finishing level → the
+    // first sudden-death pair that separates them).
+    if (round > maxRounds && totalKicks % 2 === 0 && newUserScore !== newOppScore) {
+      setUserWon(newUserScore > newOppScore);
+      setPhase("finished");
+      return true;
     }
     return false;
   }, []);
@@ -217,7 +212,10 @@ export default function PenaltyShootout({
 
   const handleOpponentKick = useCallback(() => {
     if (phase !== "waiting") return;
-    if (!isUserTurn && practiceMode && effectiveMode !== "shooter") {
+    // Whenever the user controls the keeper (goalkeeper or both modes), let them
+    // pick a dive direction on the opponent's kick — in real knockouts too, not
+    // just practice.
+    if (!isUserTurn && (effectiveMode === "both" || effectiveMode === "goalkeeper")) {
       setCurrentKick(null);
       setPhase("selecting_dive");
       return;
@@ -244,7 +242,7 @@ export default function PenaltyShootout({
         setPhase("waiting");
       }, RESULT_DURATION);
     }, ANIMATION_DURATION);
-  }, [phase, isUserTurn, practiceMode, effectiveMode, currentRound, opponent.name, userGkRating, userScore, oppScore, kicks.length, addKick, checkFinished]);
+  }, [phase, isUserTurn, effectiveMode, currentRound, opponent.name, userGkRating, userScore, oppScore, kicks.length, addKick, checkFinished]);
 
   useEffect(() => {
     if (phase === "waiting" && !isUserTurn && !isFinished) {
@@ -478,12 +476,12 @@ export default function PenaltyShootout({
                       </p>
                       <p className="text-sm text-gray-400 mt-1">
                         {currentKick.result === "saved" ? (
-                          currentKick.team === "user" ? 
+                          currentKick.team === "user" ?
                             `Keeper dived ${currentKick.keeperDirection}!` :
                             `You dived ${currentKick.keeperDirection}!`
                         ) : currentKick.result === "missed" ?
-                          "Wide of the goal!" :
-                          "Top corner!"}
+                          describeMissDirection(displayShotDirection) :
+                          describeGoalDirection(displayShotDirection)}
                       </p>
                     </div>
                   )}

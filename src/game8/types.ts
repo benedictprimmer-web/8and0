@@ -89,6 +89,10 @@ export interface MatchResult {
   opponentGoals: number;
   regularTimeUserGoals: number;
   regularTimeOpponentGoals: number;
+  // Goals scored during extra time only (excludes regulation and the penalty
+  // shootout decider). Used to animate ET goals without replaying the pen bonus.
+  extraTimeUserGoals: number;
+  extraTimeOpponentGoals: number;
   opponentGkRating: number;
   result: "W" | "D" | "L";
   decidedByPens: boolean;

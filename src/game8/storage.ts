@@ -90,7 +90,11 @@ export function loadHistory(): TournamentRun[] {
 }
 
 export function saveRun(run: TournamentRun): TournamentRun[] {
-  const history = sortRuns([run, ...loadHistory()]).slice(0, 12);
+  // De-duplicate by run id so re-saving the same run (e.g. after an interactive
+  // penalty shootout updates the result) replaces the earlier entry instead of
+  // creating a duplicate.
+  const others = loadHistory().filter((item) => item.id !== run.id);
+  const history = sortRuns([run, ...others]).slice(0, 12);
   window.localStorage.setItem(HISTORY_KEY, JSON.stringify(history));
   return history;
 }

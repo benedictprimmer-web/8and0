@@ -12,7 +12,8 @@ import {
 } from "./draft";
 import { FORMATIONS } from "./formations";
 import { calculateTeamRatings } from "./ratings";
-import { simulateTournamentRun } from "./simulate";
+import { buildMatchEvents, distributeExtraTimeMinutes, simulateTournamentRun } from "./simulate";
+import { describeGoalDirection, describeMissDirection } from "./penaltyText";
 import { sortRuns } from "./storage";
 import type { DraftPick, EightZeroPlayer, EightZeroTeam, TournamentRun } from "./types";
 import teamsData from "../../public/data/teams.json";
@@ -525,5 +526,140 @@ describe("8-0 bracket balancing", () => {
 
     expect(legendRun.matches.length).toBeGreaterThanOrEqual(3);
     expect(normalRun.matches.length).toBeGreaterThanOrEqual(3);
+  });
+});
+
+describe("8-0 Last Dance rerolls", () => {
+  // Last Dance (legend) mode must not clobber the difficulty-based reroll count.
+  it("keeps the difficulty reroll count when a legend is locked in", () => {
+    const data = buildEightZeroData(teamsData as RawTeam[], playersData as RawPlayer[]);
+
+    const easy = createDraftState("legend-easy-seed", "433", { difficulty: "easy", legendMode: "messi" }, data);
+    expect(easy.picks).toHaveLength(1);
+    expect(easy.picks[0].player.name).toContain("Messi");
+    expect(easy.rerollsLeft).toBe(3);
+
+    const normal = createDraftState("legend-normal-seed", "433", { difficulty: "normal", legendMode: "messi" }, data);
+    expect(normal.rerollsLeft).toBe(1);
+
+    const hard = createDraftState("legend-hard-seed", "433", { difficulty: "hard", legendMode: "messi" }, data);
+    expect(hard.rerollsLeft).toBe(0);
+  });
+});
+
+describe("8-0 penalty direction text", () => {
+  it("describes goals by direction, with a Panenka down the middle", () => {
+    expect(describeGoalDirection("center")).toContain("Panenka");
+    expect(describeGoalDirection("left")).not.toBe(describeGoalDirection("center"));
+    expect(describeGoalDirection("right")).not.toBe(describeGoalDirection("center"));
+    expect(describeGoalDirection("left")).not.toBe(describeGoalDirection("right"));
+    // The old bug always returned the same "Top corner!" label.
+    const labels = new Set(["left", "center", "right"].map((d) => describeGoalDirection(d as "left" | "center" | "right")));
+    expect(labels.size).toBe(3);
+  });
+
+  it("describes misses by direction", () => {
+    expect(describeMissDirection("center")).toContain("bar");
+    expect(describeMissDirection("left")).not.toBe(describeMissDirection("center"));
+  });
+});
+
+describe("8-0 extra time and penalties", () => {
+  const midPicks: DraftPick[] = [
+    makePick(1, "GK", 78),
+    makePick(2, "DEF", 78),
+    makePick(3, "DEF", 78),
+    makePick(4, "DEF", 78),
+    makePick(5, "DEF", 78),
+    makePick(6, "MID", 78),
+    makePick(7, "MID", 78),
+    makePick(8, "MID", 78),
+    makePick(9, "FWD", 78),
+    makePick(10, "FWD", 78),
+    makePick(11, "FWD", 78),
+  ];
+  const data = buildEightZeroData(rawTeams, rawPlayers);
+  const ratings = calculateTeamRatings(midPicks);
+
+  function runWith(seed: string, penOverrides: Record<string, "W" | "L">) {
+    return simulateTournamentRun({
+      teams: data.teams,
+      picks: midPicks,
+      ratings,
+      seed,
+      formationId: "433",
+      penOverrides,
+    });
+  }
+
+  function findSeedWithPenMatch(): { seed: string; stage: string } | null {
+    for (let i = 0; i < 1000; i += 1) {
+      const seed = `pen-search-${i}`;
+      const run = runWith(seed, {});
+      const penMatch = run.matches.find((match) => match.decidedByPens);
+      if (penMatch) return { seed, stage: penMatch.stage };
+    }
+    return null;
+  }
+
+  it("keeps extra-time goal minutes within 91-120", () => {
+    expect(distributeExtraTimeMinutes(1, () => 0)).toEqual([91]);
+    expect(distributeExtraTimeMinutes(1, () => 0.9999)).toEqual([120]);
+    let calls = 0;
+    const sequence = () => {
+      calls += 1;
+      return (calls % 31) / 31; // spread across the range
+    };
+    const minutes = distributeExtraTimeMinutes(60, sequence);
+    expect(minutes).toHaveLength(60);
+    expect(minutes.every((minute) => minute >= 91 && minute <= 120)).toBe(true);
+  });
+
+  it("lets an interactive shootout override decide the knockout result", () => {
+    const found = findSeedWithPenMatch();
+    expect(found, "expected to find a knockout decided by penalties").not.toBeNull();
+    const { seed, stage } = found!;
+
+    const won = runWith(seed, { [stage]: "W" });
+    const lost = runWith(seed, { [stage]: "L" });
+
+    const wonMatch = won.matches.find((match) => match.stage === stage)!;
+    const lostMatch = lost.matches.find((match) => match.stage === stage)!;
+    expect(wonMatch.result).toBe("W");
+    expect(wonMatch.decidedByPens).toBe(true);
+    expect(lostMatch.result).toBe("L");
+
+    // Losing the shootout eliminates the run at that stage (no later matches).
+    const lastLost = lost.matches[lost.matches.length - 1];
+    expect(lastLost.stage).toBe(stage);
+
+    // Winning advances at least as far as the lost path, and never less far.
+    expect(won.matches.length).toBeGreaterThanOrEqual(lost.matches.length);
+  });
+
+  it("re-simulates deterministically for the same seed and overrides", () => {
+    const found = findSeedWithPenMatch();
+    expect(found).not.toBeNull();
+    const { seed, stage } = found!;
+
+    const a = runWith(seed, { [stage]: "W" });
+    const b = runWith(seed, { [stage]: "W" });
+    expect(JSON.stringify(a.matches)).toBe(JSON.stringify(b.matches));
+  });
+
+  it("never emits penalty events into the live timeline for a shootout match", () => {
+    const found = findSeedWithPenMatch();
+    expect(found).not.toBeNull();
+    const { seed, stage } = found!;
+    const run = runWith(seed, {});
+    const penMatch = run.matches.find((match) => match.stage === stage)!;
+    const index = run.matches.indexOf(penMatch);
+    const { events } = buildMatchEvents(penMatch, run.picks, `${seed}:events:${index}`);
+
+    expect(events.some((event) => event.type.startsWith("penalty"))).toBe(false);
+    // Extra time is signalled and every goal stays within 120 minutes.
+    expect(penMatch.extraTime).toBe(true);
+    expect(events.some((event) => event.type === "extra_time_end")).toBe(true);
+    expect(events.filter((event) => event.type === "goal").every((event) => event.minute <= 120)).toBe(true);
   });
 });

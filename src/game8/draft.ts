@@ -55,7 +55,7 @@ export function createDraftState(
   let picks: DraftPick[] = [];
   let activeSlotId = formation.slots[0].id;
   let spinCount = 0;
-  let rerollsLeft = rerollsForDifficulty(resolvedOptions.difficulty);
+  const rerollsLeft = rerollsForDifficulty(resolvedOptions.difficulty);
   let blindMode = resolvedOptions.blindMode || resolvedOptions.difficulty === "hard";
 
   if (legendMode !== "none" && data) {
@@ -76,7 +76,8 @@ export function createDraftState(
       const nextSlot = formation.slots.find((candidate) => !picks.some((filled) => filled.slotId === candidate.id));
       activeSlotId = nextSlot?.id ?? slot.id;
       spinCount = 0;
-      rerollsLeft = 1;
+      // Keep the difficulty-based reroll count (Easy 3 / Normal 1 / Hard 0).
+      // Last Dance pre-fills the legend pick but must not clobber rerolls.
       blindMode = false;
     }
   }
