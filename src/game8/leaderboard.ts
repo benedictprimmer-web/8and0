@@ -1,4 +1,7 @@
-import type { TournamentRun } from "./types";
+import type { DraftDifficulty, TournamentRun } from "./types";
+// NOTE: .js extension is required — the Vercel serverless function runs this as
+// native ESM (see api/_upstash.ts / PR #32). Extensionless would crash at load.
+import { calculateRunScore } from "./scoring.js";
 
 // ── Shared leaderboard types ─────────────────────────────────────────────────
 // This module is intentionally free of any browser/DOM or Node-only APIs so it
@@ -274,6 +277,21 @@ export function sanitiseSubmission(input: unknown): SubmissionResult {
     createdAt:
       typeof body.createdAt === "string" ? body.createdAt.slice(0, 40) : new Date().toISOString(),
   };
+
+  // Anti-cheat: the score is NOT trusted from the client. Recompute it from the
+  // (already-clamped) run summary using the same formula the game uses, and
+  // overwrite. A forged score (e.g. POST score=1000 with a losing record) is
+  // simply replaced by the real value, so the worst a tampered payload can do is
+  // claim the score its own summary legitimately earns — never an arbitrary one.
+  submission.score = calculateRunScore({
+    wins: submission.wins,
+    draws: submission.draws,
+    losses: submission.losses,
+    stageReached: submission.stageReached,
+    rating: submission.overall,
+    difficulty: submission.difficulty as DraftDifficulty,
+    blindMode: submission.blindMode,
+  });
 
   return { ok: true, submission };
 }

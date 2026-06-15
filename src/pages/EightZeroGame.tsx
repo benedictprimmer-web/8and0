@@ -17,7 +17,7 @@ import {
   Trophy,
   X,
 } from "lucide-react";
-import { api, leaderboardApi, type LeaderboardResponse, type SubmitResponse } from "../api/client";
+import { api, leaderboardApi, type LeaderboardResponse, type RankedEntry, type SubmitResponse } from "../api/client";
 import { buildSubmission } from "../game8/leaderboard";
 import Flag from "../components/Flag";
 import LiveMatch from "../components/LiveMatch";
@@ -40,6 +40,7 @@ import { FORMATIONS, getFormation } from "../game8/formations";
 import { calculateTeamRatings } from "../game8/ratings";
 import {
   addMyGlobalEntry,
+  loadMyGlobalEntries,
   shareText,
   loadHistory,
   loadPlayerName,
@@ -421,12 +422,23 @@ function LegendModal({
 // Compact live top-5 of the global leaderboard, shown on the setup screen so
 // players see the board (and the competition) before they even start a run.
 function GlobalTopFive() {
+  // Seeds this device has submitted — sent with the request so the API returns
+  // this player's current rank ("mine"), even when they're outside the top 5.
+  const mySeeds = useMemo(() => loadMyGlobalEntries().map((entry) => entry.seed), []);
+  const mySeedSet = useMemo(() => new Set(mySeeds), [mySeeds]);
+
   const query = useQuery<LeaderboardResponse>({
-    queryKey: ["8-0-global-top5"],
-    queryFn: () => leaderboardApi.list(5),
+    queryKey: ["8-0-global-top5", mySeeds],
+    queryFn: () => leaderboardApi.list(5, mySeeds),
     staleTime: 30_000,
   });
   const entries = (query.data?.entries ?? []).slice(0, 5);
+  const myBest = (query.data?.mine ?? []).reduce<RankedEntry | null>((best, item) => {
+    if (item.rank == null) return best;
+    if (!best || best.rank == null || item.rank < best.rank) return item;
+    return best;
+  }, null);
+  const myBestInTopFive = myBest?.rank != null && myBest.rank <= entries.length;
 
   return (
     <section className="rounded-2xl border border-indigo-900/70 bg-[#11111f] p-5 shadow-2xl shadow-black/20">
@@ -448,25 +460,44 @@ function GlobalTopFive() {
         {!query.isLoading && entries.length === 0 && (
           <p className="text-sm text-gray-500">No runs yet — be the first to make the board.</p>
         )}
-        {entries.map((entry, index) => (
-          <div
-            key={entry.id}
-            className="flex items-center gap-3 rounded-lg border border-surface-700 bg-surface-800 px-3 py-2"
-          >
-            <span className="w-6 flex-shrink-0 text-center font-black text-gray-500">{index + 1}</span>
-            <div className="min-w-0 flex-1">
-              <p className="flex items-center gap-2 truncate text-sm font-bold text-white">
-                {index === 0 && <Trophy size={14} className="flex-shrink-0 text-gold-400" />}
-                <span className="truncate">{entry.name}</span>
-              </p>
-              <p className="truncate text-xs text-gray-500">
-                {entry.stageReached} · {entry.formationLabel}
-              </p>
+        {entries.map((entry, index) => {
+          const isMine = mySeedSet.has(entry.seed);
+          return (
+            <div
+              key={entry.id}
+              className={`flex items-center gap-3 rounded-lg border px-3 py-2 ${
+                isMine ? "border-gold-600 bg-gold-500/10" : "border-surface-700 bg-surface-800"
+              }`}
+            >
+              <span className="w-6 flex-shrink-0 text-center font-black text-gray-500">{index + 1}</span>
+              <div className="min-w-0 flex-1">
+                <p className="flex items-center gap-2 truncate text-sm font-bold text-white">
+                  {index === 0 && <Trophy size={14} className="flex-shrink-0 text-gold-400" />}
+                  <span className="truncate">{entry.name}</span>
+                  {isMine && (
+                    <span className="flex-shrink-0 rounded bg-gold-500 px-1.5 py-0.5 text-[10px] font-black text-black">
+                      YOU
+                    </span>
+                  )}
+                </p>
+                <p className="truncate text-xs text-gray-500">
+                  {entry.stageReached} · {entry.formationLabel}
+                </p>
+              </div>
+              <span className="flex-shrink-0 font-black tabular-nums text-gold-400">{entry.score}</span>
             </div>
-            <span className="flex-shrink-0 font-black tabular-nums text-gold-400">{entry.score}</span>
-          </div>
-        ))}
+          );
+        })}
       </div>
+      {myBest?.rank != null && !myBestInTopFive && (
+        <div className="mt-3 flex items-center justify-between rounded-lg border border-gold-600/40 bg-gold-500/5 px-3 py-2">
+          <span className="inline-flex items-center gap-2 text-sm font-bold text-gold-300">
+            <span className="rounded bg-gold-500 px-1.5 py-0.5 text-[10px] font-black text-black">YOU</span>
+            Your best: #{myBest.rank}
+          </span>
+          <span className="font-black tabular-nums text-gold-400">{myBest.entry.score}</span>
+        </div>
+      )}
     </section>
   );
 }

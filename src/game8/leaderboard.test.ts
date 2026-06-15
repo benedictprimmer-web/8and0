@@ -6,6 +6,7 @@ import {
   sanitiseSubmission,
   topScorerOf,
 } from "./leaderboard";
+import { calculateRunScore } from "./scoring";
 import type { DraftPick, EightZeroPlayer, TournamentRun } from "./types";
 
 function player(name: string): EightZeroPlayer {
@@ -163,7 +164,9 @@ describe("sanitiseSubmission (server-side)", () => {
     });
     expect(result.ok).toBe(true);
     if (result.ok) {
-      expect(result.submission.score).toBe(1000);
+      // Score is recomputed from the (clamped) summary, NOT taken from the
+      // forged 999999: wins8*5 + normal(3) + blind(2) + ratingBonus(13) = 58.
+      expect(result.submission.score).toBe(58);
       expect(result.submission.wins).toBe(8);
       expect(result.submission.overall).toBeLessThanOrEqual(120);
       expect(result.submission.difficulty).toBe("normal");
@@ -176,5 +179,52 @@ describe("sanitiseSubmission (server-side)", () => {
   it("rejects non-object bodies", () => {
     expect(sanitiseSubmission(null).ok).toBe(false);
     expect(sanitiseSubmission("nope").ok).toBe(false);
+  });
+});
+
+describe("sanitiseSubmission anti-cheat (authoritative score)", () => {
+  const base = {
+    name: "Honest",
+    stageReached: "Round of 16",
+    record: "4-1-0",
+    wins: 4,
+    draws: 1,
+    losses: 0,
+    overall: 80,
+    difficulty: "normal",
+    formationId: "433",
+    formationLabel: "4-3-3",
+    blindMode: false,
+    topScorer: null,
+    xi: ["a"],
+    seed: "seed1",
+    createdAt: "2026-01-01T00:00:00.000Z",
+  };
+
+  it("overwrites a forged score with the value recomputed from the summary", () => {
+    const result = sanitiseSubmission({ ...base, score: 9999 });
+    expect(result.ok).toBe(true);
+    if (result.ok) {
+      const expected = calculateRunScore({
+        wins: 4,
+        draws: 1,
+        losses: 0,
+        stageReached: "Round of 16",
+        rating: 80,
+        difficulty: "normal",
+        blindMode: false,
+      });
+      expect(result.submission.score).toBe(expected);
+      expect(result.submission.score).toBeLessThan(9999);
+    }
+  });
+
+  it("ignores the client score field entirely (same result for 0 and 1000)", () => {
+    const low = sanitiseSubmission({ ...base, score: 0 });
+    const high = sanitiseSubmission({ ...base, score: 1000 });
+    expect(low.ok && high.ok).toBe(true);
+    if (low.ok && high.ok) {
+      expect(low.submission.score).toBe(high.submission.score);
+    }
   });
 });
