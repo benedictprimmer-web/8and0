@@ -1083,6 +1083,9 @@ export default function EightZeroGame() {
   const [tournamentPhase, setTournamentPhase] = useState<"idle" | "ready" | "live" | "penalties" | "practice_penalties" | "complete">("idle");
   const [currentMatchIndex, setCurrentMatchIndex] = useState(0);
   const [allMatchEvents, setAllMatchEvents] = useState<MatchEvent[][]>([]);
+  // Authoritative interactive-shootout results, keyed by knockout stage. Fed
+  // back into simulateTournamentRun so the bracket follows actual play.
+  const [penOverrides, setPenOverrides] = useState<Record<string, "W" | "L">>({});
   const draftControlsRef = useRef<HTMLDivElement | null>(null);
   const spinIntervalRef = useRef<number | null>(null);
   const spinTimeoutRef = useRef<number | null>(null);
@@ -1113,6 +1116,15 @@ export default function EightZeroGame() {
       if (spinTimeoutRef.current) window.clearTimeout(spinTimeoutRef.current);
     };
   }, []);
+
+  // Persist the finalized run once the tournament completes. Interactive
+  // shootouts rebuild `run`, so the run saved here reflects actual play (the
+  // provisional save at draft time is replaced by id).
+  useEffect(() => {
+    if (tournamentPhase === "complete" && run) {
+      setHistory(saveRun(run));
+    }
+  }, [tournamentPhase, run]);
 
   const bestRun = history[0] ?? null;
   const openSlots = getOpenSlots(draftState);
@@ -1158,6 +1170,7 @@ export default function EightZeroGame() {
     setOptions(resolvedOptions);
     setDraftState(createDraftState(makeSeed(), nextFormationId, resolvedOptions, gameData ?? undefined));
     setRun(null);
+    setPenOverrides({});
     setStarted(true);
     setSearch("");
     setCopied(false);
@@ -1174,6 +1187,7 @@ export default function EightZeroGame() {
   function resetToSetup() {
     clearSpinTimers();
     setRun(null);
+    setPenOverrides({});
     setStarted(false);
     setSearch("");
     setCopied(false);
@@ -1190,6 +1204,8 @@ export default function EightZeroGame() {
   function finishDraftIfComplete(next: DraftState) {
     if (!gameData || !next.complete) return;
     const ratings = calculateTeamRatings(next.picks);
+    // Fresh run starts with no shootout overrides.
+    setPenOverrides({});
     const nextRun = simulateTournamentRun({
       teams: gameData.teams,
       picks: next.picks,
@@ -1200,6 +1216,7 @@ export default function EightZeroGame() {
       blindMode: next.blindMode,
       draftMode: next.draftMode,
       legendMode: next.legendMode,
+      penOverrides: {},
     });
     setRun(nextRun);
     setHistory(saveRun(nextRun));
@@ -1210,6 +1227,57 @@ export default function EightZeroGame() {
     setAllMatchEvents(events);
     setCurrentMatchIndex(0);
     setTournamentPhase("ready");
+    window.requestAnimationFrame(() => window.scrollTo({ top: 0, behavior: "smooth" }));
+  }
+
+  // Record the authoritative result of an interactive penalty shootout, re-run
+  // the tournament with that override so the bracket/score stay consistent, then
+  // advance to the next match (or finish if the run ended).
+  function applyPenaltyResult(userWon: boolean) {
+    if (!gameData || !run) {
+      handleMatchFinished();
+      return;
+    }
+    const match = run.matches[currentMatchIndex];
+    if (!match) {
+      handleMatchFinished();
+      return;
+    }
+    const nextOverrides: Record<string, "W" | "L"> = {
+      ...penOverrides,
+      [match.stage]: userWon ? "W" : "L",
+    };
+    setPenOverrides(nextOverrides);
+
+    const rebuilt = simulateTournamentRun({
+      teams: gameData.teams,
+      picks: run.picks,
+      ratings: run.ratings,
+      seed: run.seed,
+      formationId: run.formationId,
+      difficulty: run.difficulty,
+      blindMode: run.blindMode,
+      draftMode: run.draftMode,
+      legendMode: run.legendMode,
+      penOverrides: nextOverrides,
+    });
+    // Preserve identity so local history / leaderboard dedupe stays stable.
+    rebuilt.id = run.id;
+    rebuilt.createdAt = run.createdAt;
+    setRun(rebuilt);
+
+    const events = rebuilt.matches.map((rebuiltMatch, index) =>
+      buildMatchEvents(rebuiltMatch, rebuilt.picks, `${rebuilt.seed}:events:${index}`).events
+    );
+    setAllMatchEvents(events);
+
+    const nextIndex = currentMatchIndex + 1;
+    if (nextIndex >= rebuilt.matches.length) {
+      setTournamentPhase("complete");
+    } else {
+      setCurrentMatchIndex(nextIndex);
+      setTournamentPhase("ready");
+    }
     window.requestAnimationFrame(() => window.scrollTo({ top: 0, behavior: "smooth" }));
   }
 
@@ -1486,7 +1554,7 @@ export default function EightZeroGame() {
               legendMode={run.legendMode}
               onFinished={() => {
                 const match = run.matches[currentMatchIndex];
-                if (match.decidedByPens && match.penaltyShootout) {
+                if (match.decidedByPens) {
                   setTournamentPhase("penalties");
                 } else {
                   handleMatchFinished();
@@ -1501,15 +1569,7 @@ export default function EightZeroGame() {
               userGkRating={run.ratings.gk}
               oppGkRating={run.matches[currentMatchIndex]?.opponentGkRating ?? 75}
               userShooterRating={run.ratings.attack}
-              onFinished={(userWon) => {
-                // Update the match result based on penalty shootout
-                const match = run.matches[currentMatchIndex];
-                if (match) {
-                  match.result = userWon ? "W" : "L";
-                  match.userGoals = userWon ? match.userGoals + 1 : match.userGoals;
-                }
-                handleMatchFinished();
-              }}
+              onFinished={(userWon) => applyPenaltyResult(userWon)}
             />
           )}
 

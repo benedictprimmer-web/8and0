@@ -111,7 +111,9 @@ export default function LiveMatch({ stage, opponent, result, events, onFinished,
 
   const tick = useCallback(() => {
     setCurrentMinute((prev) => {
-      const maxMinute = result.decidedByPens ? 121 : result.extraTime ? 120 : 90;
+      // Playback always ends at the final whistle of extra time (120'). A level
+      // game then routes to the interactive penalty shootout.
+      const maxMinute = result.extraTime ? 120 : 90;
       const next = prev + 1;
       if (next > maxMinute) return prev;
 
@@ -139,7 +141,7 @@ export default function LiveMatch({ stage, opponent, result, events, onFinished,
 
       return next;
     });
-  }, [clearTimer, result.decidedByPens, result.extraTime]);
+  }, [clearTimer, result.extraTime]);
 
   useEffect(() => {
     clearTimer();
@@ -164,7 +166,7 @@ export default function LiveMatch({ stage, opponent, result, events, onFinished,
   }
 
   function skipToEnd() {
-    const maxMinute = result.decidedByPens ? 121 : result.extraTime ? 120 : 90;
+    const maxMinute = result.extraTime ? 120 : 90;
     setCurrentMinute(maxMinute);
     setIsFinished(true);
     clearTimer();
@@ -173,11 +175,9 @@ export default function LiveMatch({ stage, opponent, result, events, onFinished,
     const oGoals = events.filter(e => e.type === "goal" && e.team === "opponent").length;
     setUserScore(uGoals);
     setOppScore(oGoals);
-    const endEvent = result.decidedByPens
-      ? { minute: 121, type: "penalty_shootout" as const, team: "user" as const }
-      : result.extraTime
-        ? { minute: 120, type: "extra_time_end" as const, team: "user" as const }
-        : { minute: 90, type: "fulltime" as const, team: "user" as const };
+    const endEvent = result.extraTime
+      ? { minute: 120, type: "extra_time_end" as const, team: "user" as const }
+      : { minute: 90, type: "fulltime" as const, team: "user" as const };
     setRecentEvent(endEvent);
   }
 
@@ -338,24 +338,30 @@ export default function LiveMatch({ stage, opponent, result, events, onFinished,
       {isFinished && (
         <div className="text-center">
           <div className="mb-4">
-            <span
-              className={`inline-flex items-center rounded-full px-4 py-2 text-lg font-black ${
-                result.result === "W"
-                  ? "bg-green-500/20 text-green-400"
-                  : result.result === "L"
-                    ? "bg-red-500/20 text-red-400"
-                    : "bg-gray-500/20 text-gray-300"
-              }`}
-            >
-              {result.result === "W" ? "WIN" : result.result === "L" ? "LOSS" : "DRAW"}
-            </span>
+            {result.decidedByPens ? (
+              <span className="inline-flex items-center rounded-full px-4 py-2 text-lg font-black bg-yellow-500/20 text-yellow-400">
+                LEVEL AFTER EXTRA TIME
+              </span>
+            ) : (
+              <span
+                className={`inline-flex items-center rounded-full px-4 py-2 text-lg font-black ${
+                  result.result === "W"
+                    ? "bg-green-500/20 text-green-400"
+                    : result.result === "L"
+                      ? "bg-red-500/20 text-red-400"
+                      : "bg-gray-500/20 text-gray-300"
+                }`}
+              >
+                {result.result === "W" ? "WIN" : result.result === "L" ? "LOSS" : "DRAW"}
+              </span>
+            )}
           </div>
           <button
             type="button"
             onClick={onFinished}
             className="rounded-xl bg-gold-500 px-6 py-3 text-sm sm:text-base font-black text-black transition-colors hover:bg-gold-400"
           >
-            Continue
+            {result.decidedByPens ? "Take penalties" : "Continue"}
           </button>
         </div>
       )}
