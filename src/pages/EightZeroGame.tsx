@@ -19,6 +19,7 @@ import {
 } from "lucide-react";
 import { api, leaderboardApi, type LeaderboardResponse, type RankedEntry, type SubmitResponse } from "../api/client";
 import { buildSubmission } from "../game8/leaderboard";
+import Celebration from "../components/Celebration";
 import Flag from "../components/Flag";
 import LiveMatch from "../components/LiveMatch";
 import PenaltyShootout from "../components/PenaltyShootout";
@@ -64,6 +65,8 @@ import type {
 } from "../game8/types";
 
 const DEFAULT_FORMATION = "433";
+// Knockout stages that trigger the confetti celebration (group wins do not).
+const KNOCKOUT_STAGES = new Set(["Round of 32", "Round of 16", "Quarter-final", "Semi-final", "Final"]);
 const DEFAULT_OPTIONS: DraftOptions = {
   difficulty: "normal",
   blindMode: false,
@@ -1283,12 +1286,18 @@ export default function EightZeroGame() {
   const [copied, setCopied] = useState(false);
   const [isSpinning, setIsSpinning] = useState(false);
   const [reelTeam, setReelTeam] = useState<EightZeroTeam | null>(null);
+  // True for the brief moment the reel snaps onto the chosen nation, driving
+  // the scale-overshoot + gold glow landing flash.
+  const [reelLanded, setReelLanded] = useState(false);
   const [categoryFilter, setCategoryFilter] = useState<SlotCategory | "ALL">("ALL");
   const [showLeaderboard, setShowLeaderboard] = useState(false);
   const [showTeamSheet, setShowTeamSheet] = useState(false);
   const [tournamentPhase, setTournamentPhase] = useState<"idle" | "ready" | "live" | "penalties" | "practice_penalties" | "complete">("idle");
   const [currentMatchIndex, setCurrentMatchIndex] = useState(0);
   const [allMatchEvents, setAllMatchEvents] = useState<MatchEvent[][]>([]);
+  // Active full-screen confetti celebration (knockout wins + the final), or
+  // null when nothing is celebrating.
+  const [celebration, setCelebration] = useState<{ headline: string; intensity: "normal" | "big" } | null>(null);
   // Authoritative interactive-shootout results, keyed by knockout stage. Fed
   // back into simulateTournamentRun so the bracket follows actual play.
   const [penOverrides, setPenOverrides] = useState<Record<string, "W" | "L">>({});
@@ -1493,6 +1502,12 @@ export default function EightZeroGame() {
     rebuilt.createdAt = run.createdAt;
     setRun(rebuilt);
 
+    // A shootout win is still a knockout/final win — celebrate at the run level
+    // (never from inside PenaltyShootout).
+    if (userWon) {
+      celebrateWin(match.stage, rebuilt.stageReached === "Champion");
+    }
+
     const events = rebuilt.matches.map((rebuiltMatch, index) =>
       buildMatchEvents(rebuiltMatch, rebuilt.picks, `${rebuilt.seed}:events:${index}`).events
     );
@@ -1512,18 +1527,51 @@ export default function EightZeroGame() {
     if (!gameData) return;
     clearSpinTimers();
     setIsSpinning(true);
+    setReelLanded(false);
     setSearch("");
     setCategoryFilter("ALL");
-    setReelTeam(gameData.teams[0] ?? null);
-    spinIntervalRef.current = window.setInterval(() => {
-      setReelTeam(gameData.teams[Math.floor(Math.random() * gameData.teams.length)] ?? null);
-    }, 80);
-    spinTimeoutRef.current = window.setTimeout(() => {
-      clearSpinTimers();
-      setReelTeam(null);
-      setDraftState(nextState);
-      setIsSpinning(false);
-    }, 1000);
+
+    const teams = gameData.teams;
+    // The draft has already chosen the landing nation — make the reel actually
+    // stop on it rather than a random frame. Math.random below is pure UI
+    // flavour (the sim path is untouched).
+    const chosen = nextState.currentSpin?.team ?? teams[0] ?? null;
+
+    // Decelerating tick chain: interval ramps from ~60ms toward ~220ms so the
+    // reel visibly slows before landing. Stored in spinTimeoutRef so the
+    // existing clearSpinTimers() (which clears that ref) keeps working.
+    const startMs = 60;
+    const endMs = 220;
+    const totalMs = 1150;
+    let elapsed = 0;
+
+    setReelTeam(teams[Math.floor(Math.random() * teams.length)] ?? null);
+
+    const step = () => {
+      const progress = Math.min(elapsed / totalMs, 1);
+      // Ease-out: slow down as we approach the landing frame.
+      const interval = startMs + (endMs - startMs) * (1 - Math.pow(1 - progress, 2));
+
+      if (progress >= 1) {
+        // Land on the real drafted nation, then fire the snap/flash.
+        setReelTeam(chosen);
+        setReelLanded(true);
+        spinTimeoutRef.current = window.setTimeout(() => {
+          clearSpinTimers();
+          setReelLanded(false);
+          setReelTeam(null);
+          setDraftState(nextState);
+          setIsSpinning(false);
+        }, 450);
+        return;
+      }
+
+      setReelTeam(teams[Math.floor(Math.random() * teams.length)] ?? null);
+      elapsed += interval;
+      spinTimeoutRef.current = window.setTimeout(step, interval);
+    };
+
+    step();
   }
 
   function handleSpin() {
@@ -1572,8 +1620,23 @@ export default function EightZeroGame() {
     window.requestAnimationFrame(() => window.scrollTo({ top: 0, behavior: "smooth" }));
   }
 
+  // Fire the full-screen confetti for a knockout/final win. Group-stage wins
+  // are intentionally ignored. `champion` makes the final win bigger.
+  function celebrateWin(stage: string, champion: boolean) {
+    if (champion) {
+      setCelebration({ headline: "🏆 WORLD CHAMPIONS", intensity: "big" });
+      return;
+    }
+    if (!KNOCKOUT_STAGES.has(stage)) return;
+    setCelebration({ headline: `${stage.toUpperCase()} WON`, intensity: "normal" });
+  }
+
   function handleMatchFinished() {
     if (!run) return;
+    const finished = run.matches[currentMatchIndex];
+    if (finished && finished.result === "W") {
+      celebrateWin(finished.stage, run.stageReached === "Champion");
+    }
     const nextIndex = currentMatchIndex + 1;
     if (nextIndex >= run.matches.length) {
       setTournamentPhase("complete");
@@ -1682,6 +1745,14 @@ export default function EightZeroGame() {
           </div>
         </div>
       </section>
+
+      {celebration && (
+        <Celebration
+          headline={celebration.headline}
+          intensity={celebration.intensity}
+          onDismiss={() => setCelebration(null)}
+        />
+      )}
 
       {showLeaderboard && (
         <LeaderboardPanel
@@ -1843,7 +1914,7 @@ export default function EightZeroGame() {
                   <p className="section-label">{isSpinning ? "Nation reel" : "Nation"}</p>
                   <div
                     className={`mt-3 flex min-h-[58px] items-center gap-3 rounded-lg ${
-                      isSpinning ? "animate-pulse" : ""
+                      reelLanded ? "animate-reel-land" : isSpinning ? "animate-pulse" : ""
                     }`}
                   >
                     {displayedTeam ? (

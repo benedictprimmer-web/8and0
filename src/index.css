@@ -312,6 +312,37 @@
   100% { transform: scale(1.0); opacity: 1; }
 }
 @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
+/* Slot-machine landing: brief scale overshoot with a gold glow flash. */
+@keyframes reelLand {
+  0%   { transform: scale(1.0); box-shadow: 0 0 0 0 rgba(250, 204, 21, 0); }
+  40%  { transform: scale(1.12); box-shadow: 0 0 22px 6px rgba(250, 204, 21, 0.55); }
+  100% { transform: scale(1.0); box-shadow: 0 0 0 0 rgba(250, 204, 21, 0); }
+}
+/* Floating "+1 GOAL" callout: rises and fades out. */
+@keyframes goalFloat {
+  0%   { transform: translateY(8px) scale(0.85); opacity: 0; }
+  25%  { transform: translateY(-4px) scale(1.08); opacity: 1; }
+  70%  { transform: translateY(-22px) scale(1.0); opacity: 1; }
+  100% { transform: translateY(-40px) scale(0.95); opacity: 0; }
+}
+/* Punchy pulse on the score digit that just changed. */
+@keyframes scorePop {
+  0%   { transform: scale(1.0); }
+  40%  { transform: scale(1.35); }
+  100% { transform: scale(1.0); }
+}
+/* Confetti piece falling and tumbling down the viewport. */
+@keyframes confettiFall {
+  0%   { transform: translateY(-12vh) rotate(0deg); opacity: 1; }
+  100% { transform: translateY(112vh) rotate(720deg); opacity: 1; }
+}
+/* Reduced-motion / final flash: a single gold pulse, no movement. */
+@keyframes championFlash {
+  0%   { transform: scale(0.85); opacity: 0; }
+  30%  { transform: scale(1.04); opacity: 1; }
+  80%  { transform: scale(1.0); opacity: 1; }
+  100% { transform: scale(1.0); opacity: 0; }
+}
 
 .animate-fade-up    { animation: fadeUp 0.4s ease-out forwards; }
 .animate-slide-up   { animation: slideUp 0.28s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
@@ -320,3 +351,8 @@
 .animate-pulse-live { animation: pulseLive 1.5s ease-in-out infinite; }
 .animate-pulse-gold { animation: pulseGold 2s ease-in-out infinite; }
 .animate-goal-pop   { animation: goalPop 0.5s ease-out forwards; }
+.animate-reel-land  { animation: reelLand 0.45s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+.animate-goal-float { animation: goalFloat 0.9s ease-out forwards; }
+.animate-score-pop  { animation: scorePop 0.4s cubic-bezier(0.16, 1, 0.3, 1); }
+.animate-champion-flash { animation: championFlash 1.6s ease-out forwards; }
+.confetti-piece     { animation: confettiFall linear forwards; }
