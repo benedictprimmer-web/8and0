@@ -1,6 +1,8 @@
 import { getFormation } from "./formations";
 import { clamp, poisson, seededRandom } from "./random";
 import { gradeRun } from "./ratings";
+import { calculateRunScore } from "./scoring";
+export { calculateRunScore } from "./scoring";
 import type {
   DraftDifficulty,
   DraftMode,
@@ -251,43 +253,6 @@ function simulatePenalties(
 
 function recordLabel(wins: number, draws: number, losses: number): string {
   return `${wins}-${draws}-${losses}`;
-}
-
-const STAGE_BONUS: Record<string, number> = {
-  "Group stage": 0,
-  "Round of 32": 2,
-  "Round of 16": 4,
-  "Quarter-final": 6,
-  "Semi-final": 8,
-  Final: 10,
-  Champion: 14,
-};
-
-const DIFFICULTY_BONUS: Record<DraftDifficulty, number> = {
-  easy: 0,
-  normal: 3,
-  hard: 7,
-};
-
-export function calculateRunScore(args: {
-  wins: number;
-  draws: number;
-  losses: number;
-  stageReached: string;
-  rating: number;
-  difficulty: DraftDifficulty;
-  blindMode: boolean;
-}): number {
-  const ratingBonus = Math.max(0, Math.round((args.rating - 68) / 4));
-  const raw =
-    args.wins * 5 +
-    args.draws * 2 -
-    args.losses +
-    (STAGE_BONUS[args.stageReached] ?? 0) +
-    DIFFICULTY_BONUS[args.difficulty] +
-    (args.blindMode ? 2 : 0) +
-    ratingBonus;
-  return Math.max(0, raw);
 }
 
 export function simulateTournamentRun(args: {

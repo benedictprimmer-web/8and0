@@ -12,5 +12,5 @@
     "resolveJsonModule": true,
     "isolatedModules": true
   },
-  "include": ["api", "src/game8/leaderboard.ts", "src/game8/types.ts"]
+  "include": ["api", "src/game8/leaderboard.ts", "src/game8/scoring.ts", "src/game8/types.ts"]
 }
