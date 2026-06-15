@@ -3,9 +3,25 @@
 
 type RedisArg = string | number;
 
+// Read an Upstash env var defensively. Tolerates the common mistakes when
+// copying from Upstash's ".env" view into a Vercel field: surrounding quotes,
+// stray whitespace/newlines, a leading "NAME=" prefix, or even the entire
+// .env block accidentally pasted into a single field.
+function readEnvVar(name: string): string | undefined {
+  let raw = process.env[name];
+  if (!raw) return undefined;
+  raw = raw.trim();
+  // If a whole KEY=VALUE block was pasted, pull out this key's own line.
+  const line = raw.match(new RegExp(`(?:^|\\n)\\s*${name}\\s*=\\s*(.+?)\\s*$`, "m"));
+  if (line) raw = line[1].trim();
+  // Strip one layer of surrounding quotes.
+  raw = raw.replace(/^["']|["']$/g, "").trim();
+  return raw || undefined;
+}
+
 function config(): { url: string; token: string } | null {
-  const url = process.env.UPSTASH_REDIS_REST_URL;
-  const token = process.env.UPSTASH_REDIS_REST_TOKEN;
+  const url = readEnvVar("UPSTASH_REDIS_REST_URL");
+  const token = readEnvVar("UPSTASH_REDIS_REST_TOKEN");
   if (!url || !token) return null;
   return { url: url.replace(/\/$/, ""), token };
 }

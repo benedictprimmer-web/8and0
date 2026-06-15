@@ -102,7 +102,8 @@ function scoreMatch(
   teams: EightZeroTeam[],
   seed: string,
   knockout: boolean,
-  legendMode: LegendMode
+  legendMode: LegendMode,
+  penOverride?: "W" | "L"
 ): MatchResult {
   const random = seededRandom(seed);
   const opponentStrength = normalizeOpponentStrength(opponent, teams);
@@ -151,6 +152,8 @@ function scoreMatch(
   let opponentGoals = poisson(opponentLambda, random);
   const regularTimeUserGoals = userGoals;
   const regularTimeOpponentGoals = opponentGoals;
+  let extraTimeUserGoals = 0;
+  let extraTimeOpponentGoals = 0;
   let decidedByPens = false;
   let extraTime = false;
   let penaltyShootout: PenaltyKick[] | undefined;
@@ -161,28 +164,37 @@ function scoreMatch(
     const etMultiplier = stage === "Final" ? 0.10 : stage === "Semi-final" ? 0.12 : stage === "Quarter-final" ? 0.15 : 0.20;
     const etUserLambda = userLambda * etMultiplier;
     const etOppLambda = opponentLambda * etMultiplier;
-    userGoals += poisson(etUserLambda, random);
-    opponentGoals += poisson(etOppLambda, random);
+    extraTimeUserGoals = poisson(etUserLambda, random);
+    extraTimeOpponentGoals = poisson(etOppLambda, random);
+    userGoals += extraTimeUserGoals;
+    opponentGoals += extraTimeOpponentGoals;
 
     if (userGoals === opponentGoals) {
-      // Penalties
+      // Still level after extra time → penalty shootout. The interactive
+      // shootout is authoritative; `penOverride` carries that result back in on
+      // re-simulation. Without an override (initial provisional run) a seeded
+      // shootout decides a winner that is never shown to the player.
       decidedByPens = true;
       penaltyShootout = simulatePenalties(ratings, opponent, random, legendMode);
-      const userPenGoals = penaltyShootout.filter((k) => k.team === "user" && !k.saved).length;
-      const oppPenGoals = penaltyShootout.filter((k) => k.team === "opponent" && !k.saved).length;
-      if (userPenGoals > oppPenGoals) {
-        userGoals += 1;
-      } else if (oppPenGoals > userPenGoals) {
-        opponentGoals += 1;
+      let userWins: boolean;
+      if (penOverride) {
+        userWins = penOverride === "W";
       } else {
-        // Safety: if somehow tied, force a winner
+        const userPenGoals = penaltyShootout.filter((k) => k.team === "user" && !k.saved).length;
+        const oppPenGoals = penaltyShootout.filter((k) => k.team === "opponent" && !k.saved).length;
+        // Tie falls to the user (matches the previous safety fallback).
+        userWins = userPenGoals >= oppPenGoals;
+      }
+      if (userWins) {
         userGoals += 1;
+      } else {
+        opponentGoals += 1;
       }
     }
   }
 
   const result = userGoals > opponentGoals ? "W" : userGoals < opponentGoals ? "L" : "D";
-  return { stage, opponent, userGoals, opponentGoals, regularTimeUserGoals, regularTimeOpponentGoals, opponentGkRating, result, decidedByPens, extraTime, penaltyShootout };
+  return { stage, opponent, userGoals, opponentGoals, regularTimeUserGoals, regularTimeOpponentGoals, extraTimeUserGoals, extraTimeOpponentGoals, opponentGkRating, result, decidedByPens, extraTime, penaltyShootout };
 }
 
 function simulatePenalties(
@@ -288,6 +300,10 @@ export function simulateTournamentRun(args: {
   blindMode?: boolean;
   draftMode?: DraftMode;
   legendMode?: LegendMode;
+  // Authoritative knockout shootout results, keyed by stage name. When the
+  // player wins/loses an interactive shootout, the run is re-simulated with the
+  // result recorded here so the bracket and score stay consistent with play.
+  penOverrides?: Record<string, "W" | "L">;
 }): TournamentRun {
   const excludeIds = new Set(args.picks.map((pick) => pick.player.teamId));
   const matches: MatchResult[] = [];
@@ -323,7 +339,7 @@ export function simulateTournamentRun(args: {
       const stage = KNOCKOUT_STAGES[index];
       const opponent = pickOpponent(args.teams, `${args.seed}:knockout:${index}`, excludeIds, stage, userElo, legendMode);
       excludeIds.add(opponent.teamId);
-      const result = scoreMatch(stage, opponent, args.ratings, args.teams, `${args.seed}:${stage}`, true, legendMode);
+      const result = scoreMatch(stage, opponent, args.ratings, args.teams, `${args.seed}:${stage}`, true, legendMode, args.penOverrides?.[stage]);
       matches.push(result);
       if (result.result === "W") {
         wins += 1;
@@ -390,6 +406,14 @@ export function simulateTournamentRun(args: {
 export function distributeGoalMinutes(totalGoals: number, random: () => number): number[] {
   if (totalGoals <= 0) return [];
   const times = Array.from({ length: totalGoals }, () => Math.floor(random() * 90) + 1);
+  return times.sort((a, b) => a - b);
+}
+
+// Extra-time goals fall within minutes 91-120 (two 15-minute halves), so the
+// live match playback (capped at minute 120) always animates them.
+export function distributeExtraTimeMinutes(totalGoals: number, random: () => number): number[] {
+  if (totalGoals <= 0) return [];
+  const times = Array.from({ length: totalGoals }, () => Math.floor(random() * 30) + 91);
   return times.sort((a, b) => a - b);
 }
 
@@ -491,19 +515,18 @@ export function buildMatchEvents(
 
   if (result.extraTime) {
     events.push({ minute: 91, type: "extra_time_start", team: "user" });
-    // Distribute extra time goals (91-120)
-    const etUserGoals = result.userGoals - result.regularTimeUserGoals;
-    const etOppGoals = result.opponentGoals - result.regularTimeOpponentGoals;
-    if (etUserGoals > 0) {
-      const etMinutes = distributeGoalMinutes(etUserGoals, random).map((m) => m + 90);
+    // Extra-time goals only — never the penalty-shootout decider, which is
+    // played out interactively rather than animated here.
+    if (result.extraTimeUserGoals > 0) {
+      const etMinutes = distributeExtraTimeMinutes(result.extraTimeUserGoals, random);
       for (const minute of etMinutes) {
         const scorer = pickRandomPlayer(picks, random);
         events.push({ minute, type: "goal", team: "user", playerName: scorer.name, playerRating: scorer.rating });
         scorers[scorer.name] = (scorers[scorer.name] ?? 0) + 1;
       }
     }
-    if (etOppGoals > 0) {
-      const etMinutes = distributeGoalMinutes(etOppGoals, random).map((m) => m + 90);
+    if (result.extraTimeOpponentGoals > 0) {
+      const etMinutes = distributeExtraTimeMinutes(result.extraTimeOpponentGoals, random);
       for (const minute of etMinutes) {
         events.push({ minute, type: "goal", team: "opponent", playerName: result.opponent.name, playerRating: 0 });
       }
@@ -511,17 +534,8 @@ export function buildMatchEvents(
     events.push({ minute: 120, type: "extra_time_end", team: "user" });
   }
 
-  if (result.decidedByPens && result.penaltyShootout) {
-    events.push({ minute: 121, type: "penalty_shootout", team: "user" });
-    for (const kick of result.penaltyShootout) {
-      events.push({
-        minute: 121 + kick.round,
-        type: kick.saved ? "penalty_saved" : "penalty_scored",
-        team: kick.team,
-        playerName: kick.scorer,
-      });
-    }
-  }
+  // The penalty shootout is handled by the interactive PenaltyShootout
+  // component, so no penalty events are emitted into the live-match timeline.
 
   return { events: events.sort((a, b) => a.minute - b.minute), scorers };
 }

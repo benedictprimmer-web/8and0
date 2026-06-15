@@ -1,5 +1,5 @@
-import { isConfigured, pipeline, redis } from "./_upstash";
-import { sanitiseSubmission, type LeaderboardEntry } from "../src/game8/leaderboard";
+import { isConfigured, pipeline, redis } from "./_upstash.js";
+import { sanitiseSubmission, type LeaderboardEntry } from "../src/game8/leaderboard.js";
 
 // ── Vercel serverless function: global leaderboard ───────────────────────────
 //
@@ -194,7 +194,9 @@ export default async function handler(req: ApiRequest, res: ApiResponse): Promis
     res.setHeader("Allow", "GET, POST");
     res.status(405).json({ error: "Method not allowed" });
   } catch (err) {
-    const message = err instanceof Error ? err.message : "Unexpected error";
-    res.status(500).json({ error: message });
+    // Never echo raw error text to the client — upstream (Upstash) errors can
+    // contain credentials or internal details. Log server-side only.
+    console.error("leaderboard handler error:", err);
+    res.status(500).json({ error: "Internal error handling the leaderboard request." });
   }
 }

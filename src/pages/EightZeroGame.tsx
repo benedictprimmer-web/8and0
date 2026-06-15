@@ -6,6 +6,7 @@ import {
   Check,
   Copy,
   Globe,
+  HelpCircle,
   Medal,
   Play,
   RefreshCw,
@@ -16,7 +17,7 @@ import {
   Trophy,
   X,
 } from "lucide-react";
-import { api, leaderboardApi, type SubmitResponse } from "../api/client";
+import { api, leaderboardApi, type LeaderboardResponse, type SubmitResponse } from "../api/client";
 import { buildSubmission } from "../game8/leaderboard";
 import Flag from "../components/Flag";
 import LiveMatch from "../components/LiveMatch";
@@ -417,6 +418,112 @@ function LegendModal({
   );
 }
 
+// Compact live top-5 of the global leaderboard, shown on the setup screen so
+// players see the board (and the competition) before they even start a run.
+function GlobalTopFive() {
+  const query = useQuery<LeaderboardResponse>({
+    queryKey: ["8-0-global-top5"],
+    queryFn: () => leaderboardApi.list(5),
+    staleTime: 30_000,
+  });
+  const entries = (query.data?.entries ?? []).slice(0, 5);
+
+  return (
+    <section className="rounded-2xl border border-indigo-900/70 bg-[#11111f] p-5 shadow-2xl shadow-black/20">
+      <div className="flex items-center justify-between gap-3">
+        <p className="section-label text-base tracking-[0.18em] inline-flex items-center gap-2">
+          <Globe size={16} className="text-gold-400" />
+          Global leaderboard
+        </p>
+        <Link
+          to="/leaderboard"
+          className="inline-flex items-center gap-1 text-sm font-bold text-gold-400 hover:underline"
+        >
+          View full
+          <ArrowLeft size={14} className="rotate-180" />
+        </Link>
+      </div>
+      <div className="mt-4 space-y-2">
+        {query.isLoading && <p className="text-sm text-gray-500">Loading the board…</p>}
+        {!query.isLoading && entries.length === 0 && (
+          <p className="text-sm text-gray-500">No runs yet — be the first to make the board.</p>
+        )}
+        {entries.map((entry, index) => (
+          <div
+            key={entry.id}
+            className="flex items-center gap-3 rounded-lg border border-surface-700 bg-surface-800 px-3 py-2"
+          >
+            <span className="w-6 flex-shrink-0 text-center font-black text-gray-500">{index + 1}</span>
+            <div className="min-w-0 flex-1">
+              <p className="flex items-center gap-2 truncate text-sm font-bold text-white">
+                {index === 0 && <Trophy size={14} className="flex-shrink-0 text-gold-400" />}
+                <span className="truncate">{entry.name}</span>
+              </p>
+              <p className="truncate text-xs text-gray-500">
+                {entry.stageReached} · {entry.formationLabel}
+              </p>
+            </div>
+            <span className="flex-shrink-0 font-black tabular-nums text-gold-400">{entry.score}</span>
+          </div>
+        ))}
+      </div>
+    </section>
+  );
+}
+
+function HowItWorksModal({ onClose }: { onClose: () => void }) {
+  const steps = [
+    { title: "Draft your XI", text: "Spin to fill your chosen formation with 11 players from the World Cup pool — you get who you get." },
+    { title: "Play the tournament", text: "Your XI plays through the group stage and the knockouts. Win matches to advance toward the final." },
+    { title: "Score points", text: "Earn points for results, goals, and how deep you run. Harder difficulty and bigger upsets are worth more." },
+    { title: "Hit the global board", text: "Submit your run to climb the worldwide leaderboard and see how you stack up against everyone." },
+  ];
+
+  return (
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4 animate-fade-up"
+      onClick={onClose}
+    >
+      <div
+        className="w-full max-w-lg rounded-2xl border border-indigo-900/70 bg-[#11111f] p-6 shadow-2xl shadow-black/40"
+        onClick={(event) => event.stopPropagation()}
+      >
+        <div className="mb-5 flex items-center justify-between">
+          <h2 className="text-2xl font-black text-white">How it works</h2>
+          <button
+            type="button"
+            onClick={onClose}
+            aria-label="Close"
+            className="rounded-lg p-1 text-gray-400 transition-colors hover:text-white"
+          >
+            <X size={20} />
+          </button>
+        </div>
+        <div className="space-y-4">
+          {steps.map((step, index) => (
+            <div key={step.title} className="flex gap-3">
+              <span className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full bg-gold-500/15 text-sm font-black text-gold-400">
+                {index + 1}
+              </span>
+              <div className="min-w-0">
+                <p className="font-bold text-white">{step.title}</p>
+                <p className="text-sm text-gray-400">{step.text}</p>
+              </div>
+            </div>
+          ))}
+        </div>
+        <button
+          type="button"
+          onClick={onClose}
+          className="mt-6 w-full rounded-xl bg-gold-500 px-6 py-3 text-base font-black text-black transition-colors hover:bg-gold-400"
+        >
+          Got it
+        </button>
+      </div>
+    </div>
+  );
+}
+
 function SetupScreen({
   formationId,
   options,
@@ -442,56 +549,13 @@ function SetupScreen({
   onLegendSelect: (legendMode: "none" | "messi" | "ronaldo" | "neymar") => void;
   onStartPracticePenalties?: () => void;
 }) {
-  const [spinningFormationId, setSpinningFormationId] = useState<string | null>(null);
   const [showLegendModal, setShowLegendModal] = useState(false);
-  const spinIntervalRef = useRef<number | null>(null);
-  const spinTimeoutRef = useRef<number | null>(null);
+  const [showHowItWorks, setShowHowItWorks] = useState(false);
 
   function updateOptions(next: Partial<DraftOptions>) {
     const merged = { ...options, ...next };
     if (merged.difficulty === "hard") merged.blindMode = true;
     onOptionsChange(merged);
-  }
-
-  function clearSpinTimers() {
-    if (spinIntervalRef.current) window.clearInterval(spinIntervalRef.current);
-    if (spinTimeoutRef.current) window.clearTimeout(spinTimeoutRef.current);
-    spinIntervalRef.current = null;
-    spinTimeoutRef.current = null;
-  }
-
-  function handleSpinWheel() {
-    if (loading || spinningFormationId) return;
-    clearSpinTimers();
-    let index = 0;
-    setSpinningFormationId(FORMATIONS[0].id);
-    spinIntervalRef.current = window.setInterval(() => {
-      index = (index + 1) % FORMATIONS.length;
-      setSpinningFormationId(FORMATIONS[index].id);
-    }, 150);
-    spinTimeoutRef.current = window.setTimeout(() => {
-      if (spinIntervalRef.current) window.clearInterval(spinIntervalRef.current);
-      spinIntervalRef.current = window.setInterval(() => {
-        index = (index + 1) % FORMATIONS.length;
-        setSpinningFormationId(FORMATIONS[index].id);
-      }, 300);
-    }, 1500);
-    spinTimeoutRef.current = window.setTimeout(() => {
-      if (spinIntervalRef.current) window.clearInterval(spinIntervalRef.current);
-      spinIntervalRef.current = window.setInterval(() => {
-        index = (index + 1) % FORMATIONS.length;
-        setSpinningFormationId(FORMATIONS[index].id);
-      }, 500);
-    }, 2500);
-    spinTimeoutRef.current = window.setTimeout(() => {
-      clearSpinTimers();
-      const landed = FORMATIONS[Math.floor(Math.random() * FORMATIONS.length)];
-      setSpinningFormationId(landed.id);
-      onFormationChange(landed.id);
-      window.setTimeout(() => {
-        setSpinningFormationId(null);
-      }, 500);
-    }, 3000);
   }
 
   return (
@@ -506,12 +570,22 @@ function SetupScreen({
           <p className="mt-2 text-lg leading-7 text-gray-400">
             #Russel=Mogged
           </p>
+          <button
+            type="button"
+            onClick={() => setShowHowItWorks(true)}
+            className="mt-3 inline-flex items-center gap-2 rounded-lg border border-surface-700 bg-surface-950 px-3 py-1.5 text-sm font-bold text-gray-300 transition-colors hover:border-gold-600/40 hover:text-white"
+          >
+            <HelpCircle size={15} />
+            How it works
+          </button>
         </div>
         <div className="text-right">
           <p className="text-3xl sm:text-5xl font-black text-gold-400 tabular-nums">{bestRun?.score ?? 0}</p>
           <p className="section-label">Best</p>
         </div>
       </div>
+
+      <GlobalTopFive />
 
       <section className="rounded-2xl border border-indigo-900/70 bg-[#11111f] p-5 shadow-2xl shadow-black/20">
         <p className="section-label text-base tracking-[0.18em]">Formation</p>
@@ -521,25 +595,12 @@ function SetupScreen({
               key={formation.id}
               active={formationId === formation.id}
               onClick={() => onFormationChange(formation.id)}
-              className={`min-w-[110px] text-lg sm:text-xl ${spinningFormationId === formation.id ? "animate-pulse" : ""}`}
+              className="min-w-[110px] text-lg sm:text-xl"
             >
               {formation.label}
             </OptionButton>
           ))}
         </div>
-        <button
-          type="button"
-          onClick={handleSpinWheel}
-          disabled={loading || Boolean(spinningFormationId) || options.legendMode !== "none"}
-          className={`mt-4 inline-flex w-full items-center justify-center gap-2 rounded-xl border px-6 py-4 text-lg font-black transition-colors disabled:cursor-not-allowed disabled:opacity-50 ${
-            options.legendMode !== "none"
-              ? "border-surface-800 bg-surface-950/50 text-gray-600"
-              : "border-gold-600 bg-gold-500/10 text-gold-400 hover:bg-gold-500/20"
-          }`}
-        >
-          <Shuffle size={20} />
-          Spin the Wheel
-        </button>
         <button
           type="button"
           onClick={() => {
@@ -549,7 +610,7 @@ function SetupScreen({
               setShowLegendModal(true);
             }
           }}
-          disabled={loading || Boolean(spinningFormationId)}
+          disabled={loading}
           className={`mt-3 inline-flex w-full items-center justify-center gap-2 rounded-xl border px-6 py-4 text-lg font-black transition-colors disabled:cursor-not-allowed disabled:opacity-50 ${
             options.legendMode !== "none"
               ? "border-gold-600 bg-gold-500/10 text-gold-400 hover:bg-gold-500/20"
@@ -567,7 +628,7 @@ function SetupScreen({
         <button
           type="button"
           onClick={() => onStartPracticePenalties?.()}
-          disabled={loading || Boolean(spinningFormationId)}
+          disabled={loading}
           className="mt-3 inline-flex w-full items-center justify-center gap-2 rounded-xl border border-surface-700 bg-surface-950 px-6 py-4 text-lg font-black text-white transition-colors hover:border-gold-600/40 hover:bg-surface-900 disabled:cursor-not-allowed disabled:opacity-50"
         >
           <Target size={20} className="text-gold-400" />
@@ -652,6 +713,8 @@ function SetupScreen({
       >
         Start draft →
       </button>
+
+      {showHowItWorks && <HowItWorksModal onClose={() => setShowHowItWorks(false)} />}
     </div>
   );
 }
@@ -1093,6 +1156,9 @@ export default function EightZeroGame() {
   const [tournamentPhase, setTournamentPhase] = useState<"idle" | "ready" | "live" | "penalties" | "practice_penalties" | "complete">("idle");
   const [currentMatchIndex, setCurrentMatchIndex] = useState(0);
   const [allMatchEvents, setAllMatchEvents] = useState<MatchEvent[][]>([]);
+  // Authoritative interactive-shootout results, keyed by knockout stage. Fed
+  // back into simulateTournamentRun so the bracket follows actual play.
+  const [penOverrides, setPenOverrides] = useState<Record<string, "W" | "L">>({});
   const draftControlsRef = useRef<HTMLDivElement | null>(null);
   const spinIntervalRef = useRef<number | null>(null);
   const spinTimeoutRef = useRef<number | null>(null);
@@ -1138,6 +1204,15 @@ export default function EightZeroGame() {
       document.body.style.overflow = prevOverflow;
     };
   }, [showTeamSheet]);
+
+  // Persist the finalized run once the tournament completes. Interactive
+  // shootouts rebuild `run`, so the run saved here reflects actual play (the
+  // provisional save at draft time is replaced by id).
+  useEffect(() => {
+    if (tournamentPhase === "complete" && run) {
+      setHistory(saveRun(run));
+    }
+  }, [tournamentPhase, run]);
 
   const bestRun = history[0] ?? null;
   const openSlots = getOpenSlots(draftState);
@@ -1187,6 +1262,7 @@ export default function EightZeroGame() {
     setOptions(resolvedOptions);
     setDraftState(createDraftState(makeSeed(), nextFormationId, resolvedOptions, gameData ?? undefined));
     setRun(null);
+    setPenOverrides({});
     setStarted(true);
     setSearch("");
     setCopied(false);
@@ -1205,6 +1281,7 @@ export default function EightZeroGame() {
     clearSpinTimers();
     setRun(null);
     setShowTeamSheet(false);
+    setPenOverrides({});
     setStarted(false);
     setSearch("");
     setCopied(false);
@@ -1221,6 +1298,8 @@ export default function EightZeroGame() {
   function finishDraftIfComplete(next: DraftState) {
     if (!gameData || !next.complete) return;
     const ratings = calculateTeamRatings(next.picks);
+    // Fresh run starts with no shootout overrides.
+    setPenOverrides({});
     const nextRun = simulateTournamentRun({
       teams: gameData.teams,
       picks: next.picks,
@@ -1231,6 +1310,7 @@ export default function EightZeroGame() {
       blindMode: next.blindMode,
       draftMode: next.draftMode,
       legendMode: next.legendMode,
+      penOverrides: {},
     });
     setRun(nextRun);
     setHistory(saveRun(nextRun));
@@ -1241,6 +1321,57 @@ export default function EightZeroGame() {
     setAllMatchEvents(events);
     setCurrentMatchIndex(0);
     setTournamentPhase("ready");
+    window.requestAnimationFrame(() => window.scrollTo({ top: 0, behavior: "smooth" }));
+  }
+
+  // Record the authoritative result of an interactive penalty shootout, re-run
+  // the tournament with that override so the bracket/score stay consistent, then
+  // advance to the next match (or finish if the run ended).
+  function applyPenaltyResult(userWon: boolean) {
+    if (!gameData || !run) {
+      handleMatchFinished();
+      return;
+    }
+    const match = run.matches[currentMatchIndex];
+    if (!match) {
+      handleMatchFinished();
+      return;
+    }
+    const nextOverrides: Record<string, "W" | "L"> = {
+      ...penOverrides,
+      [match.stage]: userWon ? "W" : "L",
+    };
+    setPenOverrides(nextOverrides);
+
+    const rebuilt = simulateTournamentRun({
+      teams: gameData.teams,
+      picks: run.picks,
+      ratings: run.ratings,
+      seed: run.seed,
+      formationId: run.formationId,
+      difficulty: run.difficulty,
+      blindMode: run.blindMode,
+      draftMode: run.draftMode,
+      legendMode: run.legendMode,
+      penOverrides: nextOverrides,
+    });
+    // Preserve identity so local history / leaderboard dedupe stays stable.
+    rebuilt.id = run.id;
+    rebuilt.createdAt = run.createdAt;
+    setRun(rebuilt);
+
+    const events = rebuilt.matches.map((rebuiltMatch, index) =>
+      buildMatchEvents(rebuiltMatch, rebuilt.picks, `${rebuilt.seed}:events:${index}`).events
+    );
+    setAllMatchEvents(events);
+
+    const nextIndex = currentMatchIndex + 1;
+    if (nextIndex >= rebuilt.matches.length) {
+      setTournamentPhase("complete");
+    } else {
+      setCurrentMatchIndex(nextIndex);
+      setTournamentPhase("ready");
+    }
     window.requestAnimationFrame(() => window.scrollTo({ top: 0, behavior: "smooth" }));
   }
 
@@ -1517,7 +1648,7 @@ export default function EightZeroGame() {
               legendMode={run.legendMode}
               onFinished={() => {
                 const match = run.matches[currentMatchIndex];
-                if (match.decidedByPens && match.penaltyShootout) {
+                if (match.decidedByPens) {
                   setTournamentPhase("penalties");
                 } else {
                   handleMatchFinished();
@@ -1532,15 +1663,7 @@ export default function EightZeroGame() {
               userGkRating={run.ratings.gk}
               oppGkRating={run.matches[currentMatchIndex]?.opponentGkRating ?? 75}
               userShooterRating={run.ratings.attack}
-              onFinished={(userWon) => {
-                // Update the match result based on penalty shootout
-                const match = run.matches[currentMatchIndex];
-                if (match) {
-                  match.result = userWon ? "W" : "L";
-                  match.userGoals = userWon ? match.userGoals + 1 : match.userGoals;
-                }
-                handleMatchFinished();
-              }}
+              onFinished={(userWon) => applyPenaltyResult(userWon)}
             />
           )}
 
