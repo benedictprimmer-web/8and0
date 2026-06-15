@@ -181,28 +181,6 @@ export default function LiveMatch({ stage, opponent, result, events, onFinished,
     setRecentEvent(endEvent);
   }
 
-  function skipToNextEvent() {
-    const maxMinute = result.decidedByPens ? 121 : result.extraTime ? 120 : 90;
-    let targetMinute = maxMinute;
-    for (let m = currentMinute + 1; m <= maxMinute; m++) {
-      if (eventsByMinute.current.has(m)) {
-        targetMinute = m;
-        break;
-      }
-    }
-    setCurrentMinute(targetMinute);
-    const eventsUpToTarget = events.filter(e => e.minute <= targetMinute);
-    setVisibleEvents(eventsUpToTarget);
-    const uGoals = eventsUpToTarget.filter(e => e.type === "goal" && e.team === "user").length;
-    const oGoals = eventsUpToTarget.filter(e => e.type === "goal" && e.team === "opponent").length;
-    setUserScore(uGoals);
-    setOppScore(oGoals);
-    if (targetMinute >= maxMinute) {
-      setIsFinished(true);
-      clearTimer();
-    }
-  }
-
   const displayMinute = currentMinute > 120 ? "120+" : (result.extraTime && currentMinute > 90) ? `${currentMinute}' ET` : `${currentMinute}'`;
   const speeds: Speed[] = [1, 2, 5, 10];
 
@@ -230,15 +208,8 @@ export default function LiveMatch({ stage, opponent, result, events, onFinished,
         ))}
         <button
           type="button"
-          onClick={skipToNextEvent}
-          className="ml-2 rounded-lg bg-surface-800 px-4 py-2 text-xs sm:text-sm font-bold text-gray-500 hover:text-white min-w-[44px]"
-        >
-          Skip
-        </button>
-        <button
-          type="button"
           onClick={skipToHalf}
-          className="rounded-lg bg-surface-800 px-4 py-2 text-xs sm:text-sm font-bold text-gray-500 hover:text-white min-w-[44px]"
+          className="ml-2 rounded-lg bg-surface-800 px-4 py-2 text-xs sm:text-sm font-bold text-gray-500 hover:text-white min-w-[44px]"
         >
           Half
         </button>
