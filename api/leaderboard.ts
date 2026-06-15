@@ -1,5 +1,5 @@
-import { isConfigured, pipeline, redis } from "./_upstash";
-import { sanitiseSubmission, type LeaderboardEntry } from "../src/game8/leaderboard";
+import { isConfigured, pipeline, redis } from "./_upstash.js";
+import { sanitiseSubmission, type LeaderboardEntry } from "../src/game8/leaderboard.js";
 
 // ── Vercel serverless function: global leaderboard ───────────────────────────
 //
