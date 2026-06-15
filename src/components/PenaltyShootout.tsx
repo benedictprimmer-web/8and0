@@ -1,16 +1,24 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import Flag from "../components/Flag";
-import { describeGoalDirection, describeMissDirection } from "../game8/penaltyText";
+import { describeGoalDirection, describeMissDirection, type ShotDirection } from "../game8/penaltyText";
+import {
+  OPPONENT_SHOOTER_RATING,
+  SHOOTER_CENTER_WEIGHT,
+  keeperCenterWeight,
+  pickDirection,
+  resolveKick,
+} from "../game8/penaltyModel";
+import { REGULATION_KICKS, shootoutStatus } from "../game8/shootoutStatus";
 import type { EightZeroTeam, PenaltyKick } from "../game8/types";
 
 interface InteractivePenaltyKick {
   round: number;
   team: "user" | "opponent";
   playerName: string;
-  userDirection?: "left" | "center" | "right";
-  userDiveDirection?: "left" | "center" | "right";
-  opponentShotDirection?: "left" | "center" | "right";
-  keeperDirection: "left" | "center" | "right";
+  userDirection?: ShotDirection;
+  userDiveDirection?: ShotDirection;
+  opponentShotDirection?: ShotDirection;
+  keeperDirection: ShotDirection;
   result: "goal" | "saved" | "missed";
 }
 
@@ -28,62 +36,66 @@ interface PenaltyShootoutProps {
   onStopPractice?: () => void;
 }
 
-function getKeeperSaveChance(keeperRating: number): number {
-  return 0.25 + (keeperRating - 60) * 0.005;
-}
-
-function getKeeperGuessWeight(keeperRating: number): number {
-  return 0.33 + (keeperRating - 60) * 0.004;
-}
-
-function getMissChance(shooterRating: number): number {
-  return Math.max(0.02, 0.08 - (shooterRating - 60) * 0.002);
-}
-
-function randomDirection(weight: number): "left" | "center" | "right" {
-  const r = Math.random();
-  const leftProb = (1 - weight) / 2;
-  const rightProb = (1 - weight) / 2;
-  if (r < leftProb) return "left";
-  if (r < leftProb + rightProb) return "right";
-  return "center";
-}
-
-function generateKick(
-  round: number,
-  team: "user" | "opponent",
-  playerName: string,
-  shooterRating: number,
-  keeperRating: number,
-  userDirection?: "left" | "center" | "right",
-  userDiveDirection?: "left" | "center" | "right"
+// Build a kick the user takes as the shooter (keeper is AI).
+function buildUserShot(
+  direction: ShotDirection,
+  kickNumber: number,
+  userShooterRating: number,
+  oppGkRating: number
 ): InteractivePenaltyKick {
-  if (team === "user" && userDirection) {
-    const keeperDirection = randomDirection(getKeeperGuessWeight(keeperRating));
-    if (Math.random() < getMissChance(shooterRating)) {
-      return { round, team, playerName, userDirection, keeperDirection, result: "missed" };
-    }
-    if (userDirection === keeperDirection && Math.random() < getKeeperSaveChance(keeperRating)) {
-      return { round, team, playerName, userDirection, keeperDirection, result: "saved" };
-    }
-    return { round, team, playerName, userDirection, keeperDirection, result: "goal" };
-  } else {
-    const opponentShotDirection = randomDirection(0.33);
-    if (Math.random() < getMissChance(shooterRating)) {
-      return { round, team, playerName, opponentShotDirection, keeperDirection: opponentShotDirection, result: "missed" };
-    }
-    if (userDiveDirection) {
-      if (userDiveDirection === opponentShotDirection) {
-        return { round, team, playerName, userDiveDirection, opponentShotDirection, keeperDirection: userDiveDirection, result: "saved" };
-      }
-      return { round, team, playerName, userDiveDirection, opponentShotDirection, keeperDirection: userDiveDirection, result: "goal" };
-    }
-    const keeperDirection = randomDirection(getKeeperGuessWeight(keeperRating));
-    if (keeperDirection === opponentShotDirection && Math.random() < getKeeperSaveChance(keeperRating)) {
-      return { round, team, playerName, opponentShotDirection, keeperDirection, result: "saved" };
-    }
-    return { round, team, playerName, opponentShotDirection, keeperDirection, result: "goal" };
-  }
+  const keeperDirection = pickDirection(keeperCenterWeight(oppGkRating), Math.random);
+  const result = resolveKick(direction, keeperDirection, userShooterRating, oppGkRating, Math.random);
+  return { round: kickNumber, team: "user", playerName: "You", userDirection: direction, keeperDirection, result };
+}
+
+// Build an opponent kick the user faces as the keeper (shooter is AI).
+function buildUserDive(
+  direction: ShotDirection,
+  kickNumber: number,
+  opponentName: string,
+  userGkRating: number
+): InteractivePenaltyKick {
+  const opponentShotDirection = pickDirection(SHOOTER_CENTER_WEIGHT, Math.random);
+  const result = resolveKick(opponentShotDirection, direction, OPPONENT_SHOOTER_RATING, userGkRating, Math.random);
+  return {
+    round: kickNumber,
+    team: "opponent",
+    playerName: opponentName,
+    userDiveDirection: direction,
+    opponentShotDirection,
+    keeperDirection: direction,
+    result,
+  };
+}
+
+type DotOutcome = "made" | "missed";
+
+// A row of penalty markers for one team: green = scored/saved, red = missed,
+// hollow = not yet taken. At least five slots, growing into sudden death.
+function PenaltyDots({ label, dots, total }: { label: string; dots: DotOutcome[]; total: number }) {
+  return (
+    <div className="flex items-center gap-3">
+      <span className="w-16 shrink-0 truncate text-xs font-bold text-gray-400">{label}</span>
+      <div className="flex flex-wrap gap-1.5">
+        {Array.from({ length: total }).map((_, index) => {
+          const outcome = dots[index];
+          const cls =
+            outcome === "made"
+              ? "bg-green-500 border-green-400"
+              : outcome === "missed"
+                ? "bg-red-500 border-red-400"
+                : "bg-surface-700 border-surface-600";
+          const isSuddenDeath = index >= REGULATION_KICKS;
+          return (
+            <span
+              key={index}
+              className={`h-3.5 w-3.5 rounded-full border ${cls} ${isSuddenDeath ? "ring-1 ring-gold-500/40" : ""}`}
+            />
+          );
+        })}
+      </div>
+    </div>
+  );
 }
 
 const ANIMATION_DURATION = 2000; // ms - ball fly + keeper dive
@@ -101,7 +113,6 @@ export default function PenaltyShootout({
   onStopPractice
 }: PenaltyShootoutProps) {
   const [kicks, setKicks] = useState<InteractivePenaltyKick[]>([]);
-  const [currentRound, setCurrentRound] = useState(1);
   const [userScore, setUserScore] = useState(0);
   const [oppScore, setOppScore] = useState(0);
   const [phase, setPhase] = useState<"waiting" | "selecting_dive" | "kicking" | "opp_kicking" | "revealed" | "finished">("waiting");
@@ -117,14 +128,46 @@ export default function PenaltyShootout({
 
   const showModeSelector = practiceMode && !selectedMode && !mode;
 
+  // Kicks taken so far, per team — drives turn order and termination.
+  const userKicks = useMemo(() => kicks.filter((k) => k.team === "user").length, [kicks]);
+  const oppKicks = useMemo(() => kicks.filter((k) => k.team === "opponent").length, [kicks]);
+
   const isUserTurn = useMemo(() => {
     if (effectiveMode === "shooter") return true;
     if (effectiveMode === "goalkeeper") return false;
-    return currentRound % 2 === 1;
-  }, [effectiveMode, currentRound]);
+    // Both mode: teams alternate and the user shoots first each round.
+    return userKicks === oppKicks;
+  }, [effectiveMode, userKicks, oppKicks]);
+
+  // Live shootout status (only meaningful for two-sided "both" mode).
+  const status = useMemo(
+    () => shootoutStatus({ userScore, oppScore, userKicks, oppKicks }),
+    [userScore, oppScore, userKicks, oppKicks]
+  );
+
+  // Marker rows: a "made" dot is a goal you scored, or — as keeper — a save.
+  const userDots = useMemo<DotOutcome[]>(() => {
+    if (effectiveMode === "goalkeeper") {
+      return kicks.filter((k) => k.team === "opponent").map((k) => (k.result === "saved" ? "made" : "missed"));
+    }
+    return kicks.filter((k) => k.team === "user").map((k) => (k.result === "goal" ? "made" : "missed"));
+  }, [kicks, effectiveMode]);
+
+  const oppDots = useMemo<DotOutcome[]>(() => {
+    if (effectiveMode === "shooter") return [];
+    return kicks.filter((k) => k.team === "opponent").map((k) => (k.result === "goal" ? "made" : "missed"));
+  }, [kicks, effectiveMode]);
+
+  const dotTotal = Math.max(REGULATION_KICKS, userDots.length, oppDots.length);
+
+  const roundLabel = useMemo(() => {
+    if (effectiveMode === "both" && status.suddenDeath) return "Sudden Death";
+    const taken =
+      effectiveMode === "shooter" ? userKicks : effectiveMode === "goalkeeper" ? oppKicks : Math.min(userKicks, oppKicks);
+    return `Round ${Math.min(REGULATION_KICKS, taken + 1)}`;
+  }, [effectiveMode, status.suddenDeath, userKicks, oppKicks]);
 
   const isFinished = phase === "finished";
-  const maxRounds = 5;
 
   const addKick = useCallback((kick: InteractivePenaltyKick) => {
     setKicks(prev => [...prev, kick]);
@@ -143,106 +186,89 @@ export default function PenaltyShootout({
     }
   }, [effectiveMode]);
 
-  const checkFinished = useCallback((newUserScore: number, newOppScore: number, round: number, totalKicks: number) => {
-    // Decide a winner once both teams have taken an equal number of kicks and
-    // they are past the opening rounds (covers regulation finishing level → the
-    // first sudden-death pair that separates them).
-    if (round > maxRounds && totalKicks % 2 === 0 && newUserScore !== newOppScore) {
-      setUserWon(newUserScore > newOppScore);
-      setPhase("finished");
-      return true;
-    }
-    return false;
-  }, []);
+  // After a kick is revealed: apply the score, then either finish the shootout
+  // or hand over to the next taker. Pre-kick counts/scores are passed in so the
+  // decision is computed from a stable snapshot (state updates are async).
+  const resolveAfterKick = useCallback(
+    (kick: InteractivePenaltyKick, preUserKicks: number, preOppKicks: number, preUserScore: number, preOppScore: number) => {
+      const userKicksAfter = preUserKicks + (kick.team === "user" ? 1 : 0);
+      const oppKicksAfter = preOppKicks + (kick.team === "opponent" ? 1 : 0);
 
-  const handleUserKick = useCallback((direction: "left" | "center" | "right") => {
-    if (phase !== "waiting") return;
-    if (!isUserTurn) return;
-    const kick = generateKick(
-      currentRound,
-      "user",
-      "You",
-      userShooterRating,
-      oppGkRating,
-      direction
-    );
-    setCurrentKick(kick);
-    setPhase("kicking");
-    setTimeout(() => {
-      setPhase("revealed");
-      addKick(kick);
-      const newUserScore = kick.result === "goal" ? userScore + 1 : userScore;
-      setTimeout(() => {
-        if (checkFinished(newUserScore, oppScore, currentRound, kicks.length + 1)) {
-          return;
-        }
-        setCurrentRound(r => r + 1);
-        setPhase("waiting");
-      }, RESULT_DURATION);
-    }, ANIMATION_DURATION);
-  }, [phase, isUserTurn, currentRound, userShooterRating, oppGkRating, userScore, oppScore, kicks.length, addKick, checkFinished]);
+      let newUserScore = preUserScore;
+      let newOppScore = preOppScore;
+      if (effectiveMode === "goalkeeper") {
+        if (kick.team === "opponent" && kick.result === "saved") newUserScore += 1;
+        else if (kick.team === "opponent" && kick.result === "goal") newOppScore += 1;
+      } else {
+        if (kick.team === "user" && kick.result === "goal") newUserScore += 1;
+        else if (kick.team === "opponent" && kick.result === "goal") newOppScore += 1;
+      }
 
-  const handleUserDive = useCallback((direction: "left" | "center" | "right") => {
-    if (phase !== "selecting_dive") return;
-    const kick = generateKick(
-      currentRound,
-      "opponent",
-      opponent.name,
-      80,
-      userGkRating,
-      undefined,
-      direction
-    );
-    setCurrentKick(kick);
-    setPhase("opp_kicking");
-    setTimeout(() => {
-      setPhase("revealed");
-      addKick(kick);
-      const newOppScore = kick.result === "goal" ? oppScore + 1 : oppScore;
-      const newUserScore = effectiveMode === "goalkeeper" && kick.result === "saved" ? userScore + 1 : userScore;
-      setTimeout(() => {
-        if (checkFinished(newUserScore, newOppScore, currentRound, kicks.length + 1)) {
-          return;
-        }
-        setCurrentRound(r => r + 1);
-        setPhase("waiting");
-      }, RESULT_DURATION);
-    }, ANIMATION_DURATION);
-  }, [phase, currentRound, opponent.name, userGkRating, userScore, oppScore, kicks.length, addKick, checkFinished, effectiveMode]);
+      let finishedWinner: boolean | null = null;
+      if (effectiveMode === "both") {
+        const st = shootoutStatus({
+          userScore: newUserScore,
+          oppScore: newOppScore,
+          userKicks: userKicksAfter,
+          oppKicks: oppKicksAfter,
+        });
+        if (st.decided) finishedWinner = st.winner === "user";
+      } else if (userKicksAfter >= REGULATION_KICKS && effectiveMode === "shooter") {
+        // Shooter practice: a set of five — "win" by scoring the majority.
+        finishedWinner = newUserScore > REGULATION_KICKS / 2;
+      } else if (oppKicksAfter >= REGULATION_KICKS && effectiveMode === "goalkeeper") {
+        // Goalkeeper practice: "win" by saving the majority of five kicks.
+        finishedWinner = newUserScore > REGULATION_KICKS / 2;
+      }
 
-  const handleOpponentKick = useCallback(() => {
-    if (phase !== "waiting") return;
-    // Whenever the user controls the keeper (goalkeeper or both modes), let them
-    // pick a dive direction on the opponent's kick — in real knockouts too, not
-    // just practice.
-    if (!isUserTurn && (effectiveMode === "both" || effectiveMode === "goalkeeper")) {
-      setCurrentKick(null);
-      setPhase("selecting_dive");
-      return;
-    }
-    const kick = generateKick(
-      currentRound,
-      "opponent",
-      opponent.name,
-      80,
-      userGkRating
-    );
-    setCurrentKick(kick);
-    setPhase("opp_kicking");
-    setTimeout(() => {
-      setPhase("revealed");
-      addKick(kick);
-      const newOppScore = kick.result === "goal" ? oppScore + 1 : oppScore;
-      setTimeout(() => {
-        if (checkFinished(userScore, newOppScore, currentRound, kicks.length + 1)) {
-          return;
-        }
-        setCurrentRound(r => r + 1);
+      if (finishedWinner !== null) {
+        setUserWon(finishedWinner);
+        setPhase("finished");
+      } else {
         setCurrentKick(null);
         setPhase("waiting");
-      }, RESULT_DURATION);
-    }, ANIMATION_DURATION);
-  }, [phase, isUserTurn, effectiveMode, currentRound, opponent.name, userGkRating, userScore, oppScore, kicks.length, addKick, checkFinished]);
+      }
+    },
+    [effectiveMode]
+  );
+
+  const handleUserKick = useCallback(
+    (direction: ShotDirection) => {
+      if (phase !== "waiting" || !isUserTurn) return;
+      const kick = buildUserShot(direction, userKicks + 1, userShooterRating, oppGkRating);
+      setCurrentKick(kick);
+      setPhase("kicking");
+      window.setTimeout(() => {
+        setPhase("revealed");
+        addKick(kick);
+        window.setTimeout(() => resolveAfterKick(kick, userKicks, oppKicks, userScore, oppScore), RESULT_DURATION);
+      }, ANIMATION_DURATION);
+    },
+    [phase, isUserTurn, userKicks, oppKicks, userScore, oppScore, userShooterRating, oppGkRating, addKick, resolveAfterKick]
+  );
+
+  const handleUserDive = useCallback(
+    (direction: ShotDirection) => {
+      if (phase !== "selecting_dive") return;
+      const kick = buildUserDive(direction, oppKicks + 1, opponent.name, userGkRating);
+      setCurrentKick(kick);
+      setPhase("opp_kicking");
+      window.setTimeout(() => {
+        setPhase("revealed");
+        addKick(kick);
+        window.setTimeout(() => resolveAfterKick(kick, userKicks, oppKicks, userScore, oppScore), RESULT_DURATION);
+      }, ANIMATION_DURATION);
+    },
+    [phase, userKicks, oppKicks, userScore, oppScore, opponent.name, userGkRating, addKick, resolveAfterKick]
+  );
+
+  // Reached only when it is the opponent's turn and the user keeps the goal, so
+  // always hand control to the dive selector (real knockouts and practice).
+  const handleOpponentKick = useCallback(() => {
+    if (phase !== "waiting") return;
+    setCurrentKick(null);
+    setPhase("selecting_dive");
+  }, [phase]);
 
   useEffect(() => {
     if (phase === "waiting" && !isUserTurn && !isFinished) {
@@ -404,8 +430,8 @@ export default function PenaltyShootout({
           <>
             <div className="text-center mb-4">
               <p className="section-label">Penalty Shootout</p>
-              <h2 className="mt-1 text-xl sm:text-2xl font-black text-white">
-                {currentRound > maxRounds ? "Sudden Death" : "Round " + currentRound}
+              <h2 className={`mt-1 text-xl sm:text-2xl font-black ${roundLabel === "Sudden Death" ? "text-gold-400" : "text-white"}`}>
+                {roundLabel}
               </h2>
               {practiceMode && (
                 <p className="text-xs text-gray-500 mt-1">
@@ -433,6 +459,19 @@ export default function PenaltyShootout({
                 <p className="mt-2 text-sm font-bold text-white">{opponent.name}</p>
                 <p className="text-2xl sm:text-3xl font-black text-white tabular-nums mt-1">{oppScore}</p>
               </div>
+            </div>
+
+            {/* Penalty marker dots so you can see exactly where the shootout stands */}
+            <div className="mb-6 space-y-2 rounded-xl border border-surface-700 bg-surface-800/50 p-3">
+              <PenaltyDots label="You" dots={userDots} total={dotTotal} />
+              {effectiveMode !== "shooter" && (
+                <PenaltyDots label={opponent.name} dots={oppDots} total={dotTotal} />
+              )}
+              {effectiveMode === "both" && status.suddenDeath && (
+                <p className="pt-1 text-center text-xs font-black uppercase tracking-wide text-gold-400">
+                  Sudden Death — next goal advantage wins
+                </p>
+              )}
             </div>
 
             {!isFinished && (
