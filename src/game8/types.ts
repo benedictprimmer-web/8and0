@@ -97,7 +97,6 @@ export interface MatchResult {
   result: "W" | "D" | "L";
   decidedByPens: boolean;
   extraTime: boolean;
-  penaltyShootout?: PenaltyKick[];
 }
 
 export interface PenaltyKick {

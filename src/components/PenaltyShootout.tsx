@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import Flag from "../components/Flag";
 import { describeGoalDirection, describeMissDirection } from "../game8/penaltyText";
-import type { EightZeroTeam, PenaltyKick } from "../game8/types";
+import type { EightZeroTeam } from "../game8/types";
 
 interface InteractivePenaltyKick {
   round: number;
@@ -23,7 +23,6 @@ interface PenaltyShootoutProps {
   userShooterRating?: number;
   onFinished: (userWon: boolean) => void;
   practiceMode?: boolean;
-  initialKicks?: PenaltyKick[];
   mode?: PenaltyMode;
   onStopPractice?: () => void;
 }
@@ -96,7 +95,6 @@ export default function PenaltyShootout({
   userShooterRating = 80,
   onFinished,
   practiceMode = false,
-  initialKicks,
   mode,
   onStopPractice
 }: PenaltyShootoutProps) {
@@ -256,23 +254,6 @@ export default function PenaltyShootout({
       onFinished(userWon);
     }
   }, [userWon, onFinished]);
-
-  useEffect(() => {
-    if (initialKicks && initialKicks.length > 0) {
-      const converted: InteractivePenaltyKick[] = initialKicks.map((k) => ({
-        round: k.round,
-        team: k.team,
-        playerName: k.scorer,
-        keeperDirection: "center",
-        result: k.saved ? "saved" : "goal",
-        userDiveDirection: k.team === "opponent" ? "center" : undefined,
-        opponentShotDirection: k.team === "opponent" ? "center" : undefined,
-      }));
-      setKicks(converted);
-      setUserScore(converted.filter(k => k.team === "user" && k.result === "goal").length);
-      setOppScore(converted.filter(k => k.team === "opponent" && k.result === "goal").length);
-    }
-  }, [initialKicks]);
 
   // Compute the shot direction being displayed
   const displayShotDirection = useMemo(() => {

@@ -156,7 +156,6 @@ function scoreMatch(
   let extraTimeOpponentGoals = 0;
   let decidedByPens = false;
   let extraTime = false;
-  let penaltyShootout: PenaltyKick[] | undefined;
 
   if (knockout && userGoals === opponentGoals) {
     // Extra time - lower scoring in later rounds = more penalties
@@ -175,13 +174,13 @@ function scoreMatch(
       // re-simulation. Without an override (initial provisional run) a seeded
       // shootout decides a winner that is never shown to the player.
       decidedByPens = true;
-      penaltyShootout = simulatePenalties(ratings, opponent, random, legendMode);
       let userWins: boolean;
       if (penOverride) {
         userWins = penOverride === "W";
       } else {
-        const userPenGoals = penaltyShootout.filter((k) => k.team === "user" && !k.saved).length;
-        const oppPenGoals = penaltyShootout.filter((k) => k.team === "opponent" && !k.saved).length;
+        const kicks = simulatePenalties(ratings, opponent, random, legendMode);
+        const userPenGoals = kicks.filter((k) => k.team === "user" && !k.saved).length;
+        const oppPenGoals = kicks.filter((k) => k.team === "opponent" && !k.saved).length;
         // Tie falls to the user (matches the previous safety fallback).
         userWins = userPenGoals >= oppPenGoals;
       }
@@ -194,7 +193,7 @@ function scoreMatch(
   }
 
   const result = userGoals > opponentGoals ? "W" : userGoals < opponentGoals ? "L" : "D";
-  return { stage, opponent, userGoals, opponentGoals, regularTimeUserGoals, regularTimeOpponentGoals, extraTimeUserGoals, extraTimeOpponentGoals, opponentGkRating, result, decidedByPens, extraTime, penaltyShootout };
+  return { stage, opponent, userGoals, opponentGoals, regularTimeUserGoals, regularTimeOpponentGoals, extraTimeUserGoals, extraTimeOpponentGoals, opponentGkRating, result, decidedByPens, extraTime };
 }
 
 function simulatePenalties(
