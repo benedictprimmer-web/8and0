@@ -33,14 +33,24 @@ function calculateOpponentGkRating(team: EightZeroTeam): number {
   return clamp(60 + (team.elo - 1200) * 0.03, 58, 92);
 }
 
+// Opponent draw is `sorted_by_elo[ floor(random()^exponent * n) ]`, so a HIGHER
+// exponent biases toward weaker teams and a LOWER one toward stronger teams.
+// Knockout exponents decrease monotonically R32 → Final so the bracket ramps:
+// you ease in against weaker sides and meet the strongest teams in the late
+// rounds, the way a real tournament feels.
 const STAGE_EXPONENT: Record<string, number> = {
-  "Group match": 0.5,
-  "Round of 32": 3.5,
-  "Round of 16": 0.3,
-  "Quarter-final": 0.5,
-  "Semi-final": 2.0,
-  "Final": 2.0,
+  "Group match": 1.0,
+  "Round of 32": 2.5,
+  "Round of 16": 1.5,
+  "Quarter-final": 0.9,
+  "Semi-final": 0.5,
+  "Final": 0.3,
 };
+
+// Group qualification: you must earn it. 4 points (e.g. 2W-0D-1L, 1W-1D-1L, or
+// 1W-2D-0L) is the floor — a single win amid two losses (3 pts) no longer
+// scrapes you through, so qualifiers have genuinely competed for their place.
+const GROUP_QUALIFY_POINTS = 4;
 
 function getStageExponent(stage: string): number {
   const key = stage.startsWith("Group") ? "Group match" : stage;
@@ -52,7 +62,7 @@ function pickOpponent(
   seed: string,
   excludeIds: Set<number>,
   stage: string,
-  userElo: number,
+  userOverall: number,
   legendMode: LegendMode
 ): EightZeroTeam {
   let pool = teams.filter((team) => !excludeIds.has(team.teamId));
@@ -60,13 +70,21 @@ function pickOpponent(
     throw new Error("No opponents available");
   }
 
-  // Group stage balance: rating-based tier expansion
-  // 84+ rating: ±3 tiers (easier), 76-83: ±2 tiers, <76: ±1 tier (standard)
+  // Group stage: aim the draw a notch below the player on the same [64, 93]
+  // strength scale the match model uses, with the gap widening as the squad
+  // gets stronger. Elite squads should boss their group; modest squads still
+  // get a competitive but winnable draw. Either way qualification is earned
+  // with wins rather than scraped through against elite sides.
   if (stage.startsWith("Group")) {
-    const userTier = Math.floor((userElo - 1400) / 100);
-    const tierRange = userElo >= 1680 ? 3 : userElo >= 1520 ? 2 : 1;
-    const balanced = pool.filter((t) => Math.abs(Math.floor((t.elo - 1400) / 100) - userTier) <= tierRange);
-    if (balanced.length > 0) pool = balanced;
+    const margin = 3 + Math.max(0, userOverall - 72) * 0.5;
+    const target = userOverall - margin;
+    const lo = target - 7;
+    const hi = target + 7;
+    const banded = pool.filter((t) => {
+      const strength = normalizeOpponentStrength(t, teams);
+      return strength >= lo && strength <= hi;
+    });
+    if (banded.length >= 3) pool = banded;
   }
 
   const random = seededRandom(seed);
@@ -74,11 +92,12 @@ function pickOpponent(
 
   let exponent = getStageExponent(stage);
 
-  // Legend mode: easier opponents in early rounds (reduce exponent for earlier stages)
+  // Legend mode: easier opponents in early rounds. A higher exponent biases the
+  // draw toward weaker teams, so add to it (not subtract) for the early stages.
   if (legendMode !== "none") {
     const stageKey = stage.startsWith("Group") ? "Group match" : stage;
     if (stageKey === "Group match" || stageKey === "Round of 32" || stageKey === "Round of 16") {
-      exponent = Math.max(0.3, exponent - 0.3);
+      exponent = exponent + 0.8;
     }
   }
 
@@ -277,11 +296,11 @@ export function simulateTournamentRun(args: {
   let stageReached = "Group stage";
   let groupPoints = 0;
   const legendMode = args.legendMode ?? "none";
-  const userElo = args.ratings.overall * 20 + 1000; // Approximate ELO from rating
+  const userOverall = args.ratings.overall;
 
   for (let index = 0; index < GROUP_STAGES.length; index += 1) {
     const stage = GROUP_STAGES[index];
-    const opponent = pickOpponent(args.teams, `${args.seed}:group:${index}`, excludeIds, stage, userElo, legendMode);
+    const opponent = pickOpponent(args.teams, `${args.seed}:group:${index}`, excludeIds, stage, userOverall, legendMode);
     excludeIds.add(opponent.teamId);
     const result = scoreMatch(stage, opponent, args.ratings, args.teams, `${args.seed}:${stage}`, false, legendMode);
     matches.push(result);
@@ -296,12 +315,12 @@ export function simulateTournamentRun(args: {
     }
   }
 
-  if (groupPoints < 2) {
+  if (groupPoints < GROUP_QUALIFY_POINTS) {
     stageReached = "Group stage";
   } else {
     for (let index = 0; index < KNOCKOUT_STAGES.length; index += 1) {
       const stage = KNOCKOUT_STAGES[index];
-      const opponent = pickOpponent(args.teams, `${args.seed}:knockout:${index}`, excludeIds, stage, userElo, legendMode);
+      const opponent = pickOpponent(args.teams, `${args.seed}:knockout:${index}`, excludeIds, stage, userOverall, legendMode);
       excludeIds.add(opponent.teamId);
       const result = scoreMatch(stage, opponent, args.ratings, args.teams, `${args.seed}:${stage}`, true, legendMode, args.penOverrides?.[stage]);
       matches.push(result);

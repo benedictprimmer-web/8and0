@@ -57,6 +57,12 @@ const rawPlayers: RawPlayer[] = rawTeams.flatMap((team, teamIndex) => {
   ];
 });
 
+const ELEVEN_SLOTS: DraftPick["category"][] = ["GK", "DEF", "DEF", "DEF", "DEF", "MID", "MID", "MID", "FWD", "FWD", "FWD"];
+
+function elevenPicks(rating: number): DraftPick[] {
+  return ELEVEN_SLOTS.map((category, index) => makePick(index + 1, category, rating));
+}
+
 function makePick(id: number, category: DraftPick["category"], rating: number): DraftPick {
   const team: EightZeroTeam = {
     teamId: 90 + id,
@@ -526,6 +532,49 @@ describe("8-0 bracket balancing", () => {
 
     expect(legendRun.matches.length).toBeGreaterThanOrEqual(3);
     expect(normalRun.matches.length).toBeGreaterThanOrEqual(3);
+  });
+
+  // Group qualification must be earned: GROUP_QUALIFY_POINTS = 4 means a single
+  // win amid two losses (3 pts) no longer scrapes you through.
+  it("only lets you qualify by winning, never on a 1W-2L scrape", () => {
+    const data = buildEightZeroData(teamsData as RawTeam[], playersData as RawPlayer[]);
+    const picks = elevenPicks(80);
+    const ratings = calculateTeamRatings(picks);
+    let qualifiers = 0;
+    for (let i = 0; i < 400; i += 1) {
+      const run = simulateTournamentRun({ teams: data.teams, picks, ratings, seed: `earned-${i}`, formationId: "433" });
+      if (run.stageReached === "Group stage") continue;
+      qualifiers += 1;
+      const group = run.matches.slice(0, 3);
+      const wins = group.filter((m) => m.result === "W").length;
+      const losses = group.filter((m) => m.result === "L").length;
+      expect(wins).toBeGreaterThanOrEqual(1); // never qualify without a win
+      expect(losses).toBeLessThanOrEqual(1); // never qualify having lost twice
+    }
+    expect(qualifiers).toBeGreaterThan(100); // a strong squad still gets out plenty
+  });
+
+  // Knockout seeding ramps: opponents get stronger every round, so the toughest
+  // games come late rather than (as before) in the Round of 16.
+  it("draws progressively stronger knockout opponents each round", () => {
+    const data = buildEightZeroData(teamsData as RawTeam[], playersData as RawPlayer[]);
+    const picks = elevenPicks(86);
+    const ratings = calculateTeamRatings(picks);
+    const order = ["Round of 32", "Round of 16", "Quarter-final", "Semi-final", "Final"];
+    const sum: Record<string, number> = {};
+    const count: Record<string, number> = {};
+    for (let i = 0; i < 600; i += 1) {
+      const run = simulateTournamentRun({ teams: data.teams, picks, ratings, seed: `ramp-${i}`, formationId: "433" });
+      for (const match of run.matches) {
+        if (!order.includes(match.stage)) continue;
+        sum[match.stage] = (sum[match.stage] ?? 0) + match.opponent.elo;
+        count[match.stage] = (count[match.stage] ?? 0) + 1;
+      }
+    }
+    const avgElo = order.map((stage) => sum[stage] / count[stage]);
+    for (let i = 1; i < avgElo.length; i += 1) {
+      expect(avgElo[i]).toBeGreaterThan(avgElo[i - 1]);
+    }
   });
 });
 
