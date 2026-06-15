@@ -351,6 +351,14 @@ export default function PenaltyShootout({
           0%, 100% { opacity: 1; }
           50% { opacity: 0.5; }
         }
+        @keyframes pen-ball-spin {
+          to { transform: rotate(360deg); }
+        }
+        @keyframes pen-net-bulge {
+          0% { transform: scale(1); }
+          45% { transform: scale(1.05, 1.04); }
+          100% { transform: scale(1); }
+        }
       `}</style>
       <div className="stat-card animate-fade-up">
         {showModeSelector && (
@@ -483,34 +491,53 @@ export default function PenaltyShootout({
 
                 {/* THE GOAL */}
                 <div
-                  className="relative w-full h-80 sm:h-96 bg-green-900 rounded-xl overflow-hidden"
+                  className="relative w-full h-80 sm:h-96 rounded-xl overflow-hidden"
                   style={{
+                    background:
+                      "radial-gradient(125% 85% at 50% 0%, #1f7a40 0%, #14532d 45%, #0b3a1f 100%)",
                     animation: currentKick?.result === "saved" && phase === "revealed" ? "goal-shake 0.5s ease-in-out" : undefined,
                   }}
                 >
-                  {/* Grass texture */}
-                  <div className="absolute inset-0 opacity-20" style={{
-                    backgroundImage: "repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(255,255,255,0.03) 2px, rgba(255,255,255,0.03) 4px)",
+                  {/* Stadium floodlight glow */}
+                  <div className="absolute inset-x-0 top-0 h-1/3 pointer-events-none" style={{
+                    background: "radial-gradient(60% 100% at 50% 0%, rgba(255,255,255,0.20), transparent 70%)",
                   }} />
-                  
-                  {/* Pitch markings */}
-                  <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-[60%] h-[30%] border-2 border-white/20 rounded-t-full" />
 
-                  {/* GOAL FRAME - much bigger */}
-                  <div className="absolute top-[5%] left-[5%] right-[5%] h-[55%]">
-                    {/* Goal posts and crossbar */}
-                    <div className="absolute top-0 left-0 right-0 h-1 bg-white" />
-                    <div className="absolute top-0 left-0 w-1 h-full bg-white" />
-                    <div className="absolute top-0 right-0 w-1 h-full bg-white" />
-                    
-                    {/* Net */}
-                    <div className="absolute inset-[2px] opacity-40" style={{
-                      background: "repeating-linear-gradient(90deg, rgba(255,255,255,0.5) 0px, rgba(255,255,255,0.5) 1px, transparent 1px, transparent 10px), repeating-linear-gradient(0deg, rgba(255,255,255,0.5) 0px, rgba(255,255,255,0.5) 1px, transparent 1px, transparent 10px)"
-                    }} />
-                    
-                    {/* Net depth lines */}
-                    <div className="absolute top-[20%] left-[20%] right-[20%] h-[60%] border border-white/20" />
-                    <div className="absolute top-[40%] left-[40%] right-[40%] h-[20%] border border-white/20" />
+                  {/* Mowed grass stripes */}
+                  <div className="absolute inset-0 opacity-[0.10] pointer-events-none" style={{
+                    backgroundImage: "repeating-linear-gradient(90deg, transparent 0 30px, rgba(255,255,255,0.65) 30px 60px)",
+                  }} />
+
+                  {/* Penalty box markings + spot */}
+                  <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-[64%] h-[34%] border-2 border-b-0 border-white/25 rounded-t-[44px] pointer-events-none" />
+                  <div className="absolute bottom-[7%] left-1/2 -translate-x-1/2 w-2.5 h-2.5 rounded-full bg-white/70 pointer-events-none" />
+
+                  {/* GOAL — SVG with 3D perspective net */}
+                  <div className="absolute top-[5%] left-[5%] right-[5%] h-[55%] pointer-events-none">
+                    <svg viewBox="0 0 320 180" width="100%" height="100%" preserveAspectRatio="none" className="drop-shadow-[0_6px_10px_rgba(0,0,0,0.4)]">
+                      <defs>
+                        <pattern id="pen-net" width="8" height="8" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
+                          <path d="M0 0H8M0 0V8" stroke="rgba(255,255,255,0.38)" strokeWidth="0.5" fill="none" />
+                        </pattern>
+                        <linearGradient id="pen-post" x1="0" y1="0" x2="1" y2="0">
+                          <stop offset="0" stopColor="#e6ebf0" />
+                          <stop offset="0.5" stopColor="#ffffff" />
+                          <stop offset="1" stopColor="#bcc5cf" />
+                        </linearGradient>
+                      </defs>
+                      {/* Net panels (back + receding top/sides) for depth — bulges on a goal */}
+                      <g style={{ transformBox: "fill-box", transformOrigin: "center", animation: currentKick?.result === "goal" && phase === "revealed" ? "pen-net-bulge 0.5s ease-out" : undefined }}>
+                        <polygon points="10,10 310,10 276,34 44,34" fill="url(#pen-net)" />
+                        <polygon points="10,10 44,34 44,150 10,176" fill="url(#pen-net)" />
+                        <polygon points="310,10 276,34 276,150 310,176" fill="url(#pen-net)" />
+                        <rect x="44" y="34" width="232" height="116" fill="url(#pen-net)" />
+                        <path d="M10 10L44 34M310 10L276 34M10 176L44 150M310 176L276 150" stroke="rgba(255,255,255,0.20)" strokeWidth="1" />
+                      </g>
+                      {/* Frame: crossbar + posts */}
+                      <rect x="6" y="4" width="308" height="8" rx="4" fill="url(#pen-post)" />
+                      <rect x="6" y="4" width="9" height="174" rx="4" fill="url(#pen-post)" />
+                      <rect x="305" y="4" width="9" height="174" rx="4" fill="url(#pen-post)" />
+                    </svg>
                   </div>
 
                   {/* CLICKABLE ZONES - User shooter */}
@@ -570,46 +597,69 @@ export default function PenaltyShootout({
                     </div>
                   )}
 
-                  {/* KEEPER SVG */}
+                  {/* KEEPER */}
                   <div
-                    className={`absolute z-10 ${transitionClass}`}
+                    className={`absolute z-10 pointer-events-none ${transitionClass}`}
                     style={{
                       top: keeperPosition.top,
                       left: keeperPosition.left,
                       transform: `translate(-50%, -50%) rotate(${keeperRotation}deg)`,
-                      width: "60px",
-                      height: "60px",
+                      width: "80px",
+                      height: "80px",
                     }}
                   >
-                    <svg viewBox="0 0 60 60" width="100%" height="100%" className="drop-shadow-lg">
-                      {/* Body */}
-                      <ellipse cx="30" cy="32" rx="12" ry="14" fill="#2563eb" opacity="0.95" />
-                      {/* Head */}
-                      <circle cx="30" cy="14" r="9" fill="#2563eb" opacity="0.95" />
-                      {/* Left arm (outstretched) */}
-                      <rect x="2" y="26" width="22" height="7" fill="#2563eb" rx="3" opacity="0.95" />
-                      {/* Right arm (outstretched) */}
-                      <rect x="36" y="26" width="22" height="7" fill="#2563eb" rx="3" opacity="0.95" />
-                      {/* Left leg */}
-                      <rect x="20" y="44" width="7" height="14" fill="#2563eb" rx="2" opacity="0.95" />
-                      {/* Right leg */}
-                      <rect x="33" y="44" width="7" height="14" fill="#2563eb" rx="2" opacity="0.95" />
-                      {/* Gloves */}
-                      <circle cx="6" cy="29" r="5" fill="#fbbf24" opacity="0.9" />
-                      <circle cx="54" cy="29" r="5" fill="#fbbf24" opacity="0.9" />
+                    <svg viewBox="0 0 80 80" width="100%" height="100%" className="drop-shadow-[0_4px_6px_rgba(0,0,0,0.5)]">
+                      <defs>
+                        <linearGradient id="pen-kit" x1="0" y1="0" x2="0" y2="1">
+                          <stop offset="0" stopColor="#2dd4bf" />
+                          <stop offset="1" stopColor="#0f766e" />
+                        </linearGradient>
+                      </defs>
+                      {/* ground shadow */}
+                      <ellipse cx="40" cy="75" rx="17" ry="3.5" fill="rgba(0,0,0,0.35)" />
+                      {/* legs + boots */}
+                      <rect x="31" y="50" width="7" height="20" rx="3" fill="#0f172a" />
+                      <rect x="42" y="50" width="7" height="20" rx="3" fill="#0f172a" />
+                      <rect x="29" y="66" width="11" height="5" rx="2" fill="#f8fafc" />
+                      <rect x="40" y="66" width="11" height="5" rx="2" fill="#f8fafc" />
+                      {/* outstretched arms */}
+                      <rect x="4" y="30" width="30" height="8" rx="4" fill="url(#pen-kit)" />
+                      <rect x="46" y="30" width="30" height="8" rx="4" fill="url(#pen-kit)" />
+                      {/* gloves */}
+                      <circle cx="7" cy="34" r="7" fill="#fbbf24" stroke="#fff" strokeWidth="1.5" />
+                      <circle cx="73" cy="34" r="7" fill="#fbbf24" stroke="#fff" strokeWidth="1.5" />
+                      {/* torso */}
+                      <rect x="28" y="25" width="24" height="29" rx="9" fill="url(#pen-kit)" />
+                      <text x="40" y="46" textAnchor="middle" fontSize="11" fontWeight="bold" fill="#ecfeff">1</text>
+                      {/* head + hair */}
+                      <circle cx="40" cy="16" r="9" fill="#e8b07a" />
+                      <path d="M31 14a9 9 0 0 1 18 0z" fill="#3f2a1a" />
                     </svg>
                   </div>
 
                   {/* BALL */}
                   <div
-                    className={`absolute z-20 ${transitionClass}`}
+                    className={`absolute z-20 pointer-events-none ${transitionClass}`}
                     style={{
                       top: ballPosition.top,
                       left: ballPosition.left,
                       transform: "translate(-50%, -50%)",
                     }}
                   >
-                    <div className="text-5xl filter drop-shadow-lg">⚽</div>
+                    <div
+                      className="drop-shadow-[0_3px_4px_rgba(0,0,0,0.5)]"
+                      style={{
+                        width: "38px",
+                        height: "38px",
+                        animation: phase === "kicking" || phase === "opp_kicking" ? "pen-ball-spin 0.5s linear infinite" : undefined,
+                      }}
+                    >
+                      <svg viewBox="0 0 40 40" width="100%" height="100%">
+                        <circle cx="20" cy="20" r="18" fill="#ffffff" stroke="#cbd5e1" strokeWidth="1" />
+                        <polygon points="20,11 26,15.5 23.7,22.5 16.3,22.5 14,15.5" fill="#0f172a" />
+                        <path d="M20 2 L20 11 M38 16 L26 15.5 M31 35 L23.7 22.5 M9 35 L16.3 22.5 M2 16 L14 15.5" stroke="#0f172a" strokeWidth="1.6" fill="none" />
+                      </svg>
+                    </div>
                   </div>
 
                   {/* Save effect overlay */}
