@@ -81,6 +81,11 @@ export default function LiveMatch({ stage, opponent, result, events, onFinished,
   const [isFinished, setIsFinished] = useState(false);
   const [speed, setSpeed] = useState<Speed>(1);
   const [goalFlash, setGoalFlash] = useState(false);
+  // Which scoreboard digit just changed (drives the score-pop pulse).
+  const [scorePop, setScorePop] = useState<"user" | "opponent" | null>(null);
+  // Transient floating "+1 GOAL" callout for user goals only. `key` re-triggers
+  // the CSS animation when the same scorer pops twice in a row.
+  const [goalPop, setGoalPop] = useState<{ name: string; key: number } | null>(null);
   const intervalRef = useRef<number | null>(null);
   const logRef = useRef<HTMLDivElement | null>(null);
 
@@ -123,11 +128,16 @@ export default function LiveMatch({ stage, opponent, result, events, onFinished,
           if (event.type === "goal") {
             if (event.team === "user") {
               setUserScore((s) => s + 1);
+              setScorePop("user");
+              // Only user goals get the celebratory floating callout.
+              setGoalPop({ name: event.playerName ?? "GOAL", key: Date.now() });
             } else {
               setOppScore((s) => s + 1);
+              setScorePop("opponent");
             }
             setGoalFlash(true);
             window.setTimeout(() => setGoalFlash(false), 800);
+            window.setTimeout(() => setScorePop(null), 420);
           }
           setRecentEvent(event);
           setVisibleEvents((prev) => [...prev, event]);
@@ -234,20 +244,29 @@ export default function LiveMatch({ stage, opponent, result, events, onFinished,
           </p>
         </div>
 
-        <div className="flex flex-col items-center">
+        <div className="relative flex flex-col items-center">
+          {/* Floating "+1 GOAL" callout — user goals only. */}
+          {goalPop && (
+            <div
+              key={goalPop.key}
+              className="animate-goal-float pointer-events-none absolute -top-8 z-10 whitespace-nowrap rounded-full bg-gold-500/90 px-3 py-1 text-xs sm:text-sm font-black text-black shadow-lg"
+            >
+              &#9917; +1 {goalPop.name}
+            </div>
+          )}
           <div className="flex items-center gap-3">
             <span
-              className={`text-4xl sm:text-5xl font-black tabular-nums transition-colors ${
+              className={`inline-block text-4xl sm:text-5xl font-black tabular-nums transition-colors ${
                 goalFlash ? "text-gold-400" : "text-white"
-              }`}
+              } ${scorePop === "user" ? "animate-score-pop" : ""}`}
             >
               {userScore}
             </span>
             <span className="text-2xl font-bold text-gray-600">-</span>
             <span
-              className={`text-4xl sm:text-5xl font-black tabular-nums transition-colors ${
+              className={`inline-block text-4xl sm:text-5xl font-black tabular-nums transition-colors ${
                 goalFlash ? "text-gold-400" : "text-white"
-              }`}
+              } ${scorePop === "opponent" ? "animate-score-pop" : ""}`}
             >
               {oppScore}
             </span>
