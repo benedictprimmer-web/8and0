@@ -9,6 +9,7 @@ import {
   resolveKick,
 } from "../game8/penaltyModel";
 import { REGULATION_KICKS, shootoutStatus } from "../game8/shootoutStatus";
+import { type PenaltyTaker, takerForKick } from "../game8/penaltyLineup";
 import type { EightZeroTeam } from "../game8/types";
 
 interface InteractivePenaltyKick {
@@ -29,37 +30,46 @@ interface PenaltyShootoutProps {
   userGkRating: number;
   oppGkRating: number;
   userShooterRating?: number;
+  // Real named lineups. When provided, each kick is taken by a specific player
+  // (with their real rating), and the keeper is that team's actual keeper. When
+  // omitted (e.g. practice), the component falls back to the scalar ratings.
+  userTakers?: PenaltyTaker[];
+  userKeeper?: PenaltyTaker;
+  oppTakers?: PenaltyTaker[];
+  oppKeeper?: PenaltyTaker;
   onFinished: (userWon: boolean) => void;
   practiceMode?: boolean;
   mode?: PenaltyMode;
   onStopPractice?: () => void;
 }
 
-// Build a kick the user takes as the shooter (keeper is AI).
+// Build a kick the user takes as the shooter (keeper is AI). `shooter` names the
+// player stepping up and supplies their rating; `keeper` is the opponent's GK.
 function buildUserShot(
   direction: ShotDirection,
   kickNumber: number,
-  userShooterRating: number,
-  oppGkRating: number
+  shooter: PenaltyTaker,
+  keeper: PenaltyTaker
 ): InteractivePenaltyKick {
-  const keeperDirection = pickDirection(keeperCenterWeight(oppGkRating), Math.random);
-  const result = resolveKick(direction, keeperDirection, userShooterRating, oppGkRating, Math.random);
-  return { round: kickNumber, team: "user", playerName: "You", userDirection: direction, keeperDirection, result };
+  const keeperDirection = pickDirection(keeperCenterWeight(keeper.rating), Math.random);
+  const result = resolveKick(direction, keeperDirection, shooter.rating, keeper.rating, Math.random);
+  return { round: kickNumber, team: "user", playerName: shooter.name, userDirection: direction, keeperDirection, result };
 }
 
-// Build an opponent kick the user faces as the keeper (shooter is AI).
+// Build an opponent kick the user faces as the keeper (shooter is AI). `shooter`
+// is the opponent's named taker; `keeper` is the user's GK.
 function buildUserDive(
   direction: ShotDirection,
   kickNumber: number,
-  opponentName: string,
-  userGkRating: number
+  shooter: PenaltyTaker,
+  keeper: PenaltyTaker
 ): InteractivePenaltyKick {
   const opponentShotDirection = pickDirection(SHOOTER_CENTER_WEIGHT, Math.random);
-  const result = resolveKick(opponentShotDirection, direction, OPPONENT_SHOOTER_RATING, userGkRating, Math.random);
+  const result = resolveKick(opponentShotDirection, direction, shooter.rating, keeper.rating, Math.random);
   return {
     round: kickNumber,
     team: "opponent",
-    playerName: opponentName,
+    playerName: shooter.name,
     userDiveDirection: direction,
     opponentShotDirection,
     keeperDirection: direction,
@@ -105,11 +115,33 @@ export default function PenaltyShootout({
   userGkRating,
   oppGkRating,
   userShooterRating = 80,
+  userTakers,
+  userKeeper,
+  oppTakers,
+  oppKeeper,
   onFinished,
   practiceMode = false,
   mode,
   onStopPractice
 }: PenaltyShootoutProps) {
+  // Effective lineups: use the real named players when supplied, otherwise
+  // synthesize single generic takers/keepers from the scalar ratings (practice).
+  const effUserTakers = useMemo<PenaltyTaker[]>(
+    () => (userTakers && userTakers.length > 0 ? userTakers : [{ name: "You", rating: userShooterRating }]),
+    [userTakers, userShooterRating]
+  );
+  const effUserKeeper = useMemo<PenaltyTaker>(
+    () => userKeeper ?? { name: "You", rating: userGkRating },
+    [userKeeper, userGkRating]
+  );
+  const effOppTakers = useMemo<PenaltyTaker[]>(
+    () => (oppTakers && oppTakers.length > 0 ? oppTakers : [{ name: opponent.name, rating: OPPONENT_SHOOTER_RATING }]),
+    [oppTakers, opponent.name]
+  );
+  const effOppKeeper = useMemo<PenaltyTaker>(
+    () => oppKeeper ?? { name: opponent.name, rating: oppGkRating },
+    [oppKeeper, opponent.name, oppGkRating]
+  );
   const [kicks, setKicks] = useState<InteractivePenaltyKick[]>([]);
   const [userScore, setUserScore] = useState(0);
   const [oppScore, setOppScore] = useState(0);
@@ -230,10 +262,20 @@ export default function PenaltyShootout({
     [effectiveMode]
   );
 
+  // Who is stepping up for the next kick on each side (1-based kick number).
+  const nextUserTaker = useMemo(
+    () => takerForKick(effUserTakers, userKicks + 1, effUserTakers[0]),
+    [effUserTakers, userKicks]
+  );
+  const nextOppTaker = useMemo(
+    () => takerForKick(effOppTakers, oppKicks + 1, effOppTakers[0]),
+    [effOppTakers, oppKicks]
+  );
+
   const handleUserKick = useCallback(
     (direction: ShotDirection) => {
       if (phase !== "waiting" || !isUserTurn) return;
-      const kick = buildUserShot(direction, userKicks + 1, userShooterRating, oppGkRating);
+      const kick = buildUserShot(direction, userKicks + 1, nextUserTaker, effOppKeeper);
       setCurrentKick(kick);
       setPhase("kicking");
       window.setTimeout(() => {
@@ -242,13 +284,13 @@ export default function PenaltyShootout({
         window.setTimeout(() => resolveAfterKick(kick, userKicks, oppKicks, userScore, oppScore), RESULT_DURATION);
       }, ANIMATION_DURATION);
     },
-    [phase, isUserTurn, userKicks, oppKicks, userScore, oppScore, userShooterRating, oppGkRating, addKick, resolveAfterKick]
+    [phase, isUserTurn, userKicks, oppKicks, userScore, oppScore, nextUserTaker, effOppKeeper, addKick, resolveAfterKick]
   );
 
   const handleUserDive = useCallback(
     (direction: ShotDirection) => {
       if (phase !== "selecting_dive") return;
-      const kick = buildUserDive(direction, oppKicks + 1, opponent.name, userGkRating);
+      const kick = buildUserDive(direction, oppKicks + 1, nextOppTaker, effUserKeeper);
       setCurrentKick(kick);
       setPhase("opp_kicking");
       window.setTimeout(() => {
@@ -257,7 +299,7 @@ export default function PenaltyShootout({
         window.setTimeout(() => resolveAfterKick(kick, userKicks, oppKicks, userScore, oppScore), RESULT_DURATION);
       }, ANIMATION_DURATION);
     },
-    [phase, userKicks, oppKicks, userScore, oppScore, opponent.name, userGkRating, addKick, resolveAfterKick]
+    [phase, userKicks, oppKicks, userScore, oppScore, nextOppTaker, effUserKeeper, addKick, resolveAfterKick]
   );
 
   // Reached only when it is the opponent's turn and the user keeps the goal, so
@@ -460,16 +502,20 @@ export default function PenaltyShootout({
                 {/* Status text */}
                 <div className="mb-4 min-h-[2rem]">
                   {phase === "waiting" && isUserTurn && (effectiveMode === "shooter" || effectiveMode === "both") && (
-                    <p className="text-lg font-bold text-white">Click a corner to shoot!</p>
+                    <p className="text-lg font-bold text-white">
+                      {nextUserTaker.name === "You"
+                        ? "Your kick — click a corner!"
+                        : `${nextUserTaker.name} steps up — click a corner!`}
+                    </p>
                   )}
                   {phase === "waiting" && !isUserTurn && effectiveMode === "both" && (
                     <p className="text-lg font-bold text-white" style={{ animation: "pulse-text 1.5s ease-in-out infinite" }}>
-                      {opponent.name} is preparing to shoot...
+                      {nextOppTaker.name} steps up for {opponent.name}...
                     </p>
                   )}
                   {phase === "waiting" && effectiveMode === "goalkeeper" && (
                     <p className="text-lg font-bold text-white" style={{ animation: "pulse-text 1.5s ease-in-out infinite" }}>
-                      {opponent.name} is preparing to shoot...
+                      {nextOppTaker.name} steps up for {opponent.name}...
                     </p>
                   )}
                   {phase === "selecting_dive" && (
@@ -477,16 +523,17 @@ export default function PenaltyShootout({
                   )}
                   {phase === "kicking" && (
                     <p className="text-lg font-bold text-white" style={{ animation: "pulse-text 1.5s ease-in-out infinite" }}>
-                      You shoot...
+                      {currentKick && currentKick.playerName !== "You" ? `${currentKick.playerName} shoots...` : "You shoot..."}
                     </p>
                   )}
                   {phase === "opp_kicking" && (
                     <p className="text-lg font-bold text-white" style={{ animation: "pulse-text 1.5s ease-in-out infinite" }}>
-                      {opponent.name} shoots...
+                      {currentKick?.playerName ?? opponent.name} shoots...
                     </p>
                   )}
                   {phase === "revealed" && currentKick && (
                     <div style={{ animation: "result-pop 0.6s ease-out" }}>
+                      <p className="text-xs font-bold uppercase tracking-wide text-gray-400 mb-1">{currentKick.playerName}</p>
                       <p className={`text-3xl font-black ${
                         currentKick.result === "goal" ? "text-green-400" :
                         currentKick.result === "saved" ? "text-red-400" : "text-yellow-400"
@@ -713,7 +760,7 @@ export default function PenaltyShootout({
                 >
                   <span className="text-xs text-gray-500">Kick {kick.round}</span>
                   <span className="font-semibold text-white">
-                    {kick.team === "user" ? "You" : opponent.name}
+                    {kick.playerName}
                   </span>
                   <span
                     className={`font-black ${
