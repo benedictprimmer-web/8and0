@@ -25,6 +25,7 @@ import LiveMatch from "../components/LiveMatch";
 import PenaltyShootout from "../components/PenaltyShootout";
 import TournamentBracket from "../components/TournamentBracket";
 import { buildEightZeroData, type RawPlayer, type RawTeam } from "../game8/data";
+import { selectKeeper, selectPenaltyTakers } from "../game8/penaltyLineup";
 import {
   autofillDraft,
   canPickPlayer,
@@ -1321,6 +1322,23 @@ export default function EightZeroGame() {
     return buildEightZeroData(teamsQuery.data, playersQuery.data);
   }, [teamsQuery.data, playersQuery.data]);
 
+  // Real named penalty lineups for the current knockout: your XI vs the
+  // opponent's actual squad (their real keeper + best takers). Falls back to
+  // generic takers inside the component if squad data is unavailable.
+  const penaltyLineups = useMemo(() => {
+    if (!run) return null;
+    const match = run.matches[currentMatchIndex];
+    const userPlayers = run.picks.map((pick) => pick.player);
+    const oppPlayers =
+      match && gameData ? gameData.playersByTeam.get(match.opponent.teamId) ?? [] : [];
+    return {
+      userTakers: selectPenaltyTakers(userPlayers),
+      userKeeper: selectKeeper(userPlayers, run.ratings.gk),
+      oppTakers: selectPenaltyTakers(oppPlayers),
+      oppKeeper: selectKeeper(oppPlayers, match?.opponentGkRating ?? 78),
+    };
+  }, [run, currentMatchIndex, gameData]);
+
   useEffect(() => {
     setHistory(loadHistory());
   }, []);
@@ -1857,6 +1875,10 @@ export default function EightZeroGame() {
               userGkRating={run.ratings.gk}
               oppGkRating={run.matches[currentMatchIndex]?.opponentGkRating ?? 75}
               userShooterRating={run.ratings.attack}
+              userTakers={penaltyLineups?.userTakers}
+              userKeeper={penaltyLineups?.userKeeper}
+              oppTakers={penaltyLineups?.oppTakers}
+              oppKeeper={penaltyLineups?.oppKeeper}
               onFinished={(userWon) => applyPenaltyResult(userWon)}
             />
           )}
