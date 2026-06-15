@@ -791,6 +791,78 @@ function SquadPanel({
   );
 }
 
+function TeamSheet({
+  state,
+  picks,
+  hideRatings,
+  matchGoalScorers = [],
+  currentMatchIndex = 0,
+  tournamentPhase = "idle",
+  onClose,
+}: {
+  state: DraftState;
+  picks: DraftPick[];
+  hideRatings: boolean;
+  matchGoalScorers?: Record<string, number>[];
+  currentMatchIndex?: number;
+  tournamentPhase?: "idle" | "ready" | "live" | "penalties" | "practice_penalties" | "complete";
+  onClose: () => void;
+}) {
+  // Mirror SquadPanel's goal accumulation so the sheet pitch shows the same scorers.
+  const goalScorers: Record<string, number> = {};
+  const matchesToShow = tournamentPhase === "complete" ? matchGoalScorers.length : currentMatchIndex;
+  for (let i = 0; i < matchesToShow; i++) {
+    for (const [name, count] of Object.entries(matchGoalScorers[i] ?? {})) {
+      goalScorers[name] = (goalScorers[name] ?? 0) + count;
+    }
+  }
+
+  const ratings = picks.length ? calculateTeamRatings(picks) : null;
+
+  return (
+    <div className="fixed inset-0 z-50 flex flex-col justify-end" role="dialog" aria-modal="true" aria-label="Your team">
+      <button
+        type="button"
+        aria-label="Close team view"
+        onClick={onClose}
+        className="absolute inset-0 cursor-default bg-black/60 backdrop-blur-sm animate-fade-in"
+      />
+      <div className="relative z-10 max-h-[88vh] w-full overflow-y-auto rounded-t-2xl border-t border-surface-700 bg-surface-900 p-4 pb-8 shadow-2xl shadow-black/60 animate-slide-up sm:mx-auto sm:mb-6 sm:max-w-lg sm:rounded-2xl sm:border">
+        <div className="mx-auto mb-3 h-1 w-10 rounded-full bg-surface-700 sm:hidden" />
+        <div className="mb-4 flex items-start justify-between gap-3">
+          <div>
+            <p className="section-label">Your XI</p>
+            <h2 className="mt-1 text-lg font-extrabold text-white">{picks.length}/11 drafted</h2>
+          </div>
+          <button
+            type="button"
+            onClick={onClose}
+            className="inline-flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-full border border-surface-700 bg-surface-950 text-gray-400 transition-colors hover:text-white"
+          >
+            <X size={18} />
+          </button>
+        </div>
+        {ratings && (
+          <div className="mb-4 grid grid-cols-5 gap-2">
+            <RatingPill label="OVR" value={ratings.overall} hidden={hideRatings} />
+            <RatingPill label="GK" value={ratings.gk} hidden={hideRatings} />
+            <RatingPill label="DEF" value={ratings.defence} hidden={hideRatings} />
+            <RatingPill label="MID" value={ratings.midfield} hidden={hideRatings} />
+            <RatingPill label="ATK" value={ratings.attack} hidden={hideRatings} />
+          </div>
+        )}
+        <PitchXI
+          formationId={state.formationId}
+          picks={picks}
+          hideRatings={hideRatings}
+          goalScorers={goalScorers}
+          legendSlotId={state.legendMode !== "none" ? picks[0]?.slotId : undefined}
+        />
+      </div>
+    </div>
+  );
+}
+
 function GlobalSubmit({ run }: { run: TournamentRun }) {
   const [name, setName] = useState(() => loadPlayerName());
   const [validationError, setValidationError] = useState<string | null>(null);
@@ -1080,6 +1152,7 @@ export default function EightZeroGame() {
   const [reelTeam, setReelTeam] = useState<EightZeroTeam | null>(null);
   const [categoryFilter, setCategoryFilter] = useState<SlotCategory | "ALL">("ALL");
   const [showLeaderboard, setShowLeaderboard] = useState(false);
+  const [showTeamSheet, setShowTeamSheet] = useState(false);
   const [tournamentPhase, setTournamentPhase] = useState<"idle" | "ready" | "live" | "penalties" | "practice_penalties" | "complete">("idle");
   const [currentMatchIndex, setCurrentMatchIndex] = useState(0);
   const [allMatchEvents, setAllMatchEvents] = useState<MatchEvent[][]>([]);
@@ -1117,6 +1190,21 @@ export default function EightZeroGame() {
     };
   }, []);
 
+  // Close the "See my team" sheet on Escape and lock body scroll while it is open.
+  useEffect(() => {
+    if (!showTeamSheet) return;
+    const onKey = (event: KeyboardEvent) => {
+      if (event.key === "Escape") setShowTeamSheet(false);
+    };
+    window.addEventListener("keydown", onKey);
+    const prevOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    return () => {
+      window.removeEventListener("keydown", onKey);
+      document.body.style.overflow = prevOverflow;
+    };
+  }, [showTeamSheet]);
+
   // Persist the finalized run once the tournament completes. Interactive
   // shootouts rebuild `run`, so the run saved here reflects actual play (the
   // provisional save at draft time is replaced by id).
@@ -1130,6 +1218,10 @@ export default function EightZeroGame() {
   const openSlots = getOpenSlots(draftState);
   const activeSlot = getActiveSlot(draftState);
   const hideDraftRatings = shouldHideRatings(draftState);
+  const teamSheetRatingsHidden = hideDraftRatings && !run;
+  const teamOvr = draftState.picks.length
+    ? Math.round(calculateTeamRatings(draftState.picks).overall)
+    : null;
   const candidates = useMemo(() => {
     if (!gameData) return [];
     const normalizedSearch = search.trim().toLowerCase();
@@ -1178,6 +1270,7 @@ export default function EightZeroGame() {
     setReelTeam(null);
     setCategoryFilter("ALL");
     setShowLeaderboard(false);
+    setShowTeamSheet(false);
     setTournamentPhase("idle");
     setCurrentMatchIndex(0);
     setAllMatchEvents([]);
@@ -1187,6 +1280,7 @@ export default function EightZeroGame() {
   function resetToSetup() {
     clearSpinTimers();
     setRun(null);
+    setShowTeamSheet(false);
     setPenOverrides({});
     setStarted(false);
     setSearch("");
@@ -1412,7 +1506,7 @@ export default function EightZeroGame() {
   }
 
   return (
-    <div className="space-y-6 animate-fade-up">
+    <div className="space-y-6 animate-fade-up pb-24">
       <section className="overflow-hidden rounded-xl border border-surface-700 bg-surface-900">
         <div className="flex items-center justify-between px-5 pt-4 sm:px-6">
           <div className="text-[10px] font-mono text-gray-500">
@@ -1797,6 +1891,32 @@ export default function EightZeroGame() {
           </section>
         </div>
       </div>
+
+      {tournamentPhase !== "practice_penalties" && draftState.picks.length > 0 && !showTeamSheet && (
+        <button
+          type="button"
+          onClick={() => setShowTeamSheet(true)}
+          className="fixed bottom-4 right-4 z-40 inline-flex items-center gap-2 rounded-full bg-gold-500 px-4 py-3 text-sm font-black text-black shadow-2xl shadow-black/50 transition-transform hover:bg-gold-400 active:scale-95"
+        >
+          <Shield size={16} />
+          <span>My team {draftState.picks.length}/11</span>
+          {!teamSheetRatingsHidden && teamOvr !== null && (
+            <span className="rounded-full bg-black/15 px-1.5 py-0.5 text-xs tabular-nums">{teamOvr}</span>
+          )}
+        </button>
+      )}
+
+      {showTeamSheet && (
+        <TeamSheet
+          state={draftState}
+          picks={draftState.picks}
+          hideRatings={teamSheetRatingsHidden}
+          matchGoalScorers={run?.matchGoalScorers ?? []}
+          currentMatchIndex={currentMatchIndex}
+          tournamentPhase={tournamentPhase}
+          onClose={() => setShowTeamSheet(false)}
+        />
+      )}
     </div>
   );
 }
