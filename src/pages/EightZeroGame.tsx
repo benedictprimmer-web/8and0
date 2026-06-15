@@ -124,24 +124,47 @@ function OptionButton({
   className = "",
   children,
   onClick,
+  disabled = false,
 }: {
   active: boolean;
   className?: string;
   children: React.ReactNode;
   onClick: () => void;
+  disabled?: boolean;
 }) {
   return (
     <button
       type="button"
       onClick={onClick}
+      disabled={disabled}
       className={`rounded-xl border px-4 py-3 text-center font-bold transition-colors ${
         active
           ? "border-gold-600 bg-gold-500 text-black"
           : "border-surface-700 bg-surface-950 text-gray-400 hover:border-gold-600/40 hover:text-white"
-      } ${className}`}
+      } ${disabled ? "cursor-not-allowed opacity-50 hover:border-surface-700 hover:text-gray-400" : ""} ${className}`}
     >
       {children}
     </button>
+  );
+}
+
+function FormationGlyph({ formationId, active }: { formationId: string; active: boolean }) {
+  const formation = getFormation(formationId);
+  const rows: SlotCategory[] = ["FWD", "MID", "DEF", "GK"];
+  const dot = active ? "bg-black/80" : "bg-gold-500/70";
+  return (
+    <span className="flex flex-col items-center gap-[3px]" aria-hidden="true">
+      {rows.map((category) => {
+        const count = formation.slots.filter((slot) => slot.category === category).length;
+        return (
+          <span key={category} className="flex gap-[3px]">
+            {Array.from({ length: count }).map((_, index) => (
+              <span key={index} className={`h-1.5 w-1.5 rounded-full ${dot}`} />
+            ))}
+          </span>
+        );
+      })}
+    </span>
   );
 }
 
@@ -559,16 +582,12 @@ function SetupScreen({
   }
 
   return (
-    <div className="mx-auto max-w-6xl space-y-7 animate-fade-up">
+    <div className="mx-auto max-w-6xl space-y-7 animate-fade-up pb-28 sm:pb-7">
       <div className="flex items-start justify-between gap-4">
         <div>
-          <button type="button" className="inline-flex items-center gap-2 text-sm font-semibold text-gray-400">
-            <ArrowLeft size={16} />
-            Home
-          </button>
-          <h1 className="mt-7 font-serif text-4xl sm:text-6xl font-black tracking-normal text-white">8-0</h1>
-          <p className="mt-2 text-lg leading-7 text-gray-400">
-            #Russel=Mogged
+          <h1 className="font-serif text-4xl sm:text-6xl font-black tracking-normal text-white">8-0</h1>
+          <p className="mt-2 max-w-md text-lg leading-7 text-gray-400">
+            Spin a random World Cup XI, then go unbeaten — win all 8 and climb the global board.
           </p>
           <button
             type="button"
@@ -595,45 +614,55 @@ function SetupScreen({
               key={formation.id}
               active={formationId === formation.id}
               onClick={() => onFormationChange(formation.id)}
-              className="min-w-[110px] text-lg sm:text-xl"
+              className="flex min-w-[104px] flex-col items-center gap-2 py-3"
             >
-              {formation.label}
+              <FormationGlyph formationId={formation.id} active={formationId === formation.id} />
+              <span className="text-lg sm:text-xl">{formation.label}</span>
             </OptionButton>
           ))}
         </div>
-        <button
-          type="button"
-          onClick={() => {
-            if (options.legendMode !== "none") {
-              onLegendSelect("none");
-            } else {
-              setShowLegendModal(true);
-            }
-          }}
-          disabled={loading}
-          className={`mt-3 inline-flex w-full items-center justify-center gap-2 rounded-xl border px-6 py-4 text-lg font-black transition-colors disabled:cursor-not-allowed disabled:opacity-50 ${
-            options.legendMode !== "none"
-              ? "border-gold-600 bg-gold-500/10 text-gold-400 hover:bg-gold-500/20"
-              : "border-surface-700 bg-surface-950 text-white hover:border-gold-600/40 hover:bg-surface-900"
-          }`}
-        >
-          <Trophy size={20} className={options.legendMode !== "none" ? "text-gold-400" : "text-gray-400"} />
-          {options.legendMode !== "none" ? `Last Dance: ${titleCase(options.legendMode)}` : "Last Dance"}
-        </button>
-        {options.legendMode !== "none" && (
-          <p className="mt-2 text-center text-xs text-gray-500">
-            Click to cancel legend mode
-          </p>
-        )}
-        <button
-          type="button"
-          onClick={() => onStartPracticePenalties?.()}
-          disabled={loading}
-          className="mt-3 inline-flex w-full items-center justify-center gap-2 rounded-xl border border-surface-700 bg-surface-950 px-6 py-4 text-lg font-black text-white transition-colors hover:border-gold-600/40 hover:bg-surface-900 disabled:cursor-not-allowed disabled:opacity-50"
-        >
-          <Target size={20} className="text-gold-400" />
-          Practice Penalties
-        </button>
+      </section>
+
+      <section className="rounded-2xl border border-indigo-900/70 bg-[#11111f] p-5 shadow-2xl shadow-black/20">
+        <p className="section-label text-base tracking-[0.18em]">Modes</p>
+        <div className="mt-4 grid gap-3 md:grid-cols-2">
+          <div>
+            <button
+              type="button"
+              onClick={() => {
+                if (options.legendMode !== "none") {
+                  onLegendSelect("none");
+                } else {
+                  setShowLegendModal(true);
+                }
+              }}
+              disabled={loading}
+              className={`inline-flex w-full items-center justify-center gap-2 rounded-xl border px-6 py-4 text-lg font-black transition-colors disabled:cursor-not-allowed disabled:opacity-50 ${
+                options.legendMode !== "none"
+                  ? "border-gold-600 bg-gold-500/10 text-gold-400 hover:bg-gold-500/20"
+                  : "border-surface-700 bg-surface-950 text-white hover:border-gold-600/40 hover:bg-surface-900"
+              }`}
+            >
+              <Trophy size={20} className={options.legendMode !== "none" ? "text-gold-400" : "text-gray-400"} />
+              {options.legendMode !== "none" ? `Last Dance: ${titleCase(options.legendMode)}` : "Last Dance"}
+            </button>
+            <p className="mt-2 text-center text-xs text-gray-500">
+              {options.legendMode !== "none" ? "Click to cancel legend mode." : "Lock a legend as your first pick."}
+            </p>
+          </div>
+          <div>
+            <button
+              type="button"
+              onClick={() => onStartPracticePenalties?.()}
+              disabled={loading}
+              className="inline-flex w-full items-center justify-center gap-2 rounded-xl border border-surface-700 bg-surface-950 px-6 py-4 text-lg font-black text-white transition-colors hover:border-gold-600/40 hover:bg-surface-900 disabled:cursor-not-allowed disabled:opacity-50"
+            >
+              <Target size={20} className="text-gold-400" />
+              Practice Penalties
+            </button>
+            <p className="mt-2 text-center text-xs text-gray-500">Warm up with a standalone shootout.</p>
+          </div>
+        </div>
         {showLegendModal && (
           <LegendModal
             onSelect={(legendMode) => {
@@ -670,11 +699,16 @@ function SetupScreen({
           <OptionButton
             active={options.blindMode}
             onClick={() => updateOptions({ blindMode: !options.blindMode })}
+            disabled={options.difficulty === "hard"}
             className="mt-4 w-full text-lg"
           >
             Blind mode {options.blindMode ? "ON" : "OFF"}
           </OptionButton>
-          <p className="mt-4 text-sm text-gray-500">Hide overalls during the draft. Final reveal still shows the squad.</p>
+          <p className="mt-4 text-sm text-gray-500">
+            {options.difficulty === "hard"
+              ? "Hard mode always hides overalls during the draft. Final reveal still shows the squad."
+              : "Hide overalls during the draft. Final reveal still shows the squad."}
+          </p>
         </section>
 
         <section className="rounded-2xl border border-indigo-900/70 bg-[#11111f] p-5 shadow-2xl shadow-black/20">
@@ -705,14 +739,18 @@ function SetupScreen({
         </div>
       </section>
 
-      <button
-        type="button"
-        onClick={onStart}
-        disabled={loading}
-        className="inline-flex w-full items-center justify-center rounded-xl bg-gold-500 px-6 py-5 text-xl font-black text-black transition-colors hover:bg-gold-400 disabled:cursor-not-allowed disabled:opacity-50"
-      >
-        Start draft →
-      </button>
+      <div className="fixed inset-x-0 bottom-0 z-30 border-t border-surface-800 bg-surface-950/90 px-4 py-3 backdrop-blur sm:static sm:border-0 sm:bg-transparent sm:p-0 sm:backdrop-blur-none">
+        <div className="mx-auto max-w-6xl">
+          <button
+            type="button"
+            onClick={onStart}
+            disabled={loading}
+            className="inline-flex w-full items-center justify-center rounded-xl bg-gold-500 px-6 py-5 text-xl font-black text-black transition-colors hover:bg-gold-400 disabled:cursor-not-allowed disabled:opacity-50"
+          >
+            Start draft →
+          </button>
+        </div>
+      </div>
 
       {showHowItWorks && <HowItWorksModal onClose={() => setShowHowItWorks(false)} />}
     </div>
@@ -1508,16 +1546,6 @@ export default function EightZeroGame() {
   return (
     <div className="space-y-6 animate-fade-up pb-24">
       <section className="overflow-hidden rounded-xl border border-surface-700 bg-surface-900">
-        <div className="flex items-center justify-between px-5 pt-4 sm:px-6">
-          <div className="text-[10px] font-mono text-gray-500">
-            <span className="font-bold text-gold-400">v0.2.0</span>
-            <span className="mx-1.5 text-surface-700">·</span>
-            <span className="text-gray-600">8bbec5e</span>
-            <span className="mx-1.5 text-surface-700">·</span>
-            <span className="hidden sm:inline text-gray-600">fix: remove '(pens)'</span>
-          </div>
-        </div>
-
         <div className="grid gap-0 lg:grid-cols-[1fr_260px]">
           <div className="p-5 sm:p-6">
             <div className="flex flex-wrap items-start justify-between gap-4">
