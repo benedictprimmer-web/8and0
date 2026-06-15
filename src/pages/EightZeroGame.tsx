@@ -404,8 +404,14 @@ function LegendModal({
   ];
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4 animate-fade-up">
-      <div className="w-full max-w-2xl rounded-2xl border border-indigo-900/70 bg-[#11111f] p-6 shadow-2xl shadow-black/40">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4 animate-fade-up" onClick={onClose}>
+      <div
+        role="dialog"
+        aria-modal="true"
+        aria-label="Last Dance"
+        className="w-full max-w-2xl rounded-2xl border border-indigo-900/70 bg-[#11111f] p-6 shadow-2xl shadow-black/40"
+        onClick={(event) => event.stopPropagation()}
+      >
         <div className="mb-6 text-center">
           <h2 className="text-2xl font-black text-white">Last Dance</h2>
           <p className="mt-1 text-sm text-gray-400">Choose your legend. They are auto-locked as your first pick.</p>
@@ -539,6 +545,9 @@ function HowItWorksModal({ onClose }: { onClose: () => void }) {
       onClick={onClose}
     >
       <div
+        role="dialog"
+        aria-modal="true"
+        aria-label="How it works"
         className="w-full max-w-lg rounded-2xl border border-indigo-900/70 bg-[#11111f] p-6 shadow-2xl shadow-black/40"
         onClick={(event) => event.stopPropagation()}
       >
@@ -1037,16 +1046,71 @@ function ResultPanel({
   onPlayAgain: () => void;
   onLeaderboard: () => void;
 }) {
+  const goalsFor = run.matches.reduce((sum, match) => sum + match.userGoals, 0);
+  const goalsAgainst = run.matches.reduce((sum, match) => sum + match.opponentGoals, 0);
+  const goalDiff = goalsFor - goalsAgainst;
+  const cleanSheets = run.matches.filter((match) => match.opponentGoals === 0).length;
+  const shootoutsWon = run.matches.filter((match) => match.decidedByPens && match.result === "W").length;
+  const topScorer = Object.entries(run.goalScorers).sort((a, b) => b[1] - a[1])[0] ?? null;
+  const biggestWin = run.matches
+    .filter((match) => match.result === "W")
+    .reduce<(typeof run.matches)[number] | null>(
+      (best, match) =>
+        best && best.userGoals - best.opponentGoals >= match.userGoals - match.opponentGoals ? best : match,
+      null
+    );
+
+  const summaryStats = [
+    { label: "GF", value: goalsFor },
+    { label: "GA", value: goalsAgainst },
+    { label: "GD", value: `${goalDiff > 0 ? "+" : ""}${goalDiff}` },
+    { label: "Clean sheets", value: cleanSheets },
+    { label: "Pens won", value: shootoutsWon },
+    { label: "Played", value: run.matches.length },
+  ];
+
   return (
     <div className="space-y-5">
       <div className="rounded-2xl border border-indigo-900/70 bg-[#11111f] p-6 text-center">
         <p className="section-label text-base">Team rating {Math.round(run.ratings.overall)}</p>
         <h2 className="mt-4 font-serif text-5xl font-black tracking-normal text-gold-400">{run.stageReached}</h2>
         <p className="mt-3 text-2xl font-bold text-gray-300">+{run.score} points</p>
-        <p className="mt-2 text-sm font-bold text-gray-500">
+        <p className="mt-2 text-sm font-bold text-gray-400">
           {run.record} · {run.grade} · {run.label}
           {run.legendMode !== "none" && ` · Last Dance: ${titleCase(run.legendMode)}`}
         </p>
+      </div>
+
+      <div className="rounded-2xl border border-indigo-900/70 bg-[#11111f] p-5">
+        <p className="section-label">Tournament summary</p>
+        <div className="mt-4 grid grid-cols-3 gap-3 sm:grid-cols-6">
+          {summaryStats.map((stat) => (
+            <div key={stat.label} className="rounded-lg border border-surface-700 bg-surface-800 px-2 py-3 text-center">
+              <p className="text-xl font-black tabular-nums text-white">{stat.value}</p>
+              <p className="section-label mt-1">{stat.label}</p>
+            </div>
+          ))}
+        </div>
+        {(topScorer || biggestWin) && (
+          <div className="mt-3 grid gap-3 sm:grid-cols-2">
+            {topScorer && (
+              <div className="flex items-center justify-between gap-2 rounded-lg border border-surface-700 bg-surface-800 px-3 py-2">
+                <span className="text-xs font-bold text-gray-400">Top scorer</span>
+                <span className="min-w-0 truncate text-sm font-black text-white">
+                  {topScorer[0]} · {topScorer[1]}
+                </span>
+              </div>
+            )}
+            {biggestWin && (
+              <div className="flex items-center justify-between gap-2 rounded-lg border border-surface-700 bg-surface-800 px-3 py-2">
+                <span className="text-xs font-bold text-gray-400">Biggest win</span>
+                <span className="min-w-0 truncate text-sm font-black text-white">
+                  {biggestWin.userGoals}-{biggestWin.opponentGoals} vs {biggestWin.opponent.name}
+                </span>
+              </div>
+            )}
+          </div>
+        )}
       </div>
 
       <div className="grid gap-3 md:grid-cols-3">
