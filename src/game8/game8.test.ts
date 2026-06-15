@@ -554,9 +554,10 @@ describe("8-0 bracket balancing", () => {
     expect(qualifiers).toBeGreaterThan(100); // a strong squad still gets out plenty
   });
 
-  // Knockout seeding ramps: opponents get stronger every round, so the toughest
-  // games come late rather than (as before) in the Round of 16.
-  it("draws progressively stronger knockout opponents each round", () => {
+  // Knockout seeding ramps into the late rounds: opponents get stronger every
+  // round up to the semi-final (the deliberate "boss" gate), with the final
+  // also a top-tier draw. The toughest games come late, not in the Round of 16.
+  it("draws progressively stronger knockout opponents into the late rounds", () => {
     const data = buildEightZeroData(teamsData as RawTeam[], playersData as RawPlayer[]);
     const picks = elevenPicks(86);
     const ratings = calculateTeamRatings(picks);
@@ -571,10 +572,28 @@ describe("8-0 bracket balancing", () => {
         count[match.stage] = (count[match.stage] ?? 0) + 1;
       }
     }
-    const avgElo = order.map((stage) => sum[stage] / count[stage]);
-    for (let i = 1; i < avgElo.length; i += 1) {
-      expect(avgElo[i]).toBeGreaterThan(avgElo[i - 1]);
+    const avg = (stage: string) => sum[stage] / count[stage];
+    // Strictly increasing difficulty R32 -> R16 -> QF -> Semi (the peak gate)...
+    const ramp = ["Round of 32", "Round of 16", "Quarter-final", "Semi-final"];
+    for (let i = 1; i < ramp.length; i += 1) {
+      expect(avg(ramp[i])).toBeGreaterThan(avg(ramp[i - 1]));
     }
+    // ...and the final is also a top-tier draw, far above the quarter-final.
+    expect(avg("Final")).toBeGreaterThan(avg("Quarter-final"));
+  });
+
+  // Elite-curve intent: a top-rated squad should all but cruise the group.
+  it("lets an elite squad qualify from the group at a very high rate", () => {
+    const data = buildEightZeroData(teamsData as RawTeam[], playersData as RawPlayer[]);
+    const picks = elevenPicks(88);
+    const ratings = calculateTeamRatings(picks);
+    let qualifiers = 0;
+    const runs = 400;
+    for (let i = 0; i < runs; i += 1) {
+      const run = simulateTournamentRun({ teams: data.teams, picks, ratings, seed: `elite-${i}`, formationId: "433" });
+      if (run.stageReached !== "Group stage") qualifiers += 1;
+    }
+    expect(qualifiers / runs).toBeGreaterThan(0.93);
   });
 });
 

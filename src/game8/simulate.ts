@@ -35,15 +35,16 @@ function calculateOpponentGkRating(team: EightZeroTeam): number {
 
 // Opponent draw is `sorted_by_elo[ floor(random()^exponent * n) ]`, so a HIGHER
 // exponent biases toward weaker teams and a LOWER one toward stronger teams.
-// Knockout exponents decrease monotonically R32 → Final so the bracket ramps:
-// you ease in against weaker sides and meet the strongest teams in the late
-// rounds, the way a real tournament feels.
+// Knockout exponents fall R32 → R16 → QF → Semi so the bracket ramps: you ease
+// in against weaker sides and meet the strongest teams late. The semi-final
+// draws the single strongest opponent (the "boss" gate); the final is also a
+// top-tier draw but a touch below it, the way this game's funnel is tuned.
 const STAGE_EXPONENT: Record<string, number> = {
   "Group match": 1.0,
   "Round of 32": 2.5,
   "Round of 16": 1.5,
   "Quarter-final": 0.9,
-  "Semi-final": 0.5,
+  "Semi-final": 0.26,
   "Final": 0.3,
 };
 
@@ -105,6 +106,34 @@ function pickOpponent(
   return sorted[clamp(index, 0, sorted.length - 1)];
 }
 
+// Elite ramp — above 80 overall, strong squads get a growing edge so the top
+// of the rating curve has an easier ride (sub-80 is left untouched). Tuned per
+// stage: bonus = base + slope * (overall - 80). One edge point ≈ +0.03 user
+// goals / -0.025 opponent goals a match. The semi-final gets no bonus on
+// purpose — paired with its stronger opponent draw (see STAGE_EXPONENT) it is
+// the deliberate "boss" gate where roughly half of elite runs wash out.
+const ELITE_EDGE: Record<string, { base: number; slope: number }> = {
+  "Group match": { base: 0.5, slope: 2.05 },
+  "Round of 32": { base: 0.2, slope: 0.16 },
+  "Round of 16": { base: 0.3, slope: 0.24 },
+  "Quarter-final": { base: 0.4, slope: 0.20 },
+  "Semi-final": { base: 0.0, slope: 0.00 },
+  "Final": { base: 0.5, slope: 0.28 },
+};
+
+function eliteEdgeBonus(stage: string, overall: number): number {
+  // Preserve the original sub-80 behaviour exactly: only SF/Final gave a small
+  // bonus down there (+0.2 for 76-79), everything else was 0.
+  if (overall < 80) {
+    if (stage === "Semi-final" || stage === "Final") return overall >= 76 ? 0.2 : 0;
+    return 0;
+  }
+  const key = stage.startsWith("Group") ? "Group match" : stage;
+  const ramp = ELITE_EDGE[key];
+  if (!ramp) return 0;
+  return ramp.base + ramp.slope * (overall - 80);
+}
+
 const STAGE_PRESSURE: Record<string, number> = {
   "Group match 1": 1.0,
   "Group match 2": 1.0,
@@ -130,26 +159,7 @@ function scoreMatch(
   const opponentStrength = normalizeOpponentStrength(opponent, teams);
   const opponentGkRating = calculateOpponentGkRating(opponent);
 
-  let ratingEdgeBonus = 0;
-  // Aggressive bonuses for SF/Final to help high-rated teams close out
-  if (stage === "Semi-final") {
-    if (ratings.overall >= 88) ratingEdgeBonus = 2.0;
-    else if (ratings.overall >= 84) ratingEdgeBonus = 1.2;
-    else if (ratings.overall >= 80) ratingEdgeBonus = 0.6;
-    else if (ratings.overall >= 76) ratingEdgeBonus = 0.2;
-  }
-  if (stage === "Final") {
-    if (ratings.overall >= 88) ratingEdgeBonus = 1.2;
-    else if (ratings.overall >= 84) ratingEdgeBonus = 0.8;
-    else if (ratings.overall >= 80) ratingEdgeBonus = 0.4;
-    else if (ratings.overall >= 76) ratingEdgeBonus = 0.2;
-  }
-
-  // Group stage: bonus for high-rated teams to score more
-  if (stage.startsWith("Group")) {
-    if (ratings.overall >= 84) ratingEdgeBonus = 1.0;
-    else if (ratings.overall >= 80) ratingEdgeBonus = 0.5;
-  }
+  const ratingEdgeBonus = eliteEdgeBonus(stage, ratings.overall);
 
   const ratingEdge = (ratings.overall - opponentStrength) + ratingEdgeBonus;
   const attackEdge = (ratings.attack + ratings.midfield) / 2 - opponentStrength;
