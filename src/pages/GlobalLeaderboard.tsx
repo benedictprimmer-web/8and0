@@ -1,7 +1,7 @@
 import { useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
-import { ArrowLeft, Globe, RefreshCw, Trophy } from "lucide-react";
+import { ArrowLeft, ChevronRight, Globe, RefreshCw, Trophy, Users, X } from "lucide-react";
 import { leaderboardApi, type LeaderboardResponse, type RankedEntry } from "../api/client";
 import { loadMyGlobalEntries } from "../game8/storage";
 import type { LeaderboardEntry } from "../game8/leaderboard";
@@ -30,17 +30,22 @@ function Row({
   entry,
   rank,
   isOwn,
+  onSelect,
 }: {
   entry: LeaderboardEntry;
   rank: number;
   isOwn: boolean;
+  onSelect: () => void;
 }) {
   return (
-    <div
-      className={`grid grid-cols-[36px_1fr_auto] items-center gap-3 rounded-lg border px-3 py-3 text-sm ${
+    <button
+      type="button"
+      onClick={onSelect}
+      title="View this team"
+      className={`grid w-full grid-cols-[36px_1fr_auto_16px] items-center gap-3 rounded-lg border px-3 py-3 text-left text-sm transition-colors ${
         isOwn
-          ? "border-gold-600 bg-gold-500/10"
-          : "border-surface-700 bg-surface-800"
+          ? "border-gold-600 bg-gold-500/10 hover:bg-gold-500/20"
+          : "border-surface-700 bg-surface-800 hover:border-gold-600/40 hover:bg-surface-700"
       }`}
     >
       <span className="font-black text-gray-500">#{rank}</span>
@@ -68,6 +73,116 @@ function Row({
           {Math.round(entry.overall)} OVR
         </span>
       </div>
+      <ChevronRight size={16} className="text-gray-600" />
+    </button>
+  );
+}
+
+function StatChip({ label, value }: { label: string; value: string }) {
+  return (
+    <div className="rounded-lg border border-surface-700 bg-surface-950 px-3 py-2">
+      <p className="text-[10px] font-bold uppercase tracking-wide text-gray-500">{label}</p>
+      <p className="mt-0.5 truncate text-sm font-black text-white">{value}</p>
+    </div>
+  );
+}
+
+function TeamDetailModal({
+  entry,
+  rank,
+  isOwn,
+  onClose,
+}: {
+  entry: LeaderboardEntry;
+  rank: number;
+  isOwn: boolean;
+  onClose: () => void;
+}) {
+  return (
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4 animate-fade-up"
+      onClick={onClose}
+    >
+      <div
+        className="max-h-[90vh] w-full max-w-lg overflow-y-auto rounded-2xl border border-indigo-900/70 bg-[#11111f] p-6 shadow-2xl shadow-black/40"
+        onClick={(event) => event.stopPropagation()}
+      >
+        <div className="flex items-start justify-between gap-3">
+          <div className="min-w-0">
+            <p className="text-xs font-bold uppercase tracking-wide text-gold-400">Rank #{rank}</p>
+            <h2 className="mt-1 flex items-center gap-2 truncate text-2xl font-black text-white">
+              {rank === 1 && <Trophy size={20} className="flex-shrink-0 text-gold-400" />}
+              <span className="truncate">{entry.name}</span>
+              {isOwn && (
+                <span className="flex-shrink-0 rounded bg-gold-500 px-1.5 py-0.5 text-[10px] font-black text-black">
+                  YOU
+                </span>
+              )}
+            </h2>
+            <p className="mt-1 text-sm font-bold text-gray-400">
+              {entry.stageReached}
+              {entry.blindMode ? " · Blind mode" : ""}
+            </p>
+          </div>
+          <div className="flex flex-shrink-0 items-start gap-3">
+            <div className="text-right">
+              <p className="text-2xl font-black tabular-nums text-gold-400">{entry.score}</p>
+              <p className="section-label">points</p>
+            </div>
+            <button
+              type="button"
+              onClick={onClose}
+              aria-label="Close"
+              className="rounded-lg p-1 text-gray-400 transition-colors hover:text-white"
+            >
+              <X size={20} />
+            </button>
+          </div>
+        </div>
+
+        <div className="mt-5 grid grid-cols-2 gap-2 sm:grid-cols-4">
+          <StatChip label="Formation" value={entry.formationLabel} />
+          <StatChip label="Overall" value={`${Math.round(entry.overall)}`} />
+          <StatChip label="Record" value={`${entry.wins}-${entry.draws}-${entry.losses}`} />
+          <StatChip label="Difficulty" value={titleCase(entry.difficulty)} />
+        </div>
+
+        {entry.topScorer?.name && (
+          <div className="mt-3 flex items-center justify-between rounded-lg border border-gold-600/40 bg-gold-500/5 px-3 py-2">
+            <span className="inline-flex items-center gap-2 text-sm font-bold text-gold-300">
+              <Trophy size={14} className="text-gold-400" />
+              Top scorer · {entry.topScorer.name}
+            </span>
+            <span className="font-black tabular-nums text-gold-400">
+              {entry.topScorer.goals ?? 0} {(entry.topScorer.goals ?? 0) === 1 ? "goal" : "goals"}
+            </span>
+          </div>
+        )}
+
+        <div className="mt-5">
+          <p className="section-label inline-flex items-center gap-2">
+            <Users size={14} className="text-gold-400" />
+            Starting XI ({entry.xi.length})
+          </p>
+          {entry.xi.length === 0 ? (
+            <p className="mt-2 text-sm text-gray-500">This run didn&apos;t record its squad.</p>
+          ) : (
+            <div className="mt-3 grid grid-cols-1 gap-2 sm:grid-cols-2">
+              {entry.xi.map((name, index) => (
+                <div
+                  key={`${name}-${index}`}
+                  className="flex items-center gap-3 rounded-lg border border-surface-700 bg-surface-800 px-3 py-2"
+                >
+                  <span className="flex h-6 w-6 flex-shrink-0 items-center justify-center rounded-full bg-surface-950 text-xs font-black text-gray-500">
+                    {index + 1}
+                  </span>
+                  <span className="truncate text-sm font-bold text-white">{name}</span>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      </div>
     </div>
   );
 }
@@ -83,6 +198,7 @@ function bestRanked(mine: RankedEntry[]): RankedEntry | null {
 
 export default function GlobalLeaderboard() {
   const [filter, setFilter] = useState<FilterId>("all");
+  const [selected, setSelected] = useState<LeaderboardEntry | null>(null);
   const mySeeds = useMemo(() => loadMyGlobalEntries().map((entry) => entry.seed), []);
   const mySeedSet = useMemo(() => new Set(mySeeds), [mySeeds]);
 
@@ -200,6 +316,7 @@ export default function GlobalLeaderboard() {
                 entry={entry}
                 rank={globalRankById.get(entry.id) ?? 0}
                 isOwn={mySeedSet.has(entry.id)}
+                onSelect={() => setSelected(entry)}
               />
             ))}
 
@@ -210,6 +327,15 @@ export default function GlobalLeaderboard() {
           )}
         </div>
       </section>
+
+      {selected && (
+        <TeamDetailModal
+          entry={selected}
+          rank={globalRankById.get(selected.id) ?? 0}
+          isOwn={mySeedSet.has(selected.id)}
+          onClose={() => setSelected(null)}
+        />
+      )}
     </div>
   );
 }
