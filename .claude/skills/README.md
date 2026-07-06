@@ -20,6 +20,7 @@ full review and the reasoning behind these picks.
 | `ui-ux-and-feedback/` | "UI", "HUD", "information hierarchy", "cluttered", "accessibility" | PitchXI / SquadPanel / ResultPanel layout, feedback vocabulary |
 | `difficulty-and-balancing/` | "balance", "difficulty curve", "overpowered", "too hard/easy", "cost curve" | easy/normal/hard tuning, rating curves, rerolls (pairs with `npm run probe`) |
 | `mobile-app-ui-design/` | "mobile UI/UX", "screen design", "make this screen look better" | The "See my team" toggle + mobile draft layout (thumb-zone, 8pt grid, hierarchy) |
+| `design-review/` | "/design-review \<target\>", "review the feel/UX/balance" | Orchestrator: runs the skills above as a reviewer panel → applies safe changes → sub-agent verifies the diff |
 
 Each skill's `SKILL.md` is the entry point; gamestack skills also carry a
 `GUIDE.md` (deep reference) and `CHECKLIST.md` (review pass). The mobile skill
