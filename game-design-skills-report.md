@@ -308,6 +308,20 @@ polish on an existing, shipped web game — exactly the surface the engine-agnos
 **design-craft** skills cover, and exactly the surface the big engine-oriented
 studio packs *don't*.
 
+### What's already vendored in this repo
+
+A curated subset is now committed under [`.claude/skills/`](./.claude/skills/) so
+it auto-loads in Claude Code sessions (verbatim, MIT, attributed in
+[`.claude/skills/README.md`](./.claude/skills/README.md)):
+
+- `game-feel-and-juice`, `ui-ux-and-feedback`, `difficulty-and-balancing`
+  (from **gamestack**)
+- `mobile-app-ui-design` (from **ceorkm**, stack-matched)
+
+Deliberately trimmed to 8and0's real needs — the full upstream packs' Unity/Godot/
+3D/shader/RPG skills were left out as irrelevant to a browser game. Add more from
+the tables above if a future need appears.
+
 > ⚠️ **A caveat worth stating plainly.** Every pack here is community-made, mostly
 > low-star, and several openly flag that their "game-industry domain judgment"
 > is only partially complete. They're valuable as **structured scaffolding for
