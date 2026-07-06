@@ -27,8 +27,10 @@ focus areas (spin *feel* / "juice", difficulty tuning, mobile UX, onboarding).
 | — | Glade-tool/glade-mcp, fenixnix/Godot-Skills, IdoCohen560/claude-unity-game-studio | Engine-bound (Unity/Godot MCP + GDScript). Not applicable to a browser game. | **N/A** |
 
 **Recommendation:** start with **gamestack** (design craft) + a handful of
-**gstack-game** review commands (`/feel-pass`, `/balance-review`, `/playtest`).
-That covers 8and0's real needs without importing a 70-skill studio hierarchy.
+**gstack-game** review commands (`/feel-pass`, `/balance-review`, `/playtest`),
+and for the **mobile** work add **ceorkm/mobile-app-ui-design** — it targets our
+exact React + Tailwind + Lucide stack (see the [Mobile experience](#mobile-experience)
+section). That covers 8and0's real needs without importing a 70-skill studio hierarchy.
 
 ---
 
@@ -219,6 +221,70 @@ original is the canonical, actively maintained one.)_
 
 ---
 
+## Mobile experience
+
+Mobile is a first-class concern for 8and0 — the README's active work calls out a
+**"See my team" toggle so the drafted XI is reachable on mobile without
+scrolling**, and the whole spin/pick loop needs to feel good under a thumb. One
+distinction reorders the mobile field the same way "web vs engine" reordered the
+main list:
+
+> **8and0 is mobile _web_, not a native app.** It's React + Tailwind + Vite served
+> as a responsive site (with PWA potential), *not* iOS/Android/React Native. So
+> **thumb-zone, touch-target, and responsive-breakpoint** guidance is gold, while
+> iOS Human Interface Guidelines / React Native / native-navigation skills are
+> largely wasted.
+
+### 🥇 The mobile pick: ceorkm/mobile-app-ui-design
+
+> "Professional mobile app UI/UX design skill for Claude Code." · **130★** · MIT ·
+> updated Jul 2026
+
+This is the standout because it **targets 8and0's exact stack** — its
+implementation guidance is written for **React, Tailwind CSS, Lucide React icons,
+and CSS transitions** (compare our [tech stack](./README.md#tech-stack)). The
+principles land directly on our open mobile work:
+
+- **Thumb zone** — primary actions in the bottom third → where the **spin button,
+  pick confirmation, and "See my team" toggle** should live for one-handed play.
+- **8-point grid** — consistent spacing → tightens the **PitchXI / SquadPanel**
+  layout on small screens.
+- **60/30/10 colour rule** + **typography hierarchy (≤4 sizes / 2 weights)** →
+  keeps the draft UI legible on a phone without fighting our `gold-*`/`surface-*`
+  Tailwind tokens.
+- **Peak-end rule** — memorable finish → reinforces the **win celebration /
+  ResultPanel** payoff.
+
+Install: `npx skills add ceorkm/mobile-app-ui-design`, or copy into
+`~/.claude/skills/mobile-app-ui-design/`. MIT, so we can vendor it into the repo's
+`.claude/skills/` too.
+
+### Supporting mobile skills
+
+| Repo | Stars | What it adds | Fit for 8and0 |
+| ---- | ----: | ------------ | ------------- |
+| [wonjyou/design-audit](https://github.com/wonjyou/design-audit) | ~4 | Context-aware UI/UX **audit** — adapts criteria to *mobile app / web app / marketing site*, cites standards, severity-scores findings | **High** as a review pass — point it at the mobile draft screen |
+| [awesome-skills/mobile-app-design](https://github.com/awesome-skills/mobile-app-design) | ~48 | iOS/Android + **WCAG 2.1 AA accessibility** + React Native conventions | **Partial** — mine the accessibility + touch-target parts, skip native/RN |
+| gamestack `ui-ux-and-feedback` *(from #1 above)* | — | Info hierarchy, HUD specs, diegetic vs non-diegetic feedback | **High** — game-aware, engine-agnostic; pairs with thumb-zone rules |
+| gstack-game `/game-ux-review` *(from #2 above)* | — | On-demand UX review command | **High** — run it against the "See my team" change |
+| [anthropics/claude-code · frontend-design](https://github.com/anthropics/claude-code/blob/main/plugins/frontend-design/skills/frontend-design/SKILL.md) | official | Baseline quality floor: "responsive down to mobile, visible keyboard focus, reduced motion respected" | **Low-Med** — good hygiene defaults, but marketing-site oriented, not game UX |
+
+### Also noted (skip for 8and0)
+
+`ChrisPiz/apple-app-ui-design` (iOS HIG), `almazjanat/native-mobile-ui`,
+`draftbit/mobile-taste-skill` (React Native/Expo), `NguyenKhacPhuc/mobile-app-design-pro`
+— all **native-app** oriented. Wrong runtime for a responsive web game.
+
+### Mobile-specific caveat
+
+None of these skills *test* mobile — they reason about it from a checklist. Real
+device testing still matters: 8and0's simulation and animation (`animateSpin`,
+`LiveMatch`) should be profiled on a mid-range phone, and touch targets verified
+at real DPI. Treat the skills as **review scaffolding + a design vocabulary**, then
+confirm on hardware.
+
+---
+
 ## Recommended setup for 8and0
 
 A minimal, web-appropriate loadout — no 70-skill studio required:
@@ -228,6 +294,8 @@ A minimal, web-appropriate loadout — no 70-skill studio required:
      `ui-ux-and-feedback`, `onboarding-and-teaching`, `pacing-and-the-player-journey`.
    - From **gstack-game**: `/feel-pass`, `/balance-review`, `/playtest` as
      on-demand review commands.
+   - For **mobile**: **ceorkm/mobile-app-ui-design** (stack-matched thumb-zone /
+     grid / hierarchy rules) + **wonjyou/design-audit** as a mobile-web review pass.
 2. **Keep as references (don't install):**
    - **claude-game-design-suite** → run its `GDD Author` + `Core Loop Designer`
      **once** to turn `ideas.md`/`README.md` into a proper GDD, then archive.
@@ -260,3 +328,7 @@ studio packs *don't*.
   [hesreallyhim/awesome-claude-code](https://github.com/hesreallyhim/awesome-claude-code) ·
   [bergside/awesome-design-skills](https://github.com/bergside/awesome-design-skills)
 - [Claude Code `claude-code-skills` topic](https://github.com/topics/claude-code-skills)
+- **Mobile:** [ceorkm/mobile-app-ui-design](https://github.com/ceorkm/mobile-app-ui-design) ·
+  [awesome-skills/mobile-app-design](https://github.com/awesome-skills/mobile-app-design) ·
+  [wonjyou/design-audit](https://github.com/wonjyou/design-audit) ·
+  [anthropics/claude-code frontend-design skill](https://github.com/anthropics/claude-code/blob/main/plugins/frontend-design/skills/frontend-design/SKILL.md)
