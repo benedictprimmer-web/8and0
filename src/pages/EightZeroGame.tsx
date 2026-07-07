@@ -768,8 +768,9 @@ function SetupScreen({
             Live ratings {options.liveRatings ? "ON" : "OFF"}
           </OptionButton>
           <p className="mt-4 text-sm text-gray-500">
-            In-form boost: {LIVE_BOOSTS.length} players who are on song this tournament get a rating bump
-            (e.g. Vozinha +15, Saibari +5, Bellingham +4). Boosted players show a ▲ tag in the draft.
+            In-form boost: {LIVE_BOOSTS.length} players on song this tournament get a rating bump —
+            from Golden Boot leaders (Mbappé, Messi, Haaland) to breakout heroes (Vozinha 66→90,
+            Diomande, Enciso). Boosted players show a ▲ tag in the draft.
           </p>
         </section>
 
