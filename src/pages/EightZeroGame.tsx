@@ -1288,11 +1288,13 @@ export default function EightZeroGame() {
   const [isSpinning, setIsSpinning] = useState(false);
   // The nation reel is a cosmetic vertical slot-machine strip. `reelStrip` is the
   // list of nations scrolling past, `reelOffset` the translateY (px), and
-  // `reelAnimating` gates the long decelerating transition. The nation it lands
-  // on is always the seed-determined draft result — never chosen here.
+  // `reelTransition` the live CSS transition (per phase: the long travel, then
+  // each slow teeter step). The nation it lands on is always the seed-determined
+  // draft result — never chosen here.
   const [reelStrip, setReelStrip] = useState<EightZeroTeam[]>([]);
   const [reelOffset, setReelOffset] = useState(0);
-  const [reelAnimating, setReelAnimating] = useState(false);
+  const [reelTransition, setReelTransition] = useState("none");
+  const [reelBlurred, setReelBlurred] = useState(false);
   // True for the brief moment the reel snaps onto the chosen nation, driving
   // the scale-overshoot + gold glow landing flash.
   const [reelLanded, setReelLanded] = useState(false);
@@ -1312,16 +1314,20 @@ export default function EightZeroGame() {
   const spinIntervalRef = useRef<number | null>(null);
   const spinTimeoutRef = useRef<number | null>(null);
   const reelRafRef = useRef<number | null>(null);
+  const reelSeqRef = useRef<number | null>(null);
   const reelFinalOffsetRef = useRef(0);
   const reelLandIndexRef = useRef(0);
   const pendingDraftRef = useRef<DraftState | null>(null);
 
-  // Reel tuning. A longer, decelerating travel that reads as a real spinning
-  // wheel; skippable so the ceremony never drags across an 11-slot draft.
+  // Reel tuning. A decelerating travel that reads as a real spinning wheel, then
+  // a "gamble" teeter that hovers on the seam between the final two nations
+  // before deciding. Skippable so the ceremony never drags across an 11-slot
+  // draft. The landed nation is always the seed-determined draft result.
   const REEL_ROW_H = 64; // px per nation row (also the reel viewport height)
   const REEL_STRIP_LEN = 36; // nations that scroll past before landing
-  const REEL_SPIN_MS = 2600; // travel duration; the decel curve does the rest
+  const REEL_SPIN_MS = 2600; // overall reveal budget; ~62% travels, rest teeters
   const REEL_WINDUP_PX = 7; // anticipation nudge before launch
+  const REEL_EASE = "cubic-bezier(0.14, 0.72, 0.11, 1)"; // decel travel curve
   const prefersReduced = () =>
     typeof window !== "undefined" &&
     typeof window.matchMedia === "function" &&
@@ -1368,6 +1374,7 @@ export default function EightZeroGame() {
     return () => {
       if (spinIntervalRef.current) window.clearInterval(spinIntervalRef.current);
       if (spinTimeoutRef.current) window.clearTimeout(spinTimeoutRef.current);
+      if (reelSeqRef.current) window.clearTimeout(reelSeqRef.current);
       if (reelRafRef.current) window.cancelAnimationFrame(reelRafRef.current);
     };
   }, []);
@@ -1430,9 +1437,11 @@ export default function EightZeroGame() {
   function clearSpinTimers() {
     if (spinIntervalRef.current) window.clearInterval(spinIntervalRef.current);
     if (spinTimeoutRef.current) window.clearTimeout(spinTimeoutRef.current);
+    if (reelSeqRef.current) window.clearTimeout(reelSeqRef.current);
     if (reelRafRef.current) window.cancelAnimationFrame(reelRafRef.current);
     spinIntervalRef.current = null;
     spinTimeoutRef.current = null;
+    reelSeqRef.current = null;
     reelRafRef.current = null;
   }
 
@@ -1569,7 +1578,8 @@ export default function EightZeroGame() {
   function resetReel() {
     setReelStrip([]);
     setReelOffset(0);
-    setReelAnimating(false);
+    setReelTransition("none");
+    setReelBlurred(false);
     setReelLanded(false);
     pendingDraftRef.current = null;
   }
@@ -1578,7 +1588,8 @@ export default function EightZeroGame() {
   function finishReel() {
     clearSpinTimers();
     setReelLanded(false);
-    setReelAnimating(false);
+    setReelTransition("none");
+    setReelBlurred(false);
     setReelOffset(0);
     setReelStrip([]);
     const pending = pendingDraftRef.current;
@@ -1587,14 +1598,50 @@ export default function EightZeroGame() {
     setIsSpinning(false);
   }
 
+  // Final settle: scale-overshoot + gold glow on the landed row, then commit.
+  function landReel() {
+    setReelLanded(true);
+    spinTimeoutRef.current = window.setTimeout(finishReel, 560);
+  }
+
+  // Run the teeter step chain: each step is a slow eased move to a fractional
+  // row offset, so the reel visibly hovers on the seam between two nations.
+  function runReelSteps(steps: { off: number; ms: number; ease: string }[], i: number) {
+    if (i >= steps.length) {
+      landReel();
+      return;
+    }
+    const step = steps[i];
+    setReelTransition(`transform ${step.ms}ms ${step.ease}`);
+    setReelOffset(-(step.off * REEL_ROW_H));
+    reelSeqRef.current = window.setTimeout(() => runReelSteps(steps, i + 1), step.ms);
+  }
+
+  // The gamble: from the mid-point straddle, drift forward and back around the
+  // seam with shrinking amplitude, then edge in and decide onto the nation.
+  function startTeeter(landIndex: number, dir: number) {
+    const mid = dir * 0.5; // half-way between the drafted row and its neighbour
+    const steps: { off: number; ms: number; ease: string }[] = [];
+    let amp = 0.16;
+    let side = -dir;
+    const hovers = 2 + Math.floor(Math.random() * 2); // 2–3 wobbles
+    for (let i = 0; i < hovers; i += 1) {
+      steps.push({ off: landIndex + mid + side * amp, ms: 340, ease: "cubic-bezier(0.45, 0, 0.55, 1)" });
+      side *= -1;
+      amp *= 0.68;
+    }
+    steps.push({ off: landIndex + mid * 0.5, ms: 300, ease: "ease-in-out" }); // last hang, edging in
+    steps.push({ off: landIndex, ms: 500, ease: "cubic-bezier(0.33, 0, 0.2, 1)" }); // decide → chosen
+    runReelSteps(steps, 0);
+  }
+
   // Tap-to-skip: snap straight to the landing frame so a long ceremony is never
   // mandatory across an 11-slot draft.
   function skipReel() {
     if (!isSpinning || reelLanded) return;
-    if (reelRafRef.current) window.cancelAnimationFrame(reelRafRef.current);
-    reelRafRef.current = null;
-    if (spinTimeoutRef.current) window.clearTimeout(spinTimeoutRef.current);
-    setReelAnimating(false); // transition off → instant snap
+    clearSpinTimers();
+    setReelTransition("none"); // transition off → instant snap
+    setReelBlurred(false);
     setReelOffset(reelFinalOffsetRef.current);
     setReelLanded(true);
     spinTimeoutRef.current = window.setTimeout(finishReel, 340);
@@ -1619,42 +1666,56 @@ export default function EightZeroGame() {
       return;
     }
 
-    // Reduced motion (or a tiny pool): skip the travel, snap onto the nation.
-    if (prefersReduced() || teams.length < 4) {
+    // Reduced motion (or a tiny pool): skip the travel + teeter, snap onto it.
+    if (prefersReduced() || teams.length < 6) {
       reelLandIndexRef.current = 0;
       reelFinalOffsetRef.current = 0;
       setReelStrip([chosen]);
-      setReelAnimating(false);
+      setReelTransition("none");
+      setReelBlurred(false);
       setReelOffset(0);
       setReelLanded(true);
       spinTimeoutRef.current = window.setTimeout(finishReel, 550);
       return;
     }
 
-    // Build a strip of nations that scrolls past and lands on `chosen`, with two
-    // filler rows below it so the decel never reveals a gap.
+    // Build the strip. The drafted nation sits at landIndex with distinct
+    // neighbours so the "hover between two" reads clearly; extra rows below give
+    // the teeter room to peek forward.
     const randomTeam = () => teams[Math.floor(Math.random() * teams.length)] ?? chosen;
+    const pickDistinct = (...avoid: EightZeroTeam[]) => {
+      for (let tries = 0; tries < 20; tries += 1) {
+        const t = randomTeam();
+        if (!avoid.includes(t)) return t;
+      }
+      return randomTeam();
+    };
     const strip: EightZeroTeam[] = Array.from({ length: REEL_STRIP_LEN }, randomTeam);
-    const landIndex = REEL_STRIP_LEN - 3;
+    const landIndex = REEL_STRIP_LEN - 4;
     strip[landIndex] = chosen;
-    const finalOffset = -(landIndex * REEL_ROW_H);
+    strip[landIndex - 1] = pickDistinct(chosen);
+    strip[landIndex + 1] = pickDistinct(chosen, strip[landIndex - 1]);
     reelLandIndexRef.current = landIndex;
-    reelFinalOffsetRef.current = finalOffset;
+    reelFinalOffsetRef.current = -(landIndex * REEL_ROW_H);
 
-    // Anticipation: a small downward wind-up, then a long decelerating launch.
+    // Anticipation wind-up, then decelerate to the mid-point straddle (each of
+    // the final two nations shown half) before the teeter decides.
     setReelStrip(strip);
-    setReelAnimating(false);
+    setReelTransition("none");
+    setReelBlurred(true);
     setReelOffset(REEL_WINDUP_PX);
+
+    const dir = Math.random() < 0.5 ? -1 : 1; // which neighbour to straddle
+    const travelMs = Math.round(REEL_SPIN_MS * 0.62);
+    const travelTarget = -((landIndex + dir * 0.5) * REEL_ROW_H);
 
     // Two frames so the browser paints the wind-up start before transitioning.
     reelRafRef.current = window.requestAnimationFrame(() => {
       reelRafRef.current = window.requestAnimationFrame(() => {
-        setReelAnimating(true);
-        setReelOffset(finalOffset);
-        spinTimeoutRef.current = window.setTimeout(() => {
-          setReelLanded(true); // scale-overshoot + gold glow on the landed row
-          spinTimeoutRef.current = window.setTimeout(finishReel, 560);
-        }, REEL_SPIN_MS);
+        setReelTransition(`transform ${travelMs}ms ${REEL_EASE}, filter ${travelMs}ms ease-out`);
+        setReelBlurred(false);
+        setReelOffset(travelTarget);
+        spinTimeoutRef.current = window.setTimeout(() => startTeeter(landIndex, dir), travelMs);
       });
     });
   }
@@ -2025,10 +2086,8 @@ export default function EightZeroGame() {
                         className="reel-strip"
                         style={{
                           transform: `translateY(${reelOffset}px)`,
-                          transition: reelAnimating
-                            ? `transform ${REEL_SPIN_MS}ms cubic-bezier(0.14, 0.72, 0.11, 1), filter ${REEL_SPIN_MS}ms ease-out`
-                            : "none",
-                          filter: reelAnimating || reelLanded ? "blur(0px)" : "blur(5px)",
+                          transition: reelTransition,
+                          filter: reelBlurred ? "blur(5px)" : "blur(0px)",
                         }}
                       >
                         {reelStrip.map((team, index) => (
