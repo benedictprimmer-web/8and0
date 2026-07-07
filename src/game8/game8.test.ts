@@ -388,6 +388,7 @@ describe("8-0 simulation", () => {
       draftMode: "squad-first",
       legendMode: "none",
       liveRatings: false,
+      chemistry: false,
       score: 0,
       draws: 0,
       picks: [],

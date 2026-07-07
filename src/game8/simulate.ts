@@ -294,6 +294,7 @@ export function simulateTournamentRun(args: {
   draftMode?: DraftMode;
   legendMode?: LegendMode;
   liveRatings?: boolean;
+  chemistry?: boolean;
   // Authoritative knockout shootout results, keyed by stage name. When the
   // player wins/loses an interactive shootout, the run is re-simulated with the
   // result recorded here so the bracket and score stay consistent with play.
@@ -352,6 +353,7 @@ export function simulateTournamentRun(args: {
   const blindMode = args.blindMode ?? false;
   const draftMode = args.draftMode ?? "squad-first";
   const liveRatings = args.liveRatings ?? false;
+  const chemistry = args.chemistry ?? false;
   const score = calculateRunScore({
     wins,
     draws,
@@ -383,6 +385,7 @@ export function simulateTournamentRun(args: {
     draftMode,
     legendMode,
     liveRatings,
+    chemistry,
     score,
     record: recordLabel(wins, draws, losses),
     wins,

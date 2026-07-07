@@ -41,6 +41,7 @@ import {
 import { FORMATIONS, getFormation } from "../game8/formations";
 import { calculateTeamRatings } from "../game8/ratings";
 import { applyLiveRatings, liveBoostFor, LIVE_BOOSTS } from "../game8/liveRatings";
+import { calculateChemistry } from "../game8/chemistry";
 import {
   addMyGlobalEntry,
   loadMyGlobalEntries,
@@ -75,6 +76,7 @@ const DEFAULT_OPTIONS: DraftOptions = {
   draftMode: "squad-first",
   legendMode: "none",
   liveRatings: false,
+  chemistry: false,
 };
 
 const DIFFICULTIES: Array<{
@@ -772,6 +774,18 @@ function SetupScreen({
             from Golden Boot leaders (Mbappé, Messi, Haaland) to breakout heroes (Vozinha 66→90,
             Diomande, Enciso). Boosted players show a ▲ tag in the draft.
           </p>
+          <OptionButton
+            active={options.chemistry}
+            onClick={() => updateOptions({ chemistry: !options.chemistry })}
+            className="mt-4 w-full text-lg"
+          >
+            Club chemistry {options.chemistry ? "ON" : "OFF"}
+          </OptionButton>
+          <p className="mt-4 text-sm text-gray-500">
+            Ball-knowledge mode: players in your XI who share a real club link up and lift your OVR
+            (+0.5 per extra same-club player, capped at +3). A reward for clever drafting — revealed
+            in a chemistry panel as you build the squad.
+          </p>
         </section>
 
         <section className="rounded-2xl border border-indigo-900/70 bg-[#11111f] p-5 shadow-2xl shadow-black/20">
@@ -849,7 +863,7 @@ function SquadPanel({
     }
   }
 
-  const ratings = picks.length ? calculateTeamRatings(picks) : null;
+  const ratings = picks.length ? calculateTeamRatings(picks, state.chemistry) : null;
 
   return (
     <aside className="space-y-4">
@@ -876,6 +890,36 @@ function SquadPanel({
           </>
         )}
       </div>
+
+      {state.chemistry && picks.length > 0 && (() => {
+        const chem = calculateChemistry(picks);
+        return (
+          <div className="stat-card">
+            <div className="flex items-center justify-between">
+              <p className="section-label">Club chemistry</p>
+              <span className="text-sm font-black tabular-nums text-emerald-400">
+                +{chem.total.toFixed(1)} OVR{chem.capped ? " (cap)" : ""}
+              </span>
+            </div>
+            {chem.links.length > 0 ? (
+              <div className="mt-3 space-y-1.5">
+                {chem.links.map((link) => (
+                  <div key={link.club} className="flex items-center justify-between gap-2 text-xs">
+                    <span className="truncate text-gray-300">
+                      {link.club} <span className="text-gray-500">×{link.count}</span>
+                    </span>
+                    <span className="font-bold tabular-nums text-emerald-400">+{link.bonus.toFixed(1)}</span>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <p className="mt-2 text-xs leading-5 text-gray-500">
+                No club links yet — draft players who share a club to build chemistry.
+              </p>
+            )}
+          </div>
+        );
+      })()}
 
       {showPitch && (
         <PitchXI
@@ -918,7 +962,7 @@ function TeamSheet({
     }
   }
 
-  const ratings = picks.length ? calculateTeamRatings(picks) : null;
+  const ratings = picks.length ? calculateTeamRatings(picks, state.chemistry) : null;
 
   return (
     <div className="fixed inset-0 z-50 flex flex-col justify-end" role="dialog" aria-modal="true" aria-label="Your team">
@@ -1101,6 +1145,7 @@ function ResultPanel({
         <p className="mt-2 text-sm font-bold text-gray-400">
           {run.record} · {run.grade} · {run.label}
           {run.liveRatings && " · Live ratings"}
+          {run.chemistry && " · Chemistry"}
           {run.legendMode !== "none" && ` · Last Dance: ${titleCase(run.legendMode)}`}
         </p>
       </div>
@@ -1281,6 +1326,7 @@ function LeaderboardPanel({
                 {run.formationLabel} · {titleCase(run.difficulty)} · {run.blindMode ? "Blind" : "Open ratings"} ·{" "}
                 {run.draftMode === "squad-first" ? "Squad first" : "Position first"}
                 {run.liveRatings && " · Live ratings"}
+                {run.chemistry && " · Chemistry"}
                 {run.legendMode !== "none" && ` · Last Dance: ${titleCase(run.legendMode)}`}
               </p>
             </div>
@@ -1439,7 +1485,7 @@ export default function EightZeroGame() {
   const hideDraftRatings = shouldHideRatings(draftState);
   const teamSheetRatingsHidden = hideDraftRatings && !run;
   const teamOvr = draftState.picks.length
-    ? Math.round(calculateTeamRatings(draftState.picks).overall)
+    ? Math.round(calculateTeamRatings(draftState.picks, draftState.chemistry).overall)
     : null;
   const candidates = useMemo(() => {
     if (!draftData) return [];
@@ -1521,7 +1567,7 @@ export default function EightZeroGame() {
 
   function finishDraftIfComplete(next: DraftState) {
     if (!gameData || !next.complete) return;
-    const ratings = calculateTeamRatings(next.picks);
+    const ratings = calculateTeamRatings(next.picks, next.chemistry);
     // Fresh run starts with no shootout overrides.
     setPenOverrides({});
     const nextRun = simulateTournamentRun({
@@ -1535,6 +1581,7 @@ export default function EightZeroGame() {
       draftMode: next.draftMode,
       legendMode: next.legendMode,
       liveRatings: next.liveRatings,
+      chemistry: next.chemistry,
       penOverrides: {},
     });
     setRun(nextRun);
@@ -1579,6 +1626,7 @@ export default function EightZeroGame() {
       draftMode: run.draftMode,
       legendMode: run.legendMode,
       liveRatings: run.liveRatings,
+      chemistry: run.chemistry,
       penOverrides: nextOverrides,
     });
     // Preserve identity so local history / leaderboard dedupe stays stable.
