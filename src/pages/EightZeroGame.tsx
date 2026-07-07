@@ -5,21 +5,16 @@ import {
   ArrowLeft,
   Check,
   Copy,
-  EyeOff,
-  Flame,
   Globe,
   HelpCircle,
-  Link2,
   Medal,
   Play,
   RefreshCw,
   Share2,
   Shield,
   Shuffle,
-  Target,
   Trophy,
   X,
-  Zap,
 } from "lucide-react";
 import { api, leaderboardApi, type LeaderboardResponse, type RankedEntry, type SubmitResponse } from "../api/client";
 import { buildSubmission } from "../game8/leaderboard";
@@ -91,7 +86,7 @@ const DIFFICULTIES: Array<{
 }> = [
   { id: "easy", label: "Easy", detail: "3 rerolls" },
   { id: "normal", label: "Normal", detail: "1 reroll" },
-  { id: "hard", label: "Hard", detail: "No rerolls · ratings hidden" },
+  { id: "hard", label: "Hard", detail: "No rerolls" },
 ];
 
 function makeSeed(): string {
@@ -757,7 +752,7 @@ function SetupScreen({
         <p className="mt-1 text-sm text-gray-500">Stack any combination — each one shows on your run.</p>
         <div className="mt-4 grid gap-2 sm:grid-cols-2 sm:gap-3">
           <ModeCard
-            icon={<Flame size={18} />}
+            icon={<span className="text-lg leading-none">🔥</span>}
             title="Live Ratings"
             desc={`${LIVE_BOOSTS.length} in-form players get a boost — Vozinha 66→90, Mbappé, Bellingham, Diomande…`}
             rightLabel={options.liveRatings ? "On" : "Off"}
@@ -765,7 +760,7 @@ function SetupScreen({
             onClick={() => updateOptions({ liveRatings: !options.liveRatings })}
           />
           <ModeCard
-            icon={<Link2 size={18} />}
+            icon={<span className="text-lg leading-none">🔗</span>}
             title="Club Chemistry"
             desc="Same-club players link up and lift your OVR. Ball-knowledge reward, capped at +3."
             rightLabel={options.chemistry ? "On" : "Off"}
@@ -773,7 +768,7 @@ function SetupScreen({
             onClick={() => updateOptions({ chemistry: !options.chemistry })}
           />
           <ModeCard
-            icon={<Zap size={18} />}
+            icon={<span className="text-lg leading-none">⚡</span>}
             title="Super-Sub"
             desc="Draft a 12th man before kickoff — a bench impact sub who threatens late winners and lifts your pens in the knockouts."
             rightLabel={options.superSub ? "On" : "Off"}
@@ -781,7 +776,7 @@ function SetupScreen({
             onClick={() => updateOptions({ superSub: !options.superSub })}
           />
           <ModeCard
-            icon={<EyeOff size={18} />}
+            icon={<span className="text-lg leading-none">🙈</span>}
             title="Blind Ratings"
             desc={
               options.difficulty === "hard"
@@ -794,7 +789,7 @@ function SetupScreen({
             onClick={() => updateOptions({ blindMode: !options.blindMode })}
           />
           <ModeCard
-            icon={<Trophy size={18} />}
+            icon={<span className="text-lg leading-none">🏆</span>}
             title={options.legendMode !== "none" ? `Last Dance: ${titleCase(options.legendMode)}` : "Last Dance"}
             desc="Lock a legend — Messi, Ronaldo or Neymar — as your guaranteed first pick."
             rightLabel={options.legendMode !== "none" ? titleCase(options.legendMode) : "Pick"}
@@ -803,7 +798,7 @@ function SetupScreen({
             onClick={() => (options.legendMode !== "none" ? onLegendSelect("none") : setShowLegendModal(true))}
           />
           <ModeCard
-            icon={<Target size={18} />}
+            icon={<span className="text-lg leading-none">🎯</span>}
             title="Practice Penalties"
             desc="Warm up with a standalone shootout — no draft, just you and the keeper."
             rightLabel="Play"
