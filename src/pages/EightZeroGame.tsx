@@ -15,6 +15,7 @@ import {
   Shuffle,
   Trophy,
   X,
+  Zap,
 } from "lucide-react";
 import { api, leaderboardApi, type LeaderboardResponse, type RankedEntry, type SubmitResponse } from "../api/client";
 import { buildSubmission } from "../game8/leaderboard";
