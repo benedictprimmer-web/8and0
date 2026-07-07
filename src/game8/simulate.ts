@@ -314,6 +314,8 @@ export function simulateTournamentRun(args: {
   superSub?: boolean;
   superSubName?: string | null;
   superSubRating?: number | null;
+  // The knockout stage where the player brought the sub on (interactive, one-time).
+  superSubStage?: string | null;
   // Authoritative knockout shootout results, keyed by stage name. When the
   // player wins/loses an interactive shootout, the run is re-simulated with the
   // result recorded here so the bracket and score stay consistent with play.
@@ -327,7 +329,10 @@ export function simulateTournamentRun(args: {
   let stageReached = "Group stage";
   let groupPoints = 0;
   const legendMode = args.legendMode ?? "none";
+  // The super-sub's impact applies only to the ONE knockout stage where the
+  // player brought him on (interactive, one-time use). No stage → he stays benched.
   const superSubRating = args.superSub ? args.superSubRating ?? null : null;
+  const superSubStage = args.superSubStage ?? null;
   const userOverall = args.ratings.overall;
 
   for (let index = 0; index < GROUP_STAGES.length; index += 1) {
@@ -354,7 +359,8 @@ export function simulateTournamentRun(args: {
       const stage = KNOCKOUT_STAGES[index];
       const opponent = pickOpponent(args.teams, `${args.seed}:knockout:${index}`, excludeIds, stage, userOverall, legendMode);
       excludeIds.add(opponent.teamId);
-      const result = scoreMatch(stage, opponent, args.ratings, args.teams, `${args.seed}:${stage}`, true, legendMode, args.penOverrides?.[stage], superSubRating);
+      const subRating = superSubStage === stage ? superSubRating : null;
+      const result = scoreMatch(stage, opponent, args.ratings, args.teams, `${args.seed}:${stage}`, true, legendMode, args.penOverrides?.[stage], subRating);
       matches.push(result);
       if (result.result === "W") {
         wins += 1;

@@ -1407,6 +1407,10 @@ export default function EightZeroGame() {
   const [superSubGate, setSuperSubGate] = useState(false);
   const [subSpinTeam, setSubSpinTeam] = useState<EightZeroTeam | null>(null);
   const [subSpinCount, setSubSpinCount] = useState(0);
+  // The knockout stage where the player brought the sub on (null = still on the
+  // bench; one-time use). `liveMatchKey` remounts the match to replay it with him on.
+  const [superSubStage, setSuperSubStage] = useState<string | null>(null);
+  const [liveMatchKey, setLiveMatchKey] = useState(0);
   // The nation reel is a cosmetic vertical slot-machine strip. `reelStrip` is the
   // list of nations scrolling past, `reelOffset` the translateY (px), and
   // `reelTransition` the live CSS transition (per phase: the long travel, then
@@ -1594,6 +1598,7 @@ export default function EightZeroGame() {
     setPickingSuperSub(false);
     setSuperSubGate(false);
     setSubSpinTeam(null);
+    setSuperSubStage(null);
     resetReel();
     setCategoryFilter("ALL");
     setShowLeaderboard(false);
@@ -1616,6 +1621,7 @@ export default function EightZeroGame() {
     setPickingSuperSub(false);
     setSuperSubGate(false);
     setSubSpinTeam(null);
+    setSuperSubStage(null);
     resetReel();
     setCategoryFilter("ALL");
     setShowLeaderboard(false);
@@ -1682,6 +1688,7 @@ export default function EightZeroGame() {
       superSub: next.superSub,
       superSubName: sub?.name ?? null,
       superSubRating: sub?.rating ?? null,
+      superSubStage,
       penOverrides: {},
     });
     setRun(nextRun);
@@ -1694,6 +1701,43 @@ export default function EightZeroGame() {
     setCurrentMatchIndex(0);
     setTournamentPhase("ready");
     window.requestAnimationFrame(() => window.scrollTo({ top: 0, behavior: "smooth" }));
+  }
+
+  // Interactive Super-Sub: bring him on during a knockout (one-time). Re-simulate
+  // this match with his impact applied, then replay it so you see it unfold.
+  function bringOnSuperSub() {
+    if (!gameData || !run) return;
+    const match = run.matches[currentMatchIndex];
+    if (!match) return;
+    const sub = superSubPlayer(draftState);
+    const rebuilt = simulateTournamentRun({
+      teams: gameData.teams,
+      picks: run.picks,
+      ratings: run.ratings,
+      seed: run.seed,
+      formationId: run.formationId,
+      difficulty: run.difficulty,
+      blindMode: run.blindMode,
+      draftMode: run.draftMode,
+      legendMode: run.legendMode,
+      liveRatings: run.liveRatings,
+      chemistry: run.chemistry,
+      superSub: run.superSub,
+      superSubName: run.superSubName,
+      superSubRating: sub?.rating ?? null,
+      superSubStage: match.stage,
+      penOverrides,
+    });
+    rebuilt.id = run.id;
+    rebuilt.createdAt = run.createdAt;
+    setSuperSubStage(match.stage);
+    setRun(rebuilt);
+    setHistory(saveRun(rebuilt));
+    const events = rebuilt.matches.map((m, index) =>
+      buildMatchEvents(m, rebuilt.picks, `${rebuilt.seed}:events:${index}`).events
+    );
+    setAllMatchEvents(events);
+    setLiveMatchKey((key) => key + 1); // remount → replay this match with him on
   }
 
   // Spin a random eligible nation for the super-sub pick (seeded, distinct key).
@@ -1752,6 +1796,7 @@ export default function EightZeroGame() {
       superSub: run.superSub,
       superSubName: run.superSubName,
       superSubRating: superSubPlayer(draftState)?.rating ?? null,
+      superSubStage,
       penOverrides: nextOverrides,
     });
     // Preserve identity so local history / leaderboard dedupe stays stable.
@@ -2187,12 +2232,20 @@ export default function EightZeroGame() {
 
           {run && tournamentPhase === "live" && (
             <LiveMatch
+              key={`${currentMatchIndex}-${liveMatchKey}`}
               stage={run.matches[currentMatchIndex]?.stage ?? ""}
               opponent={run.matches[currentMatchIndex]?.opponent ?? run.matches[0].opponent}
               result={run.matches[currentMatchIndex]}
               events={allMatchEvents[currentMatchIndex] ?? []}
               legendMode={run.legendMode}
               superSubName={run.superSub ? run.superSubName : null}
+              canBringOnSub={
+                !!run.superSub &&
+                !!run.superSubName &&
+                superSubStage === null &&
+                KNOCKOUT_STAGES.has(run.matches[currentMatchIndex]?.stage ?? "")
+              }
+              onBringOnSub={bringOnSuperSub}
               onFinished={() => {
                 const match = run.matches[currentMatchIndex];
                 if (match.decidedByPens) {

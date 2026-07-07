@@ -389,7 +389,7 @@ describe("8-0 simulation", () => {
     expect(alsoOff.matches).toEqual(off.matches);
   });
 
-  it("a top super-sub lifts knockout results across many seeds", () => {
+  it("a top super-sub brought on at a stage lifts results across many seeds", () => {
     const data = buildEightZeroData(rawTeams, rawPlayers);
     const picks = Array.from({ length: 11 }, (_, i) =>
       makePick(i + 1, i === 0 ? "GK" : i < 5 ? "DEF" : i < 8 ? "MID" : "FWD", 80)
@@ -408,9 +408,21 @@ describe("8-0 simulation", () => {
         formationId: "433",
         superSub: true,
         superSubRating: 99,
+        superSubStage: "Round of 32", // brought on in the first knockout
       }).wins;
     }
     expect(subWins).toBeGreaterThan(baseWins);
+  });
+
+  it("the super-sub does nothing until he is brought on (no stage)", () => {
+    const data = buildEightZeroData(rawTeams, rawPlayers);
+    const picks = Array.from({ length: 11 }, (_, i) =>
+      makePick(i + 1, i === 0 ? "GK" : i < 5 ? "DEF" : i < 8 ? "MID" : "FWD", 80)
+    );
+    const base = { teams: data.teams, picks, ratings: calculateTeamRatings(picks), formationId: "433", seed: "ss-benched" };
+    const benched = simulateTournamentRun({ ...base, superSub: true, superSubRating: 99 }); // no stage
+    const plain = simulateTournamentRun(base);
+    expect(benched.matches).toEqual(plain.matches);
   });
 
   it("sorts local history by strongest record and rating", () => {

@@ -11,6 +11,8 @@ interface LiveMatchProps {
   onFinished: () => void;
   legendMode?: LegendMode;
   superSubName?: string | null;
+  canBringOnSub?: boolean;
+  onBringOnSub?: () => void;
 }
 
 const BASE_TICK_MS = 600;
@@ -74,7 +76,7 @@ function EventRow({ event }: { event: MatchEvent }) {
   );
 }
 
-export default function LiveMatch({ stage, opponent, result, events, onFinished, legendMode, superSubName }: LiveMatchProps) {
+export default function LiveMatch({ stage, opponent, result, events, onFinished, legendMode, superSubName, canBringOnSub, onBringOnSub }: LiveMatchProps) {
   const [currentMinute, setCurrentMinute] = useState(0);
   const [userScore, setUserScore] = useState(0);
   const [oppScore, setOppScore] = useState(0);
@@ -289,6 +291,16 @@ export default function LiveMatch({ stage, opponent, result, events, onFinished,
           <p className="mt-2 text-sm font-bold text-white">{opponent.name}</p>
         </div>
       </div>
+
+      {canBringOnSub && !isFinished && currentMinute >= 60 && userScore <= oppScore && (
+        <button
+          type="button"
+          onClick={onBringOnSub}
+          className="animate-pulse-gold mb-4 flex w-full items-center justify-center gap-2 rounded-xl border border-gold-500 bg-gold-500/15 px-4 py-3 text-sm font-black text-gold-300 transition-colors hover:bg-gold-500/25"
+        >
+          <Zap size={18} /> Bring on your Super-Sub{superSubName ? ` — ${superSubName}` : ""}
+        </button>
+      )}
 
       {recentEvent && (
         <div
