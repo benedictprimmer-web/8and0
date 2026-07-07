@@ -356,3 +356,18 @@
 .animate-score-pop  { animation: scorePop 0.4s cubic-bezier(0.16, 1, 0.3, 1); }
 .animate-champion-flash { animation: championFlash 1.6s ease-out forwards; }
 .confetti-piece     { animation: confettiFall linear forwards; }
+
+/* ── Nation reel (cosmetic vertical slot machine) ──────────────────────────── */
+.reel-viewport { position: relative; overflow: hidden; border-radius: 0.5rem; }
+.reel-strip    { will-change: transform, filter; }
+
+/* Respect reduced motion: no reel travel/blur, and collapse the in-game motion
+   accents (the win-confetti already opts out in Celebration.tsx). */
+@media (prefers-reduced-motion: reduce) {
+  .reel-strip { transition: none !important; filter: none !important; }
+  .animate-reel-land,
+  .animate-score-pop,
+  .animate-goal-float,
+  .animate-goal-pop,
+  .animate-pulse { animation: none !important; }
+}
