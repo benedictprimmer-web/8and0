@@ -50,6 +50,14 @@ export const FORMATIONS: Formation[] = [
   },
 ];
 
+// Formations offered in the setup picker. 5-3-2 stays in FORMATIONS above so
+// historical runs and leaderboard entries that used it still resolve their
+// label, but it's no longer selectable — this keeps the mobile picker a tidy
+// 3×2 block of six.
+export const SELECTABLE_FORMATIONS: Formation[] = FORMATIONS.filter(
+  (formation) => formation.id !== "532",
+);
+
 export function getFormation(id: string): Formation {
   return FORMATIONS.find((formation) => formation.id === id) ?? FORMATIONS[0];
 }

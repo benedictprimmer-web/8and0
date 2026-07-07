@@ -43,7 +43,7 @@ import {
   spinTeam,
 } from "../game8/draft";
 import { pickSeeded } from "../game8/random";
-import { FORMATIONS, getFormation } from "../game8/formations";
+import { SELECTABLE_FORMATIONS, getFormation } from "../game8/formations";
 import { calculateTeamRatings } from "../game8/ratings";
 import { applyLiveRatings, liveBoostFor, LIVE_BOOSTS } from "../game8/liveRatings";
 import { calculateChemistry } from "../game8/chemistry";
@@ -60,7 +60,6 @@ import {
 import { buildMatchEvents, simulateTournamentRun } from "../game8/simulate";
 import type {
   DraftDifficulty,
-  DraftMode,
   DraftOptions,
   DraftPick,
   DraftState,
@@ -93,11 +92,6 @@ const DIFFICULTIES: Array<{
   { id: "easy", label: "Easy", detail: "3 rerolls" },
   { id: "normal", label: "Normal", detail: "1 reroll" },
   { id: "hard", label: "Hard", detail: "No rerolls · ratings hidden" },
-];
-
-const DRAFT_MODES: Array<{ id: DraftMode; label: string; detail: string }> = [
-  { id: "squad-first", label: "Squad first", detail: "Spin a nation, pick any player for an open category." },
-  { id: "position-first", label: "Position first", detail: "The draft asks for a category, then auto-fills the next open slot." },
 ];
 
 function makeSeed(): string {
@@ -185,16 +179,16 @@ function ModeCard({
       type="button"
       onClick={onClick}
       disabled={disabled}
-      className={`flex flex-col gap-1.5 rounded-xl border p-4 text-left transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-gold-400 disabled:cursor-not-allowed disabled:opacity-45 ${
+      className={`flex flex-col gap-1 rounded-xl border p-3 text-left transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-gold-400 disabled:cursor-not-allowed disabled:opacity-45 ${
         active
           ? "border-gold-600 bg-gold-500/10"
           : "border-surface-700 bg-surface-950 hover:border-gold-600/40 hover:bg-surface-900"
       }`}
     >
       <div className="flex w-full items-center justify-between gap-2">
-        <span className="flex items-center gap-2 text-base font-black text-white">
-          <span className={active ? "text-gold-400" : "text-gray-400"}>{icon}</span>
-          {title}
+        <span className="flex min-w-0 items-center gap-2 text-base font-black text-white">
+          <span className={`shrink-0 ${active ? "text-gold-400" : "text-gray-400"}`}>{icon}</span>
+          <span className="truncate">{title}</span>
         </span>
         <span
           className={`shrink-0 rounded-full px-2 py-0.5 text-[10px] font-black uppercase tracking-wide ${
@@ -204,7 +198,7 @@ function ModeCard({
           {rightLabel}
         </span>
       </div>
-      <p className="text-xs leading-5 text-gray-500">{desc}</p>
+      <p className="line-clamp-2 text-xs leading-4 text-gray-500">{desc}</p>
     </button>
   );
 }
@@ -539,7 +533,7 @@ function GlobalTopFive() {
     queryFn: () => leaderboardApi.list(5, mySeeds),
     staleTime: 30_000,
   });
-  const entries = (query.data?.entries ?? []).slice(0, 5);
+  const entries = (query.data?.entries ?? []).slice(0, 3);
   const myBest = (query.data?.mine ?? []).reduce<RankedEntry | null>((best, item) => {
     if (item.rank == null) return best;
     if (!best || best.rank == null || item.rank < best.rank) return item;
@@ -548,10 +542,10 @@ function GlobalTopFive() {
   const myBestInTopFive = myBest?.rank != null && myBest.rank <= entries.length;
 
   return (
-    <section className="rounded-2xl border border-indigo-900/70 bg-[#11111f] p-5 shadow-2xl shadow-black/20">
+    <section className="rounded-2xl border border-indigo-900/70 bg-[#11111f] p-4 shadow-2xl shadow-black/20">
       <div className="flex items-center justify-between gap-3">
-        <p className="section-label text-base tracking-[0.18em] inline-flex items-center gap-2">
-          <Globe size={16} className="text-gold-400" />
+        <p className="section-label text-sm tracking-[0.18em] inline-flex items-center gap-2">
+          <Globe size={15} className="text-gold-400" />
           Global leaderboard
         </p>
         <Link
@@ -562,7 +556,7 @@ function GlobalTopFive() {
           <ArrowLeft size={14} className="rotate-180" />
         </Link>
       </div>
-      <div className="mt-4 space-y-2">
+      <div className="mt-3 space-y-1.5">
         {query.isLoading && <p className="text-sm text-gray-500">Loading the board…</p>}
         {!query.isLoading && entries.length === 0 && (
           <p className="text-sm text-gray-500">No runs yet — be the first to make the board.</p>
@@ -572,7 +566,7 @@ function GlobalTopFive() {
           return (
             <div
               key={entry.id}
-              className={`flex items-center gap-3 rounded-lg border px-3 py-2 ${
+              className={`flex items-center gap-3 rounded-lg border px-3 py-1.5 ${
                 isMine ? "border-gold-600 bg-gold-500/10" : "border-surface-700 bg-surface-800"
               }`}
             >
@@ -722,20 +716,37 @@ function SetupScreen({
         </div>
       </div>
 
-      <GlobalTopFive />
-
       <section className="rounded-2xl border border-indigo-900/70 bg-[#11111f] p-5 shadow-2xl shadow-black/20">
         <p className="section-label text-base tracking-[0.18em]">Formation</p>
-        <div className="mt-4 flex flex-wrap gap-3">
-          {FORMATIONS.map((formation) => (
+        <div className="mt-4 grid grid-cols-3 gap-2 sm:grid-cols-6 sm:gap-3">
+          {SELECTABLE_FORMATIONS.map((formation) => (
             <OptionButton
               key={formation.id}
               active={formationId === formation.id}
               onClick={() => onFormationChange(formation.id)}
-              className="flex min-w-[104px] flex-col items-center gap-2 py-3"
+              className="flex aspect-square flex-col items-center justify-center gap-2 px-2 py-2"
             >
               <FormationGlyph formationId={formation.id} active={formationId === formation.id} />
-              <span className="text-lg sm:text-xl">{formation.label}</span>
+              <span className="text-base sm:text-xl">{formation.label}</span>
+            </OptionButton>
+          ))}
+        </div>
+      </section>
+
+      <section className="rounded-2xl border border-indigo-900/70 bg-[#11111f] p-5 shadow-2xl shadow-black/20">
+        <p className="section-label text-base tracking-[0.18em]">Difficulty</p>
+        <div className="mt-4 grid grid-cols-3 gap-2">
+          {DIFFICULTIES.map((difficulty) => (
+            <OptionButton
+              key={difficulty.id}
+              active={options.difficulty === difficulty.id}
+              onClick={() => updateOptions({ difficulty: difficulty.id })}
+              className="flex flex-col items-center justify-center px-2 py-2.5"
+            >
+              <span className="block text-base sm:text-lg">{difficulty.label}</span>
+              <span className={`mt-0.5 block text-[11px] leading-tight ${options.difficulty === difficulty.id ? "text-black/70" : "text-gray-500"}`}>
+                {difficulty.detail}
+              </span>
             </OptionButton>
           ))}
         </div>
@@ -744,7 +755,7 @@ function SetupScreen({
       <section className="rounded-2xl border border-indigo-900/70 bg-[#11111f] p-5 shadow-2xl shadow-black/20">
         <p className="section-label text-base tracking-[0.18em]">Game modes</p>
         <p className="mt-1 text-sm text-gray-500">Stack any combination — each one shows on your run.</p>
-        <div className="mt-4 grid gap-3 sm:grid-cols-2">
+        <div className="mt-4 grid gap-2 sm:grid-cols-2 sm:gap-3">
           <ModeCard
             icon={<Flame size={18} />}
             title="Live Ratings"
@@ -812,43 +823,7 @@ function SetupScreen({
         )}
       </section>
 
-      <section className="rounded-2xl border border-indigo-900/70 bg-[#11111f] p-5 shadow-2xl shadow-black/20">
-        <p className="section-label text-base tracking-[0.18em]">Difficulty</p>
-        <div className="mt-4 grid gap-3 md:grid-cols-3">
-          {DIFFICULTIES.map((difficulty) => (
-            <OptionButton
-              key={difficulty.id}
-              active={options.difficulty === difficulty.id}
-              onClick={() => updateOptions({ difficulty: difficulty.id })}
-              className="min-h-[92px]"
-            >
-              <span className="block text-lg">{difficulty.label}</span>
-              <span className={`mt-1 block text-sm ${options.difficulty === difficulty.id ? "text-black/70" : "text-gray-500"}`}>
-                {difficulty.detail}
-              </span>
-            </OptionButton>
-          ))}
-        </div>
-      </section>
-
-      <section className="rounded-2xl border border-indigo-900/70 bg-[#11111f] p-5 shadow-2xl shadow-black/20">
-        <p className="section-label text-base tracking-[0.18em]">Draft mode</p>
-        <div className="mt-4 grid gap-3 sm:grid-cols-2">
-          {DRAFT_MODES.map((mode) => (
-            <OptionButton
-              key={mode.id}
-              active={options.draftMode === mode.id}
-              onClick={() => updateOptions({ draftMode: mode.id })}
-              className="w-full text-lg"
-            >
-              {mode.label}
-            </OptionButton>
-          ))}
-        </div>
-        <p className="mt-4 text-sm text-gray-500">
-          {DRAFT_MODES.find((mode) => mode.id === options.draftMode)?.detail}
-        </p>
-      </section>
+      <GlobalTopFive />
 
       <section className="rounded-2xl border border-surface-700 bg-surface-900 p-5">
         <div className="grid grid-cols-3 gap-3">
