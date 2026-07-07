@@ -5,8 +5,11 @@ import {
   ArrowLeft,
   Check,
   Copy,
+  EyeOff,
+  Flame,
   Globe,
   HelpCircle,
+  Link2,
   Medal,
   Play,
   RefreshCw,
@@ -16,6 +19,7 @@ import {
   Target,
   Trophy,
   X,
+  Zap,
 } from "lucide-react";
 import { api, leaderboardApi, type LeaderboardResponse, type RankedEntry, type SubmitResponse } from "../api/client";
 import { buildSubmission } from "../game8/leaderboard";
@@ -77,6 +81,7 @@ const DEFAULT_OPTIONS: DraftOptions = {
   legendMode: "none",
   liveRatings: false,
   chemistry: false,
+  superSub: false,
 };
 
 const DIFFICULTIES: Array<{
@@ -153,6 +158,52 @@ function OptionButton({
       } ${disabled ? "cursor-not-allowed opacity-50 hover:border-surface-700 hover:text-gray-400" : ""} ${className}`}
     >
       {children}
+    </button>
+  );
+}
+
+function ModeCard({
+  icon,
+  title,
+  desc,
+  rightLabel,
+  active,
+  disabled = false,
+  onClick,
+}: {
+  icon: React.ReactNode;
+  title: string;
+  desc: string;
+  rightLabel: string;
+  active: boolean;
+  disabled?: boolean;
+  onClick: () => void;
+}) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      disabled={disabled}
+      className={`flex flex-col gap-1.5 rounded-xl border p-4 text-left transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-gold-400 disabled:cursor-not-allowed disabled:opacity-45 ${
+        active
+          ? "border-gold-600 bg-gold-500/10"
+          : "border-surface-700 bg-surface-950 hover:border-gold-600/40 hover:bg-surface-900"
+      }`}
+    >
+      <div className="flex w-full items-center justify-between gap-2">
+        <span className="flex items-center gap-2 text-base font-black text-white">
+          <span className={active ? "text-gold-400" : "text-gray-400"}>{icon}</span>
+          {title}
+        </span>
+        <span
+          className={`shrink-0 rounded-full px-2 py-0.5 text-[10px] font-black uppercase tracking-wide ${
+            active ? "bg-gold-500 text-black" : "bg-surface-800 text-gray-500"
+          }`}
+        >
+          {rightLabel}
+        </span>
+      </div>
+      <p className="text-xs leading-5 text-gray-500">{desc}</p>
     </button>
   );
 }
@@ -677,44 +728,65 @@ function SetupScreen({
       </section>
 
       <section className="rounded-2xl border border-indigo-900/70 bg-[#11111f] p-5 shadow-2xl shadow-black/20">
-        <p className="section-label text-base tracking-[0.18em]">Modes</p>
-        <div className="mt-4 grid gap-3 md:grid-cols-2">
-          <div>
-            <button
-              type="button"
-              onClick={() => {
-                if (options.legendMode !== "none") {
-                  onLegendSelect("none");
-                } else {
-                  setShowLegendModal(true);
-                }
-              }}
-              disabled={loading}
-              className={`inline-flex w-full items-center justify-center gap-2 rounded-xl border px-6 py-4 text-lg font-black transition-colors disabled:cursor-not-allowed disabled:opacity-50 ${
-                options.legendMode !== "none"
-                  ? "border-gold-600 bg-gold-500/10 text-gold-400 hover:bg-gold-500/20"
-                  : "border-surface-700 bg-surface-950 text-white hover:border-gold-600/40 hover:bg-surface-900"
-              }`}
-            >
-              <Trophy size={20} className={options.legendMode !== "none" ? "text-gold-400" : "text-gray-400"} />
-              {options.legendMode !== "none" ? `Last Dance: ${titleCase(options.legendMode)}` : "Last Dance"}
-            </button>
-            <p className="mt-2 text-center text-xs text-gray-500">
-              {options.legendMode !== "none" ? "Click to cancel legend mode." : "Lock a legend as your first pick."}
-            </p>
-          </div>
-          <div>
-            <button
-              type="button"
-              onClick={() => onStartPracticePenalties?.()}
-              disabled={loading}
-              className="inline-flex w-full items-center justify-center gap-2 rounded-xl border border-surface-700 bg-surface-950 px-6 py-4 text-lg font-black text-white transition-colors hover:border-gold-600/40 hover:bg-surface-900 disabled:cursor-not-allowed disabled:opacity-50"
-            >
-              <Target size={20} className="text-gold-400" />
-              Practice Penalties
-            </button>
-            <p className="mt-2 text-center text-xs text-gray-500">Warm up with a standalone shootout.</p>
-          </div>
+        <p className="section-label text-base tracking-[0.18em]">Game modes</p>
+        <p className="mt-1 text-sm text-gray-500">Stack any combination — each one shows on your run.</p>
+        <div className="mt-4 grid gap-3 sm:grid-cols-2">
+          <ModeCard
+            icon={<Flame size={18} />}
+            title="Live Ratings"
+            desc={`${LIVE_BOOSTS.length} in-form players get a boost — Vozinha 66→90, Mbappé, Bellingham, Diomande…`}
+            rightLabel={options.liveRatings ? "On" : "Off"}
+            active={options.liveRatings}
+            onClick={() => updateOptions({ liveRatings: !options.liveRatings })}
+          />
+          <ModeCard
+            icon={<Link2 size={18} />}
+            title="Club Chemistry"
+            desc="Same-club players link up and lift your OVR. Ball-knowledge reward, capped at +3."
+            rightLabel={options.chemistry ? "On" : "Off"}
+            active={options.chemistry}
+            onClick={() => updateOptions({ chemistry: !options.chemistry })}
+          />
+          <ModeCard
+            icon={<Zap size={18} />}
+            title="Super-Sub"
+            desc="Draft a 12th man before kickoff — a bench impact sub who threatens late winners and lifts your pens in the knockouts. Coming next."
+            rightLabel="Soon"
+            active={false}
+            disabled
+            onClick={() => undefined}
+          />
+          <ModeCard
+            icon={<EyeOff size={18} />}
+            title="Blind Ratings"
+            desc={
+              options.difficulty === "hard"
+                ? "Always on in Hard — overalls stay hidden until the final reveal."
+                : "Hide overalls during the draft. Final reveal still shows the squad."
+            }
+            rightLabel={options.blindMode ? "On" : "Off"}
+            active={options.blindMode}
+            disabled={options.difficulty === "hard"}
+            onClick={() => updateOptions({ blindMode: !options.blindMode })}
+          />
+          <ModeCard
+            icon={<Trophy size={18} />}
+            title={options.legendMode !== "none" ? `Last Dance: ${titleCase(options.legendMode)}` : "Last Dance"}
+            desc="Lock a legend — Messi, Ronaldo or Neymar — as your guaranteed first pick."
+            rightLabel={options.legendMode !== "none" ? titleCase(options.legendMode) : "Pick"}
+            active={options.legendMode !== "none"}
+            disabled={loading}
+            onClick={() => (options.legendMode !== "none" ? onLegendSelect("none") : setShowLegendModal(true))}
+          />
+          <ModeCard
+            icon={<Target size={18} />}
+            title="Practice Penalties"
+            desc="Warm up with a standalone shootout — no draft, just you and the keeper."
+            rightLabel="Play"
+            active={false}
+            disabled={loading}
+            onClick={() => onStartPracticePenalties?.()}
+          />
         </div>
         {showLegendModal && (
           <LegendModal
@@ -746,67 +818,24 @@ function SetupScreen({
         </div>
       </section>
 
-      <div className="grid gap-4 md:grid-cols-2">
-        <section className="rounded-2xl border border-indigo-900/70 bg-[#11111f] p-5 shadow-2xl shadow-black/20">
-          <p className="section-label text-base tracking-[0.18em]">Ratings</p>
-          <OptionButton
-            active={options.blindMode}
-            onClick={() => updateOptions({ blindMode: !options.blindMode })}
-            disabled={options.difficulty === "hard"}
-            className="mt-4 w-full text-lg"
-          >
-            Blind mode {options.blindMode ? "ON" : "OFF"}
-          </OptionButton>
-          <p className="mt-4 text-sm text-gray-500">
-            {options.difficulty === "hard"
-              ? "Hard mode always hides overalls during the draft. Final reveal still shows the squad."
-              : "Hide overalls during the draft. Final reveal still shows the squad."}
-          </p>
-          <OptionButton
-            active={options.liveRatings}
-            onClick={() => updateOptions({ liveRatings: !options.liveRatings })}
-            className="mt-4 w-full text-lg"
-          >
-            Live ratings {options.liveRatings ? "ON" : "OFF"}
-          </OptionButton>
-          <p className="mt-4 text-sm text-gray-500">
-            In-form boost: {LIVE_BOOSTS.length} players on song this tournament get a rating bump —
-            from Golden Boot leaders (Mbappé, Messi, Haaland) to breakout heroes (Vozinha 66→90,
-            Diomande, Enciso). Boosted players show a ▲ tag in the draft.
-          </p>
-          <OptionButton
-            active={options.chemistry}
-            onClick={() => updateOptions({ chemistry: !options.chemistry })}
-            className="mt-4 w-full text-lg"
-          >
-            Club chemistry {options.chemistry ? "ON" : "OFF"}
-          </OptionButton>
-          <p className="mt-4 text-sm text-gray-500">
-            Ball-knowledge mode: players in your XI who share a real club link up and lift your OVR
-            (+0.5 per extra same-club player, capped at +3). A reward for clever drafting — revealed
-            in a chemistry panel as you build the squad.
-          </p>
-        </section>
-
-        <section className="rounded-2xl border border-indigo-900/70 bg-[#11111f] p-5 shadow-2xl shadow-black/20">
-          <p className="section-label text-base tracking-[0.18em]">Draft mode</p>
-          <div className="mt-4 space-y-3">
-            {DRAFT_MODES.map((mode) => (
-              <OptionButton
-                key={mode.id}
-                active={options.draftMode === mode.id}
-                onClick={() => updateOptions({ draftMode: mode.id })}
-                className="w-full text-lg"
-              >
-                {mode.label}
-              </OptionButton>
-            ))}
-          </div>
-          <p className="mt-4 text-sm text-gray-500">
-            {DRAFT_MODES.find((mode) => mode.id === options.draftMode)?.detail}
-          </p>
-        </section>
-      </div>
+      <section className="rounded-2xl border border-indigo-900/70 bg-[#11111f] p-5 shadow-2xl shadow-black/20">
+        <p className="section-label text-base tracking-[0.18em]">Draft mode</p>
+        <div className="mt-4 grid gap-3 sm:grid-cols-2">
+          {DRAFT_MODES.map((mode) => (
+            <OptionButton
+              key={mode.id}
+              active={options.draftMode === mode.id}
+              onClick={() => updateOptions({ draftMode: mode.id })}
+              className="w-full text-lg"
+            >
+              {mode.label}
+            </OptionButton>
+          ))}
+        </div>
+        <p className="mt-4 text-sm text-gray-500">
+          {DRAFT_MODES.find((mode) => mode.id === options.draftMode)?.detail}
+        </p>
+      </section>
 
       <section className="rounded-2xl border border-surface-700 bg-surface-900 p-5">
         <div className="grid grid-cols-3 gap-3">
@@ -1146,6 +1175,7 @@ function ResultPanel({
           {run.record} · {run.grade} · {run.label}
           {run.liveRatings && " · Live ratings"}
           {run.chemistry && " · Chemistry"}
+          {run.superSub && run.superSubName ? ` · Super-Sub: ${run.superSubName}` : ""}
           {run.legendMode !== "none" && ` · Last Dance: ${titleCase(run.legendMode)}`}
         </p>
       </div>
@@ -1327,6 +1357,7 @@ function LeaderboardPanel({
                 {run.draftMode === "squad-first" ? "Squad first" : "Position first"}
                 {run.liveRatings && " · Live ratings"}
                 {run.chemistry && " · Chemistry"}
+                {run.superSub && " · Super-Sub"}
                 {run.legendMode !== "none" && ` · Last Dance: ${titleCase(run.legendMode)}`}
               </p>
             </div>

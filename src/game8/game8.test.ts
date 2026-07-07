@@ -389,6 +389,8 @@ describe("8-0 simulation", () => {
       legendMode: "none",
       liveRatings: false,
       chemistry: false,
+      superSub: false,
+      superSubName: null,
       score: 0,
       draws: 0,
       picks: [],
