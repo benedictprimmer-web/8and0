@@ -307,6 +307,7 @@ function PitchXI({
   revealRatings = false,
   goalScorers = {},
   legendSlotId,
+  liveRatings = false,
 }: {
   formationId: string;
   picks: DraftPick[];
@@ -315,6 +316,7 @@ function PitchXI({
   revealRatings?: boolean;
   goalScorers?: Record<string, number>;
   legendSlotId?: string;
+  liveRatings?: boolean;
 }) {
   const formation = getFormation(formationId);
   const pickBySlot = new Map(picks.map((pick) => [pick.slotId, pick]));
@@ -339,11 +341,16 @@ function PitchXI({
                 const active = activeSlotId === slot.id && !pick;
                 const goals = pick ? (goalScorers[pick.player.name] ?? 0) : 0;
                 const isLegend = legendSlotId === slot.id && pick;
+                const boosted = liveRatings && !!pick && !hide && liveBoostFor(pick.player.id) > 0;
                 return (
                   <div key={slot.id} className="flex min-w-0 flex-1 max-w-[116px] flex-col items-center">
                     <div
                       className={`relative rounded-xl px-2 py-1 ${
-                        active ? "bg-gold-500/20 ring-2 ring-gold-400/80" : ""
+                        active
+                          ? "bg-gold-500/20 ring-2 ring-gold-400/80"
+                          : boosted
+                            ? "ring-2 ring-emerald-400/70"
+                            : ""
                       }`}
                     >
                       <ShirtIcon code={pick?.player.teamCode ?? slot.category} empty={!pick} number={pick?.player.shirtNumber} />
@@ -393,7 +400,13 @@ function PlayerRow({
       type="button"
       onClick={() => onPick(player.id)}
       disabled={disabled}
-      className={`flex w-full items-center gap-3 rounded-lg border px-3 py-3 text-left transition-colors hover:border-gold-600/40 hover:bg-surface-700 disabled:cursor-not-allowed disabled:opacity-45 disabled:hover:border-surface-700 disabled:hover:bg-surface-800 ${isLegend ? "border-gold-600/60 bg-gold-500/5" : "border-surface-700 bg-surface-800"}`}
+      className={`flex w-full items-center gap-3 rounded-lg border px-3 py-3 text-left transition-colors hover:border-gold-600/40 hover:bg-surface-700 disabled:cursor-not-allowed disabled:opacity-45 disabled:hover:border-surface-700 disabled:hover:bg-surface-800 ${
+        isLegend
+          ? "border-gold-600/60 bg-gold-500/5"
+          : boost > 0 && !hideRating
+            ? "border-emerald-500/60 bg-emerald-500/5 ring-1 ring-emerald-500/25"
+            : "border-surface-700 bg-surface-800"
+      }`}
     >
       <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-lg bg-surface-900 text-sm font-extrabold text-gold-400 tabular-nums">
         {formatRating(player.rating, hideRating)}
@@ -959,6 +972,7 @@ function SquadPanel({
           revealRatings
           goalScorers={goalScorers}
           legendSlotId={state.legendMode !== "none" ? picks[0]?.slotId : undefined}
+          liveRatings={state.liveRatings}
         />
       )}
     </aside>
@@ -1031,6 +1045,7 @@ function TeamSheet({
           hideRatings={hideRatings}
           goalScorers={goalScorers}
           legendSlotId={state.legendMode !== "none" ? picks[0]?.slotId : undefined}
+          liveRatings={state.liveRatings}
         />
       </div>
     </div>
@@ -1387,6 +1402,9 @@ export default function EightZeroGame() {
   // Super-Sub: after the XI is complete, the player drafts a 12th man (a bench
   // impact sub) before kickoff. `pickingSuperSub` shows that one-pick step.
   const [pickingSuperSub, setPickingSuperSub] = useState(false);
+  // `superSubGate` is the "XI complete → draft your 12th man" prompt with a
+  // dedicated button; `pickingSuperSub` is the actual sub-draft that follows.
+  const [superSubGate, setSuperSubGate] = useState(false);
   const [subSpinTeam, setSubSpinTeam] = useState<EightZeroTeam | null>(null);
   const [subSpinCount, setSubSpinCount] = useState(0);
   // The nation reel is a cosmetic vertical slot-machine strip. `reelStrip` is the
@@ -1574,6 +1592,7 @@ export default function EightZeroGame() {
     setCopied(false);
     setIsSpinning(false);
     setPickingSuperSub(false);
+    setSuperSubGate(false);
     setSubSpinTeam(null);
     resetReel();
     setCategoryFilter("ALL");
@@ -1595,6 +1614,7 @@ export default function EightZeroGame() {
     setCopied(false);
     setIsSpinning(false);
     setPickingSuperSub(false);
+    setSuperSubGate(false);
     setSubSpinTeam(null);
     resetReel();
     setCategoryFilter("ALL");
@@ -1615,16 +1635,30 @@ export default function EightZeroGame() {
 
   function finishDraftIfComplete(next: DraftState) {
     if (!gameData || !next.complete) return;
-    // Super-Sub mode: the XI is set, now draft the 12th man before kickoff.
+    // Super-Sub mode: the XI is set — show a dedicated prompt to draft the 12th
+    // man before kickoff, rather than silently swapping screens.
     if (next.superSub && next.superSubId == null) {
-      setPickingSuperSub(true);
-      setSearch("");
-      setCategoryFilter("ALL");
-      subSpin(next, 1);
+      setSuperSubGate(true);
       window.requestAnimationFrame(() => window.scrollTo({ top: 0, behavior: "smooth" }));
       return;
     }
     runSimulation(next);
+  }
+
+  // The dedicated "Draft your Super-Sub" button opens the one-pick sub draft.
+  function beginSuperSubDraft() {
+    setSuperSubGate(false);
+    setPickingSuperSub(true);
+    setSearch("");
+    setCategoryFilter("ALL");
+    subSpin(draftState, 1);
+    window.requestAnimationFrame(() => window.scrollTo({ top: 0, behavior: "smooth" }));
+  }
+
+  // Escape hatch: kick off without a sub.
+  function skipSuperSub() {
+    setSuperSubGate(false);
+    runSimulation(draftState);
   }
 
   function runSimulation(next: DraftState) {
@@ -2194,6 +2228,35 @@ export default function EightZeroGame() {
             />
           )}
 
+          {!run && superSubGate && !pickingSuperSub && (
+            <div className="rounded-2xl border border-gold-600/50 bg-gradient-to-b from-gold-500/10 to-surface-900 p-6 text-center shadow-2xl shadow-black/30">
+              <span className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-gold-500/15 text-gold-400">
+                <Zap size={26} />
+              </span>
+              <h2 className="mt-4 text-2xl font-black text-white">Your XI is set!</h2>
+              <p className="mx-auto mt-2 max-w-sm text-sm text-gray-400">
+                Now draft your <b className="text-gold-400">Super-Sub</b> — a 12th man for the bench who threatens
+                late winners and lifts your penalties in the knockouts.
+              </p>
+              <button
+                type="button"
+                onClick={beginSuperSubDraft}
+                className="mt-5 inline-flex w-full items-center justify-center gap-2 rounded-xl bg-gold-500 px-6 py-4 text-lg font-black text-black transition-colors hover:bg-gold-400 sm:w-auto"
+              >
+                <Zap size={20} /> Draft your Super-Sub
+              </button>
+              <div>
+                <button
+                  type="button"
+                  onClick={skipSuperSub}
+                  className="mt-3 text-xs font-bold text-gray-500 underline-offset-2 transition-colors hover:text-gray-300 hover:underline"
+                >
+                  Skip — kick off without a sub
+                </button>
+              </div>
+            </div>
+          )}
+
           {!run && pickingSuperSub && (
             <div className="space-y-5">
               <div className="sticky top-3 z-20 flex flex-wrap items-center justify-between gap-3 rounded-xl border border-gold-600/50 bg-surface-900/95 p-3 shadow-2xl shadow-black/20 backdrop-blur">
@@ -2242,7 +2305,7 @@ export default function EightZeroGame() {
             </div>
           )}
 
-          {!run && !pickingSuperSub && tournamentPhase !== "practice_penalties" && (
+          {!run && !pickingSuperSub && !superSubGate && tournamentPhase !== "practice_penalties" && (
             <div className="space-y-5">
               <div
                 ref={draftControlsRef}
@@ -2434,6 +2497,7 @@ export default function EightZeroGame() {
                 activeSlotId={draftState.draftMode === "position-first" ? draftState.activeSlotId : undefined}
                 hideRatings={hideDraftRatings}
                 legendSlotId={draftState.legendMode !== "none" ? draftState.picks[0]?.slotId : undefined}
+                liveRatings={draftState.liveRatings}
               />
             </div>
           )}
