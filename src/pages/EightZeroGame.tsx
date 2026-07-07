@@ -1286,7 +1286,13 @@ export default function EightZeroGame() {
   const [search, setSearch] = useState("");
   const [copied, setCopied] = useState(false);
   const [isSpinning, setIsSpinning] = useState(false);
-  const [reelTeam, setReelTeam] = useState<EightZeroTeam | null>(null);
+  // The nation reel is a cosmetic vertical slot-machine strip. `reelStrip` is the
+  // list of nations scrolling past, `reelOffset` the translateY (px), and
+  // `reelAnimating` gates the long decelerating transition. The nation it lands
+  // on is always the seed-determined draft result — never chosen here.
+  const [reelStrip, setReelStrip] = useState<EightZeroTeam[]>([]);
+  const [reelOffset, setReelOffset] = useState(0);
+  const [reelAnimating, setReelAnimating] = useState(false);
   // True for the brief moment the reel snaps onto the chosen nation, driving
   // the scale-overshoot + gold glow landing flash.
   const [reelLanded, setReelLanded] = useState(false);
@@ -1305,6 +1311,21 @@ export default function EightZeroGame() {
   const draftControlsRef = useRef<HTMLDivElement | null>(null);
   const spinIntervalRef = useRef<number | null>(null);
   const spinTimeoutRef = useRef<number | null>(null);
+  const reelRafRef = useRef<number | null>(null);
+  const reelFinalOffsetRef = useRef(0);
+  const reelLandIndexRef = useRef(0);
+  const pendingDraftRef = useRef<DraftState | null>(null);
+
+  // Reel tuning. A longer, decelerating travel that reads as a real spinning
+  // wheel; skippable so the ceremony never drags across an 11-slot draft.
+  const REEL_ROW_H = 64; // px per nation row (also the reel viewport height)
+  const REEL_STRIP_LEN = 36; // nations that scroll past before landing
+  const REEL_SPIN_MS = 2600; // travel duration; the decel curve does the rest
+  const REEL_WINDUP_PX = 7; // anticipation nudge before launch
+  const prefersReduced = () =>
+    typeof window !== "undefined" &&
+    typeof window.matchMedia === "function" &&
+    window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
   const teamsQuery = useQuery({
     queryKey: ["8-0-teams"],
@@ -1347,6 +1368,7 @@ export default function EightZeroGame() {
     return () => {
       if (spinIntervalRef.current) window.clearInterval(spinIntervalRef.current);
       if (spinTimeoutRef.current) window.clearTimeout(spinTimeoutRef.current);
+      if (reelRafRef.current) window.cancelAnimationFrame(reelRafRef.current);
     };
   }, []);
 
@@ -1393,7 +1415,7 @@ export default function EightZeroGame() {
       return matchesSearch && matchesCategory && matchesDraftMode;
     });
   }, [activeSlot.category, categoryFilter, draftState, gameData, search]);
-  const displayedTeam = isSpinning ? reelTeam : draftState.currentSpin?.team ?? null;
+  const displayedTeam = draftState.currentSpin?.team ?? null;
   const loading = teamsQuery.isLoading || playersQuery.isLoading || !gameData;
   const error = teamsQuery.error || playersQuery.error;
   const spinDisabled = isSpinning || Boolean(draftState.currentSpin && draftState.rerollsLeft <= 0);
@@ -1408,8 +1430,10 @@ export default function EightZeroGame() {
   function clearSpinTimers() {
     if (spinIntervalRef.current) window.clearInterval(spinIntervalRef.current);
     if (spinTimeoutRef.current) window.clearTimeout(spinTimeoutRef.current);
+    if (reelRafRef.current) window.cancelAnimationFrame(reelRafRef.current);
     spinIntervalRef.current = null;
     spinTimeoutRef.current = null;
+    reelRafRef.current = null;
   }
 
   function startDraft(nextFormationId = formationId, nextOptions = options) {
@@ -1427,7 +1451,7 @@ export default function EightZeroGame() {
     setSearch("");
     setCopied(false);
     setIsSpinning(false);
-    setReelTeam(null);
+    resetReel();
     setCategoryFilter("ALL");
     setShowLeaderboard(false);
     setShowTeamSheet(false);
@@ -1446,7 +1470,7 @@ export default function EightZeroGame() {
     setSearch("");
     setCopied(false);
     setIsSpinning(false);
-    setReelTeam(null);
+    resetReel();
     setCategoryFilter("ALL");
     setShowLeaderboard(false);
     setTournamentPhase("idle");
@@ -1541,6 +1565,41 @@ export default function EightZeroGame() {
     window.requestAnimationFrame(() => window.scrollTo({ top: 0, behavior: "smooth" }));
   }
 
+  // Clear the cosmetic reel back to rest. Timers are cleared separately.
+  function resetReel() {
+    setReelStrip([]);
+    setReelOffset(0);
+    setReelAnimating(false);
+    setReelLanded(false);
+    pendingDraftRef.current = null;
+  }
+
+  // Commit the drafted state once the reel has landed, and return to rest.
+  function finishReel() {
+    clearSpinTimers();
+    setReelLanded(false);
+    setReelAnimating(false);
+    setReelOffset(0);
+    setReelStrip([]);
+    const pending = pendingDraftRef.current;
+    pendingDraftRef.current = null;
+    if (pending) setDraftState(pending);
+    setIsSpinning(false);
+  }
+
+  // Tap-to-skip: snap straight to the landing frame so a long ceremony is never
+  // mandatory across an 11-slot draft.
+  function skipReel() {
+    if (!isSpinning || reelLanded) return;
+    if (reelRafRef.current) window.cancelAnimationFrame(reelRafRef.current);
+    reelRafRef.current = null;
+    if (spinTimeoutRef.current) window.clearTimeout(spinTimeoutRef.current);
+    setReelAnimating(false); // transition off → instant snap
+    setReelOffset(reelFinalOffsetRef.current);
+    setReelLanded(true);
+    spinTimeoutRef.current = window.setTimeout(finishReel, 340);
+  }
+
   function animateSpin(nextState: DraftState) {
     if (!gameData) return;
     clearSpinTimers();
@@ -1550,46 +1609,54 @@ export default function EightZeroGame() {
     setCategoryFilter("ALL");
 
     const teams = gameData.teams;
-    // The draft has already chosen the landing nation — make the reel actually
-    // stop on it rather than a random frame. Math.random below is pure UI
-    // flavour (the sim path is untouched).
+    // The draft has already chosen the landing nation — the reel only performs
+    // the reveal. Math.random below is pure UI flavour (the sim path is
+    // untouched and stays seed-deterministic).
     const chosen = nextState.currentSpin?.team ?? teams[0] ?? null;
+    pendingDraftRef.current = nextState;
+    if (!chosen) {
+      finishReel();
+      return;
+    }
 
-    // Decelerating tick chain: interval ramps from ~60ms toward ~220ms so the
-    // reel visibly slows before landing. Stored in spinTimeoutRef so the
-    // existing clearSpinTimers() (which clears that ref) keeps working.
-    const startMs = 60;
-    const endMs = 220;
-    const totalMs = 1150;
-    let elapsed = 0;
+    // Reduced motion (or a tiny pool): skip the travel, snap onto the nation.
+    if (prefersReduced() || teams.length < 4) {
+      reelLandIndexRef.current = 0;
+      reelFinalOffsetRef.current = 0;
+      setReelStrip([chosen]);
+      setReelAnimating(false);
+      setReelOffset(0);
+      setReelLanded(true);
+      spinTimeoutRef.current = window.setTimeout(finishReel, 550);
+      return;
+    }
 
-    setReelTeam(teams[Math.floor(Math.random() * teams.length)] ?? null);
+    // Build a strip of nations that scrolls past and lands on `chosen`, with two
+    // filler rows below it so the decel never reveals a gap.
+    const randomTeam = () => teams[Math.floor(Math.random() * teams.length)] ?? chosen;
+    const strip: EightZeroTeam[] = Array.from({ length: REEL_STRIP_LEN }, randomTeam);
+    const landIndex = REEL_STRIP_LEN - 3;
+    strip[landIndex] = chosen;
+    const finalOffset = -(landIndex * REEL_ROW_H);
+    reelLandIndexRef.current = landIndex;
+    reelFinalOffsetRef.current = finalOffset;
 
-    const step = () => {
-      const progress = Math.min(elapsed / totalMs, 1);
-      // Ease-out: slow down as we approach the landing frame.
-      const interval = startMs + (endMs - startMs) * (1 - Math.pow(1 - progress, 2));
+    // Anticipation: a small downward wind-up, then a long decelerating launch.
+    setReelStrip(strip);
+    setReelAnimating(false);
+    setReelOffset(REEL_WINDUP_PX);
 
-      if (progress >= 1) {
-        // Land on the real drafted nation, then fire the snap/flash.
-        setReelTeam(chosen);
-        setReelLanded(true);
+    // Two frames so the browser paints the wind-up start before transitioning.
+    reelRafRef.current = window.requestAnimationFrame(() => {
+      reelRafRef.current = window.requestAnimationFrame(() => {
+        setReelAnimating(true);
+        setReelOffset(finalOffset);
         spinTimeoutRef.current = window.setTimeout(() => {
-          clearSpinTimers();
-          setReelLanded(false);
-          setReelTeam(null);
-          setDraftState(nextState);
-          setIsSpinning(false);
-        }, 450);
-        return;
-      }
-
-      setReelTeam(teams[Math.floor(Math.random() * teams.length)] ?? null);
-      elapsed += interval;
-      spinTimeoutRef.current = window.setTimeout(step, interval);
-    };
-
-    step();
+          setReelLanded(true); // scale-overshoot + gold glow on the landed row
+          spinTimeoutRef.current = window.setTimeout(finishReel, 560);
+        }, REEL_SPIN_MS);
+      });
+    });
   }
 
   function handleSpin() {
@@ -1933,28 +2000,76 @@ export default function EightZeroGame() {
 
               <div className="grid gap-3 sm:grid-cols-2">
                 <div className="rounded-xl border border-surface-700 bg-surface-800 p-4">
-                  <p className="section-label">{isSpinning ? "Nation reel" : "Nation"}</p>
-                  <div
-                    className={`mt-3 flex min-h-[58px] items-center gap-3 rounded-lg ${
-                      reelLanded ? "animate-reel-land" : isSpinning ? "animate-pulse" : ""
-                    }`}
-                  >
-                    {displayedTeam ? (
-                      <>
-                        <Flag fifaCode={displayedTeam.fifaCode} size={42} />
-                        <div className="min-w-0">
-                          <p className="truncate text-xl font-black text-white">{displayedTeam.name}</p>
-                          <p className="text-xs font-semibold text-gray-500">
-                            {isSpinning
-                              ? "Finding your player pool"
-                              : `Group ${displayedTeam.group ?? "-"} · spin #${draftState.currentSpin?.spinIndex ?? 0}`}
-                          </p>
-                        </div>
-                      </>
-                    ) : (
-                      <p className="text-sm font-semibold text-gray-500">Spin to reveal a player pool</p>
+                  <div className="flex items-center justify-between">
+                    <p className="section-label">{isSpinning ? "Nation reel" : "Nation"}</p>
+                    {isSpinning && !reelLanded && (
+                      <button
+                        type="button"
+                        onClick={skipReel}
+                        className="text-[11px] font-bold uppercase tracking-wide text-gray-500 transition-colors hover:text-gold-400"
+                      >
+                        Tap to skip
+                      </button>
                     )}
                   </div>
+                  {isSpinning ? (
+                    <div
+                      className={`reel-viewport mt-3 ${reelLanded ? "animate-reel-land" : ""}`}
+                      style={{ height: REEL_ROW_H }}
+                      onClick={skipReel}
+                      role="button"
+                      tabIndex={-1}
+                      aria-label="Skip nation reel"
+                    >
+                      <div
+                        className="reel-strip"
+                        style={{
+                          transform: `translateY(${reelOffset}px)`,
+                          transition: reelAnimating
+                            ? `transform ${REEL_SPIN_MS}ms cubic-bezier(0.14, 0.72, 0.11, 1), filter ${REEL_SPIN_MS}ms ease-out`
+                            : "none",
+                          filter: reelAnimating || reelLanded ? "blur(0px)" : "blur(5px)",
+                        }}
+                      >
+                        {reelStrip.map((team, index) => (
+                          <div
+                            key={index}
+                            className="flex items-center gap-3"
+                            style={{ height: REEL_ROW_H }}
+                          >
+                            <Flag fifaCode={team.fifaCode} size={42} />
+                            <div className="min-w-0">
+                              <p className="truncate text-xl font-black text-white">{team.name}</p>
+                              <p className="text-xs font-semibold text-gray-500">
+                                {reelLanded && index === reelLandIndexRef.current
+                                  ? `Group ${team.group ?? "-"} · spin #${draftState.currentSpin?.spinIndex ?? 0}`
+                                  : "Spinning…"}
+                              </p>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  ) : (
+                    <div
+                      className="mt-3 flex items-center gap-3 rounded-lg"
+                      style={{ minHeight: REEL_ROW_H }}
+                    >
+                      {displayedTeam ? (
+                        <>
+                          <Flag fifaCode={displayedTeam.fifaCode} size={42} />
+                          <div className="min-w-0">
+                            <p className="truncate text-xl font-black text-white">{displayedTeam.name}</p>
+                            <p className="text-xs font-semibold text-gray-500">
+                              {`Group ${displayedTeam.group ?? "-"} · spin #${draftState.currentSpin?.spinIndex ?? 0}`}
+                            </p>
+                          </div>
+                        </>
+                      ) : (
+                        <p className="text-sm font-semibold text-gray-500">Spin to reveal a player pool</p>
+                      )}
+                    </div>
+                  )}
                 </div>
                 <div className="rounded-xl border border-surface-700 bg-surface-800 p-4">
                   <p className="section-label">Open slots</p>
