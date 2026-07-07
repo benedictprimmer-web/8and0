@@ -18,6 +18,7 @@ const DEFAULT_OPTIONS: DraftOptions = {
   blindMode: false,
   draftMode: "squad-first",
   legendMode: "none",
+  liveRatings: false,
 };
 
 const LEGEND_CONFIG: Record<Exclude<LegendMode, "none">, { fifaCode: string; nameMatch: (name: string) => boolean; category: "FWD" | "MID" }> = {
@@ -95,6 +96,7 @@ export function createDraftState(
     blindMode,
     draftMode: resolvedOptions.draftMode,
     legendMode,
+    liveRatings: resolvedOptions.liveRatings,
   };
 }
 

@@ -40,6 +40,7 @@ import {
 } from "../game8/draft";
 import { FORMATIONS, getFormation } from "../game8/formations";
 import { calculateTeamRatings } from "../game8/ratings";
+import { applyLiveRatings, liveBoostFor, LIVE_BOOSTS } from "../game8/liveRatings";
 import {
   addMyGlobalEntry,
   loadMyGlobalEntries,
@@ -73,6 +74,7 @@ const DEFAULT_OPTIONS: DraftOptions = {
   blindMode: false,
   draftMode: "squad-first",
   legendMode: "none",
+  liveRatings: false,
 };
 
 const DIFFICULTIES: Array<{
@@ -321,6 +323,7 @@ function PlayerRow({
   hideRating,
   onPick,
   isLegend = false,
+  boost = 0,
 }: {
   player: EightZeroPlayer;
   compatibleSlots: FormationSlot[];
@@ -328,6 +331,7 @@ function PlayerRow({
   hideRating: boolean;
   onPick: (playerId: number) => void;
   isLegend?: boolean;
+  boost?: number;
 }) {
   const kitColors = getKitColors(player.teamCode);
   return (
@@ -345,6 +349,9 @@ function PlayerRow({
           {player.name}
           {isLegend && (
             <span className="ml-2 inline-flex items-center rounded-full bg-gold-500/10 px-1.5 py-0.5 text-[10px] font-black text-gold-400">Legend</span>
+          )}
+          {boost > 0 && !hideRating && (
+            <span className="ml-2 inline-flex items-center rounded-full bg-emerald-500/15 px-1.5 py-0.5 text-[10px] font-black text-emerald-400">▲{boost} in form</span>
           )}
         </p>
         <p className="truncate text-xs text-gray-500">
@@ -753,6 +760,17 @@ function SetupScreen({
               ? "Hard mode always hides overalls during the draft. Final reveal still shows the squad."
               : "Hide overalls during the draft. Final reveal still shows the squad."}
           </p>
+          <OptionButton
+            active={options.liveRatings}
+            onClick={() => updateOptions({ liveRatings: !options.liveRatings })}
+            className="mt-4 w-full text-lg"
+          >
+            Live ratings {options.liveRatings ? "ON" : "OFF"}
+          </OptionButton>
+          <p className="mt-4 text-sm text-gray-500">
+            In-form boost: {LIVE_BOOSTS.length} players who are on song this tournament get a rating bump
+            (e.g. Vozinha +15, Saibari +5, Bellingham +4). Boosted players show a ▲ tag in the draft.
+          </p>
         </section>
 
         <section className="rounded-2xl border border-indigo-900/70 bg-[#11111f] p-5 shadow-2xl shadow-black/20">
@@ -1081,6 +1099,7 @@ function ResultPanel({
         <p className="mt-3 text-2xl font-bold text-gray-300">+{run.score} points</p>
         <p className="mt-2 text-sm font-bold text-gray-400">
           {run.record} · {run.grade} · {run.label}
+          {run.liveRatings && " · Live ratings"}
           {run.legendMode !== "none" && ` · Last Dance: ${titleCase(run.legendMode)}`}
         </p>
       </div>
@@ -1260,6 +1279,7 @@ function LeaderboardPanel({
               <p className="truncate text-xs text-gray-500">
                 {run.formationLabel} · {titleCase(run.difficulty)} · {run.blindMode ? "Blind" : "Open ratings"} ·{" "}
                 {run.draftMode === "squad-first" ? "Squad first" : "Position first"}
+                {run.liveRatings && " · Live ratings"}
                 {run.legendMode !== "none" && ` · Last Dance: ${titleCase(run.legendMode)}`}
               </p>
             </div>
@@ -1349,6 +1369,15 @@ export default function EightZeroGame() {
     return buildEightZeroData(teamsQuery.data, playersQuery.data);
   }, [teamsQuery.data, playersQuery.data]);
 
+  // Live Ratings: a boosted copy of the data. When the mode is on the whole
+  // draft (candidates, squad, team OVR, and the sim — all read `player.rating`)
+  // runs off this, so no other code path needs to know about the boost.
+  const boostedData = useMemo(() => (gameData ? applyLiveRatings(gameData) : null), [gameData]);
+  const draftData = useMemo(
+    () => (draftState.liveRatings && boostedData ? boostedData : gameData),
+    [draftState.liveRatings, boostedData, gameData]
+  );
+
   // Real named penalty lineups for the current knockout: your XI vs the
   // opponent's actual squad (their real keeper + best takers). Falls back to
   // generic takers inside the component if squad data is unavailable.
@@ -1412,16 +1441,16 @@ export default function EightZeroGame() {
     ? Math.round(calculateTeamRatings(draftState.picks).overall)
     : null;
   const candidates = useMemo(() => {
-    if (!gameData) return [];
+    if (!draftData) return [];
     const normalizedSearch = search.trim().toLowerCase();
-    return getAvailablePlayers(gameData, draftState).filter((player) => {
+    return getAvailablePlayers(draftData, draftState).filter((player) => {
       const matchesSearch = player.name.toLowerCase().includes(normalizedSearch);
       const matchesCategory = categoryFilter === "ALL" || player.category === categoryFilter;
       const matchesDraftMode =
         draftState.draftMode === "squad-first" || player.category === activeSlot.category;
       return matchesSearch && matchesCategory && matchesDraftMode;
     });
-  }, [activeSlot.category, categoryFilter, draftState, gameData, search]);
+  }, [activeSlot.category, categoryFilter, draftState, draftData, search]);
   const displayedTeam = draftState.currentSpin?.team ?? null;
   const loading = teamsQuery.isLoading || playersQuery.isLoading || !gameData;
   const error = teamsQuery.error || playersQuery.error;
@@ -1453,7 +1482,8 @@ export default function EightZeroGame() {
     };
     setFormationId(nextFormationId);
     setOptions(resolvedOptions);
-    setDraftState(createDraftState(makeSeed(), nextFormationId, resolvedOptions, gameData ?? undefined));
+    const startData = resolvedOptions.liveRatings && boostedData ? boostedData : gameData;
+    setDraftState(createDraftState(makeSeed(), nextFormationId, resolvedOptions, startData ?? undefined));
     setRun(null);
     setPenOverrides({});
     setStarted(true);
@@ -1503,6 +1533,7 @@ export default function EightZeroGame() {
       blindMode: next.blindMode,
       draftMode: next.draftMode,
       legendMode: next.legendMode,
+      liveRatings: next.liveRatings,
       penOverrides: {},
     });
     setRun(nextRun);
@@ -1546,6 +1577,7 @@ export default function EightZeroGame() {
       blindMode: run.blindMode,
       draftMode: run.draftMode,
       legendMode: run.legendMode,
+      liveRatings: run.liveRatings,
       penOverrides: nextOverrides,
     });
     // Preserve identity so local history / leaderboard dedupe stays stable.
@@ -1721,15 +1753,15 @@ export default function EightZeroGame() {
   }
 
   function handleSpin() {
-    if (!gameData || isSpinning) return;
-    const next = draftState.currentSpin ? rerollTeam(gameData, draftState) : spinTeam(gameData, draftState);
+    if (!draftData || isSpinning) return;
+    const next = draftState.currentSpin ? rerollTeam(draftData, draftState) : spinTeam(draftData, draftState);
     if (next === draftState) return;
     animateSpin(next);
   }
 
   function commitPick(playerId: number, slotId?: string) {
-    if (!gameData) return;
-    const next = selectPlayer(gameData, draftState, playerId, slotId);
+    if (!draftData) return;
+    const next = selectPlayer(draftData, draftState, playerId, slotId);
     setDraftState(next);
     setSearch("");
     setCategoryFilter("ALL");
@@ -1742,8 +1774,8 @@ export default function EightZeroGame() {
   }
 
   function handlePick(playerId: number) {
-    if (!gameData || isSpinning) return;
-    const player = getAvailablePlayers(gameData, draftState).find((candidate) => candidate.id === playerId);
+    if (!draftData || isSpinning) return;
+    const player = getAvailablePlayers(draftData, draftState).find((candidate) => candidate.id === playerId);
     if (!player || !canPickPlayer(player, draftState)) return;
     if (draftState.draftMode === "position-first") {
       if (player.category !== activeSlot.category) return;
@@ -1805,8 +1837,8 @@ export default function EightZeroGame() {
   }
 
   function handleAutofill() {
-    if (!gameData || isSpinning || draftState.picks.length > 0) return;
-    const next = autofillDraft(gameData, draftState);
+    if (!draftData || isSpinning || draftState.picks.length > 0) return;
+    const next = autofillDraft(draftData, draftState);
     setDraftState(next);
     if (next.complete) {
       finishDraftIfComplete(next);
@@ -2194,6 +2226,7 @@ export default function EightZeroGame() {
                           disabled={compatibleSlots.length === 0 || isSpinning}
                           hideRating={hideDraftRatings}
                           onPick={handlePick}
+                          boost={draftState.liveRatings ? liveBoostFor(player.id) : 0}
                         />
                       );
                     })}

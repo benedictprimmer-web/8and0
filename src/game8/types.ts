@@ -8,6 +8,7 @@ export interface DraftOptions {
   blindMode: boolean;
   draftMode: DraftMode;
   legendMode: LegendMode;
+  liveRatings: boolean;
 }
 
 export interface EightZeroTeam {
@@ -72,6 +73,7 @@ export interface DraftState {
   blindMode: boolean;
   draftMode: DraftMode;
   legendMode: LegendMode;
+  liveRatings: boolean;
 }
 
 export interface TeamRatings {
@@ -127,6 +129,7 @@ export interface TournamentRun {
   blindMode: boolean;
   draftMode: DraftMode;
   legendMode: LegendMode;
+  liveRatings: boolean;
   score: number;
   record: string;
   wins: number;
