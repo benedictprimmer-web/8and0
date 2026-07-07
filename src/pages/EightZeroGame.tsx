@@ -42,6 +42,7 @@ import {
   selectPlayer,
   spinTeam,
 } from "../game8/draft";
+import { pickSeeded } from "../game8/random";
 import { FORMATIONS, getFormation } from "../game8/formations";
 import { calculateTeamRatings } from "../game8/ratings";
 import { applyLiveRatings, liveBoostFor, LIVE_BOOSTS } from "../game8/liveRatings";
@@ -750,11 +751,10 @@ function SetupScreen({
           <ModeCard
             icon={<Zap size={18} />}
             title="Super-Sub"
-            desc="Draft a 12th man before kickoff — a bench impact sub who threatens late winners and lifts your pens in the knockouts. Coming next."
-            rightLabel="Soon"
-            active={false}
-            disabled
-            onClick={() => undefined}
+            desc="Draft a 12th man before kickoff — a bench impact sub who threatens late winners and lifts your pens in the knockouts."
+            rightLabel={options.superSub ? "On" : "Off"}
+            active={options.superSub}
+            onClick={() => updateOptions({ superSub: !options.superSub })}
           />
           <ModeCard
             icon={<EyeOff size={18} />}
@@ -1384,6 +1384,11 @@ export default function EightZeroGame() {
   const [search, setSearch] = useState("");
   const [copied, setCopied] = useState(false);
   const [isSpinning, setIsSpinning] = useState(false);
+  // Super-Sub: after the XI is complete, the player drafts a 12th man (a bench
+  // impact sub) before kickoff. `pickingSuperSub` shows that one-pick step.
+  const [pickingSuperSub, setPickingSuperSub] = useState(false);
+  const [subSpinTeam, setSubSpinTeam] = useState<EightZeroTeam | null>(null);
+  const [subSpinCount, setSubSpinCount] = useState(0);
   // The nation reel is a cosmetic vertical slot-machine strip. `reelStrip` is the
   // list of nations scrolling past, `reelOffset` the translateY (px), and
   // `reelTransition` the live CSS transition (per phase: the long travel, then
@@ -1568,6 +1573,8 @@ export default function EightZeroGame() {
     setSearch("");
     setCopied(false);
     setIsSpinning(false);
+    setPickingSuperSub(false);
+    setSubSpinTeam(null);
     resetReel();
     setCategoryFilter("ALL");
     setShowLeaderboard(false);
@@ -1587,6 +1594,8 @@ export default function EightZeroGame() {
     setSearch("");
     setCopied(false);
     setIsSpinning(false);
+    setPickingSuperSub(false);
+    setSubSpinTeam(null);
     resetReel();
     setCategoryFilter("ALL");
     setShowLeaderboard(false);
@@ -1596,9 +1605,32 @@ export default function EightZeroGame() {
     window.requestAnimationFrame(() => window.scrollTo({ top: 0, behavior: "smooth" }));
   }
 
+  // Look up the drafted super-sub (from the live-boosted data when that mode is
+  // on, so his impact rating matches what the player saw).
+  function superSubPlayer(state: DraftState): EightZeroPlayer | null {
+    if (!state.superSub || state.superSubId == null) return null;
+    const data = state.liveRatings && boostedData ? boostedData : gameData;
+    return data?.players.find((player) => player.id === state.superSubId) ?? null;
+  }
+
   function finishDraftIfComplete(next: DraftState) {
     if (!gameData || !next.complete) return;
+    // Super-Sub mode: the XI is set, now draft the 12th man before kickoff.
+    if (next.superSub && next.superSubId == null) {
+      setPickingSuperSub(true);
+      setSearch("");
+      setCategoryFilter("ALL");
+      subSpin(next, 1);
+      window.requestAnimationFrame(() => window.scrollTo({ top: 0, behavior: "smooth" }));
+      return;
+    }
+    runSimulation(next);
+  }
+
+  function runSimulation(next: DraftState) {
+    if (!gameData) return;
     const ratings = calculateTeamRatings(next.picks, next.chemistry);
+    const sub = superSubPlayer(next);
     // Fresh run starts with no shootout overrides.
     setPenOverrides({});
     const nextRun = simulateTournamentRun({
@@ -1613,6 +1645,9 @@ export default function EightZeroGame() {
       legendMode: next.legendMode,
       liveRatings: next.liveRatings,
       chemistry: next.chemistry,
+      superSub: next.superSub,
+      superSubName: sub?.name ?? null,
+      superSubRating: sub?.rating ?? null,
       penOverrides: {},
     });
     setRun(nextRun);
@@ -1625,6 +1660,28 @@ export default function EightZeroGame() {
     setCurrentMatchIndex(0);
     setTournamentPhase("ready");
     window.requestAnimationFrame(() => window.scrollTo({ top: 0, behavior: "smooth" }));
+  }
+
+  // Spin a random eligible nation for the super-sub pick (seeded, distinct key).
+  function subSpin(state: DraftState, n: number) {
+    const data = state.liveRatings && boostedData ? boostedData : gameData;
+    if (!data) return;
+    const eligible = data.teams.filter((team) => getAvailablePlayers(data, state, team).length > 0);
+    if (eligible.length === 0) return;
+    setSubSpinCount(n);
+    setSubSpinTeam(pickSeeded(eligible, `${state.seed}:supersub:${n}`));
+  }
+
+  function handleSubSpin() {
+    subSpin(draftState, subSpinCount + 1);
+  }
+
+  function pickSuperSub(playerId: number) {
+    const withSub: DraftState = { ...draftState, superSubId: playerId };
+    setDraftState(withSub);
+    setPickingSuperSub(false);
+    setSubSpinTeam(null);
+    runSimulation(withSub);
   }
 
   // Record the authoritative result of an interactive penalty shootout, re-run
@@ -1658,6 +1715,9 @@ export default function EightZeroGame() {
       legendMode: run.legendMode,
       liveRatings: run.liveRatings,
       chemistry: run.chemistry,
+      superSub: run.superSub,
+      superSubName: run.superSubName,
+      superSubRating: superSubPlayer(draftState)?.rating ?? null,
       penOverrides: nextOverrides,
     });
     // Preserve identity so local history / leaderboard dedupe stays stable.
@@ -2098,6 +2158,7 @@ export default function EightZeroGame() {
               result={run.matches[currentMatchIndex]}
               events={allMatchEvents[currentMatchIndex] ?? []}
               legendMode={run.legendMode}
+              superSubName={run.superSub ? run.superSubName : null}
               onFinished={() => {
                 const match = run.matches[currentMatchIndex];
                 if (match.decidedByPens) {
@@ -2133,7 +2194,55 @@ export default function EightZeroGame() {
             />
           )}
 
-          {!run && tournamentPhase !== "practice_penalties" && (
+          {!run && pickingSuperSub && (
+            <div className="space-y-5">
+              <div className="sticky top-3 z-20 flex flex-wrap items-center justify-between gap-3 rounded-xl border border-gold-600/50 bg-surface-900/95 p-3 shadow-2xl shadow-black/20 backdrop-blur">
+                <div>
+                  <p className="section-label text-gold-400">12th man · Super-Sub</p>
+                  <h2 className="mt-1 text-2xl font-black text-white">Pick your Super-Sub</h2>
+                  <p className="text-sm text-gray-500">A bench impact sub for the knockouts — spin a nation, tap one player.</p>
+                </div>
+                <button
+                  type="button"
+                  onClick={handleSubSpin}
+                  className="inline-flex items-center gap-2 rounded-lg bg-gold-600 px-4 py-2 text-sm font-bold text-white transition-colors hover:bg-gold-500"
+                >
+                  <Shuffle size={16} />
+                  Spin again
+                </button>
+              </div>
+              {subSpinTeam && draftData ? (
+                <div className="rounded-xl border border-surface-700 bg-surface-800 p-4">
+                  <div className="flex items-center gap-3">
+                    <Flag fifaCode={subSpinTeam.fifaCode} size={42} />
+                    <div className="min-w-0">
+                      <p className="truncate text-xl font-black text-white">{subSpinTeam.name}</p>
+                      <p className="text-xs font-semibold text-gray-500">
+                        Group {subSpinTeam.group ?? "-"} · tap a player to sub in
+                      </p>
+                    </div>
+                  </div>
+                  <div className="mt-3 grid gap-2">
+                    {getAvailablePlayers(draftData, draftState, subSpinTeam).map((player) => (
+                      <PlayerRow
+                        key={player.id}
+                        player={player}
+                        compatibleSlots={[]}
+                        disabled={false}
+                        hideRating={hideDraftRatings}
+                        onPick={() => pickSuperSub(player.id)}
+                        boost={draftState.liveRatings ? liveBoostFor(player.id) : 0}
+                      />
+                    ))}
+                  </div>
+                </div>
+              ) : (
+                <p className="text-sm font-semibold text-gray-500">Spinning a nation for your sub…</p>
+              )}
+            </div>
+          )}
+
+          {!run && !pickingSuperSub && tournamentPhase !== "practice_penalties" && (
             <div className="space-y-5">
               <div
                 ref={draftControlsRef}

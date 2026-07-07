@@ -153,7 +153,8 @@ function scoreMatch(
   seed: string,
   knockout: boolean,
   legendMode: LegendMode,
-  penOverride?: "W" | "L"
+  penOverride?: "W" | "L",
+  superSubRating?: number | null
 ): MatchResult {
   const random = seededRandom(seed);
   const opponentStrength = normalizeOpponentStrength(opponent, teams);
@@ -181,6 +182,15 @@ function scoreMatch(
   const opponentLambda = clamp((1.45 - ratingEdge * 0.025 - defenceEdge * 0.018) * pressure, 0.20, 3.8);
   let userGoals = poisson(userLambda, random);
   let opponentGoals = poisson(opponentLambda, random);
+  // Super-sub: the chosen 12th man threatens a late impact goal in the knockouts
+  // when the team is level or a goal down. Probability scales with his rating;
+  // it's a regulation goal so the live match plays it out. Seeded like the rest,
+  // and only consumes the RNG when a sub is actually set — existing runs are
+  // byte-for-byte unchanged.
+  if (knockout && superSubRating != null && userGoals <= opponentGoals) {
+    const impactChance = clamp((superSubRating - 60) / 70, 0.05, 0.55);
+    if (random() < impactChance) userGoals += 1;
+  }
   const regularTimeUserGoals = userGoals;
   const regularTimeOpponentGoals = opponentGoals;
   let extraTimeUserGoals = 0;
@@ -209,7 +219,7 @@ function scoreMatch(
       if (penOverride) {
         userWins = penOverride === "W";
       } else {
-        const kicks = simulatePenalties(ratings, opponent, random, legendMode);
+        const kicks = simulatePenalties(ratings, opponent, random, legendMode, superSubRating);
         const userPenGoals = kicks.filter((k) => k.team === "user" && !k.saved).length;
         const oppPenGoals = kicks.filter((k) => k.team === "opponent" && !k.saved).length;
         // Tie falls to the user (matches the previous safety fallback).
@@ -231,7 +241,8 @@ function simulatePenalties(
   ratings: TeamRatings,
   opponent: EightZeroTeam,
   random: () => number,
-  legendMode: LegendMode
+  legendMode: LegendMode,
+  superSubRating?: number | null
 ): PenaltyKick[] {
   const kicks: PenaltyKick[] = [];
   let userPenRating = clamp(0.675 + (ratings.attack - 75) * 0.005, 0.45, 0.85);
@@ -240,6 +251,11 @@ function simulatePenalties(
   // Legend mode: harder to win on penalties
   if (legendMode !== "none") {
     userPenRating = Math.max(0.4, userPenRating - 0.05);
+  }
+
+  // Super-sub steps up to the spot: a steadier conversion in the shootout.
+  if (superSubRating != null) {
+    userPenRating = Math.min(0.92, userPenRating + 0.06);
   }
 
   let userScored = 0;
@@ -297,6 +313,7 @@ export function simulateTournamentRun(args: {
   chemistry?: boolean;
   superSub?: boolean;
   superSubName?: string | null;
+  superSubRating?: number | null;
   // Authoritative knockout shootout results, keyed by stage name. When the
   // player wins/loses an interactive shootout, the run is re-simulated with the
   // result recorded here so the bracket and score stay consistent with play.
@@ -310,6 +327,7 @@ export function simulateTournamentRun(args: {
   let stageReached = "Group stage";
   let groupPoints = 0;
   const legendMode = args.legendMode ?? "none";
+  const superSubRating = args.superSub ? args.superSubRating ?? null : null;
   const userOverall = args.ratings.overall;
 
   for (let index = 0; index < GROUP_STAGES.length; index += 1) {
@@ -336,7 +354,7 @@ export function simulateTournamentRun(args: {
       const stage = KNOCKOUT_STAGES[index];
       const opponent = pickOpponent(args.teams, `${args.seed}:knockout:${index}`, excludeIds, stage, userOverall, legendMode);
       excludeIds.add(opponent.teamId);
-      const result = scoreMatch(stage, opponent, args.ratings, args.teams, `${args.seed}:${stage}`, true, legendMode, args.penOverrides?.[stage]);
+      const result = scoreMatch(stage, opponent, args.ratings, args.teams, `${args.seed}:${stage}`, true, legendMode, args.penOverrides?.[stage], superSubRating);
       matches.push(result);
       if (result.result === "W") {
         wins += 1;

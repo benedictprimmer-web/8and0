@@ -1,4 +1,5 @@
 import { useEffect, useState, useRef, useCallback } from "react";
+import { Zap } from "lucide-react";
 import Flag from "../components/Flag";
 import type { EightZeroTeam, LegendMode, MatchEvent, MatchResult } from "../game8/types";
 
@@ -9,6 +10,7 @@ interface LiveMatchProps {
   events: MatchEvent[];
   onFinished: () => void;
   legendMode?: LegendMode;
+  superSubName?: string | null;
 }
 
 const BASE_TICK_MS = 600;
@@ -72,7 +74,7 @@ function EventRow({ event }: { event: MatchEvent }) {
   );
 }
 
-export default function LiveMatch({ stage, opponent, result, events, onFinished, legendMode }: LiveMatchProps) {
+export default function LiveMatch({ stage, opponent, result, events, onFinished, legendMode, superSubName }: LiveMatchProps) {
   const [currentMinute, setCurrentMinute] = useState(0);
   const [userScore, setUserScore] = useState(0);
   const [oppScore, setOppScore] = useState(0);
@@ -242,6 +244,11 @@ export default function LiveMatch({ stage, opponent, result, events, onFinished,
               ? `${legendMode.charAt(0).toUpperCase() + legendMode.slice(1)} XI`
               : "You"}
           </p>
+          {superSubName && (
+            <span className="mt-1 inline-flex items-center gap-1 rounded-full border border-gold-600/40 bg-gold-500/10 px-2 py-0.5 text-[10px] font-black text-gold-400">
+              <Zap size={11} /> {superSubName}
+            </span>
+          )}
         </div>
 
         <div className="relative flex flex-col items-center">
