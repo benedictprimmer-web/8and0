@@ -22,6 +22,7 @@ export const LIVE_BOOSTS: LiveBoost[] = [
   { id: 149, name: "Jude Bellingham", delta: 4 }, // 91 → 95 · brace vs Mexico
   // France's in-form attack.
   { id: 127, name: "Ousmane Dembele", delta: 4 }, // 87 → 91 · hat-trick vs Norway
+  { id: 1009, name: "Michael Olise", delta: 2 }, // 88 → 90
   { id: 492, name: "Vinicius Junior", delta: 3 }, // 87 → 90 · 4 goals for Brazil
   // Morocco.
   { id: 510, name: "Ismael Saibari", delta: 5 }, // 78 → 83
@@ -29,6 +30,11 @@ export const LIVE_BOOSTS: LiveBoost[] = [
   // Belgium / Spain.
   { id: 249, name: "Youri Tielemans", delta: 2 }, // 84 → 86
   { id: 923, name: "Mikel Oyarzabal", delta: 3 }, // 81 → 84
+  // More in-form stars.
+  { id: 177, name: "Lamine Yamal", delta: 4 }, // 89 → 93
+  { id: 224, name: "Florian Wirtz", delta: 3 }, // 89 → 92
+  { id: 270, name: "Viktor Gyokeres", delta: 3 }, // 86 → 89
+  { id: 8, name: "Folarin Balogun", delta: 4 }, // 82 → 86
   // Breakout stars of the tournament — the ones who forced their way onto the map.
   { id: 973, name: 'Josimar Dias "Vozinha"', delta: 24 }, // 66 → 90 · Cape Verde's shot-stopping hero
   { id: 682, name: "Yan Diomande", delta: 8 }, // 73 → 81 · Ivory Coast, best individual run
