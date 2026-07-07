@@ -14,16 +14,27 @@ export interface LiveBoost {
 }
 
 export const LIVE_BOOSTS: LiveBoost[] = [
-  { id: 104, name: "Lionel Messi", delta: 3 },
-  { id: 973, name: 'Josimar Dias "Vozinha"', delta: 15 },
-  { id: 284, name: "Erling Haaland", delta: 3 },
-  { id: 121, name: "Kylian Mbappe", delta: 4 },
-  { id: 72, name: "Achraf Hakimi", delta: 2 },
-  { id: 150, name: "Harry Kane", delta: 3 },
-  { id: 149, name: "Jude Bellingham", delta: 4 },
-  { id: 510, name: "Ismael Saibari", delta: 5 },
-  { id: 249, name: "Youri Tielemans", delta: 2 },
-  { id: 923, name: "Mikel Oyarzabal", delta: 3 },
+  // Golden Boot race — all level on goals in a record-tying scoring tournament.
+  { id: 121, name: "Kylian Mbappe", delta: 4 }, // 93 → 97 · tournament top scorer
+  { id: 104, name: "Lionel Messi", delta: 4 }, // 90 → 94 · WC all-time top scorer, 7 in a row
+  { id: 284, name: "Erling Haaland", delta: 4 }, // 91 → 95 · brace vs Brazil
+  { id: 150, name: "Harry Kane", delta: 3 }, // 91 → 94 · England's WC record scorer
+  { id: 149, name: "Jude Bellingham", delta: 4 }, // 91 → 95 · brace vs Mexico
+  // France's in-form attack.
+  { id: 127, name: "Ousmane Dembele", delta: 4 }, // 87 → 91 · hat-trick vs Norway
+  { id: 492, name: "Vinicius Junior", delta: 3 }, // 87 → 90 · 4 goals for Brazil
+  // Morocco.
+  { id: 510, name: "Ismael Saibari", delta: 5 }, // 78 → 83
+  { id: 72, name: "Achraf Hakimi", delta: 2 }, // 88 → 90
+  // Belgium / Spain.
+  { id: 249, name: "Youri Tielemans", delta: 2 }, // 84 → 86
+  { id: 923, name: "Mikel Oyarzabal", delta: 3 }, // 81 → 84
+  // Breakout stars of the tournament — the ones who forced their way onto the map.
+  { id: 973, name: 'Josimar Dias "Vozinha"', delta: 24 }, // 66 → 90 · Cape Verde's shot-stopping hero
+  { id: 682, name: "Yan Diomande", delta: 8 }, // 73 → 81 · Ivory Coast, best individual run
+  { id: 641, name: "Julio Enciso", delta: 6 }, // 67 → 73 · Paraguay, knocked out Germany
+  { id: 412, name: "Johan Manzambi", delta: 5 }, // 73 → 78 · Switzerland breakout
+  { id: 428, name: "Nathan Saliba", delta: 5 }, // 71 → 76 · Canada breakout
 ];
 
 const BOOST_BY_ID: Record<number, number> = Object.fromEntries(
