@@ -92,31 +92,38 @@
 }
 
 /* ── Accent ramps ─────────────────────────────────────────────────────────────
-   Each accent defines a dark ramp (base rule) and a light override (shifted
-   darker so accent text stays readable on white). */
+   Each accent defines a dark ramp (base rule) and a light override. The four
+   shades play distinct ROLES rather than a strict light→dark ramp, so the light
+   override is tuned per role rather than uniformly darkened:
+     • 500/600 are used as button FILLS (bg-gold-500 + text-black, and
+       bg-gold-600 + text-white where `white` is theme-remapped to dark) — in
+       light mode these stay VIVID so the fixed text colour keeps contrast.
+     • 300/400 are used as accent TEXT (text-gold-400/300 on light surfaces) —
+       in light mode these go DARK so the text is readable on white.
+   Keeping the fills vivid is what makes primary CTAs legible in light mode. */
 :root[data-accent="gold"]                       { --gold-300: 252 211 77; --gold-400: 251 191 36; --gold-500: 245 158 11; --gold-600: 217 119 6; }
-:root[data-theme="light"][data-accent="gold"]   { --gold-300: 245 158 11; --gold-400: 217 119 6; --gold-500: 180 83 9;   --gold-600: 146 64 14; }
+:root[data-theme="light"][data-accent="gold"]   { --gold-300: 180 83 9;   --gold-400: 180 83 9;   --gold-500: 245 158 11; --gold-600: 251 191 36; }
 
 :root[data-accent="blue"]                       { --gold-300: 147 197 253; --gold-400: 96 165 250; --gold-500: 59 130 246; --gold-600: 37 99 235; }
-:root[data-theme="light"][data-accent="blue"]   { --gold-300: 59 130 246;  --gold-400: 37 99 235;  --gold-500: 29 78 216; --gold-600: 30 64 175; }
+:root[data-theme="light"][data-accent="blue"]   { --gold-300: 29 78 216;   --gold-400: 29 78 216;  --gold-500: 59 130 246; --gold-600: 96 165 250; }
 
 :root[data-accent="green"]                      { --gold-300: 110 231 183; --gold-400: 52 211 153; --gold-500: 16 185 129; --gold-600: 5 150 105; }
-:root[data-theme="light"][data-accent="green"]  { --gold-300: 16 185 129;  --gold-400: 5 150 105;  --gold-500: 4 120 87;  --gold-600: 6 95 70; }
+:root[data-theme="light"][data-accent="green"]  { --gold-300: 4 120 87;    --gold-400: 4 120 87;   --gold-500: 16 185 129; --gold-600: 52 211 153; }
 
 :root[data-accent="purple"]                     { --gold-300: 196 181 253; --gold-400: 167 139 250; --gold-500: 139 92 246; --gold-600: 124 58 237; }
-:root[data-theme="light"][data-accent="purple"] { --gold-300: 139 92 246;  --gold-400: 124 58 237; --gold-500: 109 40 217; --gold-600: 91 33 182; }
+:root[data-theme="light"][data-accent="purple"] { --gold-300: 109 40 217;  --gold-400: 109 40 217; --gold-500: 139 92 246; --gold-600: 167 139 250; }
 
 :root[data-accent="crimson"]                    { --gold-300: 253 164 175; --gold-400: 251 113 133; --gold-500: 244 63 94; --gold-600: 225 29 72; }
-:root[data-theme="light"][data-accent="crimson"]{ --gold-300: 244 63 94;   --gold-400: 225 29 72;  --gold-500: 190 18 60; --gold-600: 159 18 57; }
+:root[data-theme="light"][data-accent="crimson"]{ --gold-300: 190 18 60;   --gold-400: 190 18 60;  --gold-500: 244 63 94;  --gold-600: 251 113 133; }
 
 :root[data-accent="teal"]                       { --gold-300: 94 234 212; --gold-400: 45 212 191; --gold-500: 20 184 166; --gold-600: 13 148 136; }
-:root[data-theme="light"][data-accent="teal"]   { --gold-300: 20 184 166; --gold-400: 13 148 136; --gold-500: 15 118 110; --gold-600: 17 94 89; }
+:root[data-theme="light"][data-accent="teal"]   { --gold-300: 15 118 110;  --gold-400: 15 118 110; --gold-500: 20 184 166; --gold-600: 45 212 191; }
 
 :root[data-accent="pink"]                       { --gold-300: 249 168 212; --gold-400: 244 114 182; --gold-500: 236 72 153; --gold-600: 219 39 119; }
-:root[data-theme="light"][data-accent="pink"]   { --gold-300: 236 72 153;  --gold-400: 219 39 119;  --gold-500: 190 24 93; --gold-600: 157 23 77; }
+:root[data-theme="light"][data-accent="pink"]   { --gold-300: 190 24 93;   --gold-400: 190 24 93;  --gold-500: 236 72 153; --gold-600: 244 114 182; }
 
 :root[data-accent="orange"]                     { --gold-300: 253 186 116; --gold-400: 251 146 60; --gold-500: 249 115 22; --gold-600: 234 88 12; }
-:root[data-theme="light"][data-accent="orange"] { --gold-300: 249 115 22;  --gold-400: 234 88 12;  --gold-500: 194 65 12; --gold-600: 154 52 18; }
+:root[data-theme="light"][data-accent="orange"] { --gold-300: 194 65 12;   --gold-400: 194 65 12;  --gold-500: 249 115 22; --gold-600: 251 146 60; }
 
 /* ── Base ─────────────────────────────────────────────────────────────────── */
 @layer base {
