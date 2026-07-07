@@ -36,7 +36,7 @@ export const LIVE_BOOSTS: LiveBoost[] = [
   { id: 270, name: "Viktor Gyokeres", delta: 3 }, // 86 → 89
   { id: 8, name: "Folarin Balogun", delta: 4 }, // 82 → 86
   // Breakout stars of the tournament — the ones who forced their way onto the map.
-  { id: 973, name: 'Josimar Dias "Vozinha"', delta: 24 }, // 66 → 90 · Cape Verde's shot-stopping hero
+  { id: 973, name: "Vozinha", delta: 24 }, // 66 → 90 · Cape Verde's shot-stopping hero
   { id: 682, name: "Yan Diomande", delta: 8 }, // 73 → 81 · Ivory Coast, best individual run
   { id: 641, name: "Julio Enciso", delta: 6 }, // 67 → 73 · Paraguay, knocked out Germany
   { id: 412, name: "Johan Manzambi", delta: 5 }, // 73 → 78 · Switzerland breakout
@@ -64,13 +64,18 @@ function boostPlayer(player: EightZeroPlayer): EightZeroPlayer {
  * of which read `player.rating`) is boosted with no other code path aware of it.
  */
 export function applyLiveRatings(data: EightZeroData): EightZeroData {
+  // Boost, then re-sort by the NEW rating so in-form players (e.g. Vozinha 66→90)
+  // rank where their boosted rating puts them — top of the pool, not their old
+  // base spot. Mirrors buildEightZeroData's sort so candidate lists stay ordered.
+  const byRating = (a: EightZeroPlayer, b: EightZeroPlayer) =>
+    b.rating - a.rating || a.name.localeCompare(b.name);
   const playersByTeam = new Map<number, EightZeroPlayer[]>();
   for (const [teamId, teamPlayers] of data.playersByTeam) {
-    playersByTeam.set(teamId, teamPlayers.map(boostPlayer));
+    playersByTeam.set(teamId, teamPlayers.map(boostPlayer).sort(byRating));
   }
   return {
     teams: data.teams,
-    players: data.players.map(boostPlayer),
+    players: data.players.map(boostPlayer).sort(byRating),
     playersByTeam,
     teamById: data.teamById,
   };
