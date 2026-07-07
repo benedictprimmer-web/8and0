@@ -4,7 +4,16 @@ export default {
   theme: {
     extend: {
       colors: {
-        // Primary brand → WC-trophy gold
+        // Foreground ramp — remaps Tailwind's white/gray to theme variables so
+        // text adapts between light and dark. Values live in src/index.css.
+        white: "rgb(var(--fg) / <alpha-value>)",
+        gray: {
+          300: "rgb(var(--fg-300) / <alpha-value>)",
+          400: "rgb(var(--fg-400) / <alpha-value>)",
+          500: "rgb(var(--fg-500) / <alpha-value>)",
+          600: "rgb(var(--fg-600) / <alpha-value>)",
+        },
+        // Primary brand → WC-trophy gold (static ramp; not runtime-themed)
         brand: {
           50:  "#FFFBEB",
           100: "#FEF3C7",
@@ -18,19 +27,20 @@ export default {
           900: "#78350F",
           950: "#451A03",
         },
+        // Accent ramp — driven at runtime by [data-accent] + [data-theme].
         gold: {
-          300: "#FCD34D",
-          400: "#FBBF24",
-          500: "#F59E0B",
-          600: "#D97706",
+          300: "rgb(var(--gold-300) / <alpha-value>)",
+          400: "rgb(var(--gold-400) / <alpha-value>)",
+          500: "rgb(var(--gold-500) / <alpha-value>)",
+          600: "rgb(var(--gold-600) / <alpha-value>)",
         },
-        // Deep navy-black surfaces (not pure black)
+        // Surfaces — themed (deep navy-black in dark, near-white in light).
         surface: {
-          950: "#060810",
-          900: "#0D1117",
-          800: "#161B27",
-          700: "#1E2433",
-          600: "#2A3145",
+          950: "rgb(var(--surface-950) / <alpha-value>)",
+          900: "rgb(var(--surface-900) / <alpha-value>)",
+          800: "rgb(var(--surface-800) / <alpha-value>)",
+          700: "rgb(var(--surface-700) / <alpha-value>)",
+          600: "rgb(var(--surface-600) / <alpha-value>)",
         },
         // Rose-red for home-win probability bars
         rose: {
@@ -50,14 +60,14 @@ export default {
         },
       },
       boxShadow: {
-        gold:  "0 0 24px rgba(251,191,36,0.20)",
-        amber: "0 0 40px rgba(217,119,6,0.18)",
+        gold:  "0 0 24px rgb(var(--gold-400) / 0.20)",
+        amber: "0 0 40px rgb(var(--gold-600) / 0.18)",
         card:  "0 2px 16px rgba(0,0,0,0.7)",
-        glow:  "0 0 0 1px rgba(251,191,36,0.15), 0 4px 24px rgba(0,0,0,0.5)",
+        glow:  "0 0 0 1px rgb(var(--gold-400) / 0.15), 0 4px 24px rgba(0,0,0,0.5)",
       },
       backgroundImage: {
-        "sidebar-gradient": "linear-gradient(180deg, #0D1117 0%, #0A0D18 60%, #060810 100%)",
-        "gold-shimmer":     "linear-gradient(90deg, #D97706, #FBBF24, #D97706)",
+        "sidebar-gradient": "linear-gradient(180deg, rgb(var(--surface-900)) 0%, rgb(var(--surface-950)) 60%, rgb(var(--surface-950)) 100%)",
+        "gold-shimmer":     "linear-gradient(90deg, rgb(var(--gold-600)), rgb(var(--gold-400)), rgb(var(--gold-600)))",
       },
       animation: {
         "fade-up":    "fadeUp 0.4s ease-out forwards",
