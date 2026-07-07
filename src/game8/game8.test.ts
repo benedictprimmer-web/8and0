@@ -376,6 +376,43 @@ describe("8-0 simulation", () => {
     expect(run.wins + run.draws + run.losses).toBe(run.matches.length);
   });
 
+  it("super-sub does nothing when the mode is off (determinism preserved)", () => {
+    const data = buildEightZeroData(rawTeams, rawPlayers);
+    const picks = Array.from({ length: 11 }, (_, i) =>
+      makePick(i + 1, i === 0 ? "GK" : i < 5 ? "DEF" : i < 8 ? "MID" : "FWD", 80)
+    );
+    const base = { teams: data.teams, picks, ratings: calculateTeamRatings(picks), formationId: "433", seed: "ss-det" };
+    const off = simulateTournamentRun(base);
+    // A rating is present but the mode is off → the RNG is never touched, so the
+    // run is byte-for-byte identical.
+    const alsoOff = simulateTournamentRun({ ...base, superSub: false, superSubRating: 99 });
+    expect(alsoOff.matches).toEqual(off.matches);
+  });
+
+  it("a top super-sub lifts knockout results across many seeds", () => {
+    const data = buildEightZeroData(rawTeams, rawPlayers);
+    const picks = Array.from({ length: 11 }, (_, i) =>
+      makePick(i + 1, i === 0 ? "GK" : i < 5 ? "DEF" : i < 8 ? "MID" : "FWD", 80)
+    );
+    const ratings = calculateTeamRatings(picks);
+    let baseWins = 0;
+    let subWins = 0;
+    for (let i = 0; i < 250; i += 1) {
+      const seed = `ss-${i}`;
+      baseWins += simulateTournamentRun({ teams: data.teams, picks, ratings, seed, formationId: "433" }).wins;
+      subWins += simulateTournamentRun({
+        teams: data.teams,
+        picks,
+        ratings,
+        seed,
+        formationId: "433",
+        superSub: true,
+        superSubRating: 99,
+      }).wins;
+    }
+    expect(subWins).toBeGreaterThan(baseWins);
+  });
+
   it("sorts local history by strongest record and rating", () => {
     const base = {
       id: "run",
