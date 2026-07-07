@@ -54,6 +54,7 @@ function makeRun(overrides: Partial<TournamentRun> = {}): TournamentRun {
     blindMode: true,
     draftMode: "squad-first",
     legendMode: "none",
+    liveRatings: false,
     score: 42,
     record: "8-0-0",
     wins: 8,
