@@ -10,6 +10,7 @@ export interface DraftOptions {
   legendMode: LegendMode;
   liveRatings: boolean;
   chemistry: boolean;
+  superSub: boolean;
 }
 
 export interface EightZeroTeam {
@@ -76,6 +77,9 @@ export interface DraftState {
   legendMode: LegendMode;
   liveRatings: boolean;
   chemistry: boolean;
+  superSub: boolean;
+  // The 12th man drafted before kickoff (a bench impact sub), or null until picked.
+  superSubId: number | null;
 }
 
 export interface TeamRatings {
@@ -133,6 +137,8 @@ export interface TournamentRun {
   legendMode: LegendMode;
   liveRatings: boolean;
   chemistry: boolean;
+  superSub: boolean;
+  superSubName: string | null;
   score: number;
   record: string;
   wins: number;

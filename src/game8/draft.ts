@@ -20,6 +20,7 @@ const DEFAULT_OPTIONS: DraftOptions = {
   legendMode: "none",
   liveRatings: false,
   chemistry: false,
+  superSub: false,
 };
 
 const LEGEND_CONFIG: Record<Exclude<LegendMode, "none">, { fifaCode: string; nameMatch: (name: string) => boolean; category: "FWD" | "MID" }> = {
@@ -99,6 +100,8 @@ export function createDraftState(
     legendMode,
     liveRatings: resolvedOptions.liveRatings,
     chemistry: resolvedOptions.chemistry,
+    superSub: resolvedOptions.superSub,
+    superSubId: null,
   };
 }
 
