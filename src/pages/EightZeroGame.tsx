@@ -477,7 +477,7 @@ function LegendModal({
         role="dialog"
         aria-modal="true"
         aria-label="Last Dance"
-        className="w-full max-w-2xl rounded-2xl border border-indigo-900/70 bg-[#11111f] p-6 shadow-2xl shadow-black/40"
+        className="w-full max-w-2xl rounded-2xl border border-surface-700 bg-surface-panel p-6 shadow-2xl shadow-black/40"
         onClick={(event) => event.stopPropagation()}
       >
         <div className="mb-6 text-center">
@@ -538,7 +538,7 @@ function GlobalTopFive() {
   const myBestInTopFive = myBest?.rank != null && myBest.rank <= entries.length;
 
   return (
-    <section className="rounded-2xl border border-indigo-900/70 bg-[#11111f] p-4 shadow-2xl shadow-black/20">
+    <section className="rounded-2xl border border-surface-700 bg-surface-panel p-4 shadow-2xl shadow-black/20">
       <div className="flex items-center justify-between gap-3">
         <p className="section-label text-sm tracking-[0.18em] inline-flex items-center gap-2">
           <Globe size={15} className="text-gold-400" />
@@ -616,7 +616,7 @@ function HowItWorksModal({ onClose }: { onClose: () => void }) {
         role="dialog"
         aria-modal="true"
         aria-label="How it works"
-        className="w-full max-w-lg rounded-2xl border border-indigo-900/70 bg-[#11111f] p-6 shadow-2xl shadow-black/40"
+        className="w-full max-w-lg rounded-2xl border border-surface-700 bg-surface-panel p-6 shadow-2xl shadow-black/40"
         onClick={(event) => event.stopPropagation()}
       >
         <div className="mb-5 flex items-center justify-between">
@@ -712,7 +712,7 @@ function SetupScreen({
         </div>
       </div>
 
-      <section className="rounded-2xl border border-indigo-900/70 bg-[#11111f] p-5 shadow-2xl shadow-black/20">
+      <section className="rounded-2xl border border-surface-700 bg-surface-panel p-5 shadow-2xl shadow-black/20">
         <p className="section-label text-base tracking-[0.18em]">Formation</p>
         <div className="mt-4 grid grid-cols-3 gap-2 sm:grid-cols-6 sm:gap-3">
           {SELECTABLE_FORMATIONS.map((formation) => (
@@ -729,7 +729,7 @@ function SetupScreen({
         </div>
       </section>
 
-      <section className="rounded-2xl border border-indigo-900/70 bg-[#11111f] p-5 shadow-2xl shadow-black/20">
+      <section className="rounded-2xl border border-surface-700 bg-surface-panel p-5 shadow-2xl shadow-black/20">
         <p className="section-label text-base tracking-[0.18em]">Difficulty</p>
         <div className="mt-4 grid grid-cols-3 gap-2">
           {DIFFICULTIES.map((difficulty) => (
@@ -748,7 +748,7 @@ function SetupScreen({
         </div>
       </section>
 
-      <section className="rounded-2xl border border-indigo-900/70 bg-[#11111f] p-5 shadow-2xl shadow-black/20">
+      <section className="rounded-2xl border border-surface-700 bg-surface-panel p-5 shadow-2xl shadow-black/20">
         <p className="section-label text-base tracking-[0.18em]">Game modes</p>
         <p className="mt-1 text-sm text-gray-500">Stack any combination — each one shows on your run.</p>
         <div className="mt-4 grid gap-2 sm:grid-cols-2 sm:gap-3">
@@ -1074,7 +1074,7 @@ function GlobalSubmit({ run }: { run: TournamentRun }) {
   }
 
   return (
-    <div className="rounded-2xl border border-indigo-900/70 bg-[#11111f] p-5">
+    <div className="rounded-2xl border border-surface-700 bg-surface-panel p-5">
       <div className="flex items-center gap-2">
         <Globe className="text-gold-400" size={18} />
         <p className="section-label text-sm">Add your name to the global leaderboard</p>
@@ -1153,7 +1153,7 @@ function ResultPanel({
 
   return (
     <div className="space-y-5">
-      <div className="rounded-2xl border border-indigo-900/70 bg-[#11111f] p-6 text-center">
+      <div className="rounded-2xl border border-surface-700 bg-surface-panel p-6 text-center">
         <p className="section-label text-base">Team rating {Math.round(run.ratings.overall)}</p>
         <h2 className="mt-4 font-serif text-5xl font-black tracking-normal text-gold-400">{run.stageReached}</h2>
         <p className="mt-3 text-2xl font-bold text-gray-300">+{run.score} points</p>
@@ -1166,7 +1166,7 @@ function ResultPanel({
         </p>
       </div>
 
-      <div className="rounded-2xl border border-indigo-900/70 bg-[#11111f] p-5">
+      <div className="rounded-2xl border border-surface-700 bg-surface-panel p-5">
         <p className="section-label">Tournament summary</p>
         <div className="mt-4 grid grid-cols-3 gap-3 sm:grid-cols-6">
           {summaryStats.map((stat) => (

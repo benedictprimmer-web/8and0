@@ -41,6 +41,7 @@ export default {
           800: "rgb(var(--surface-800) / <alpha-value>)",
           700: "rgb(var(--surface-700) / <alpha-value>)",
           600: "rgb(var(--surface-600) / <alpha-value>)",
+          panel: "rgb(var(--surface-panel) / <alpha-value>)",
         },
         // Rose-red for home-win probability bars
         rose: {

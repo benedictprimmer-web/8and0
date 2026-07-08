@@ -30,6 +30,7 @@
   --surface-800: 22  27  39;
   --surface-700: 30  36  51;
   --surface-600: 42  49  69;
+  --surface-panel: 17 17 31;   /* section panels / modals (was hardcoded #11111f) */
 
   /* Semantic colours (kept meaningful across themes). */
   --live:      74 222 128;
@@ -58,6 +59,7 @@
   --surface-800: 22  27  39;
   --surface-700: 30  36  51;
   --surface-600: 42  49  69;
+  --surface-panel: 17 17 31;
 
   --live:      74 222 128;
   --upcoming:  96 165 250;
@@ -81,6 +83,7 @@
   --surface-800: 241 244 248;  /* raised */
   --surface-700: 226 230 236;  /* borders */
   --surface-600: 203 210 220;  /* border hover */
+  --surface-panel: 255 255 255; /* section panels / modals (white, lifted by shadow) */
 
   --live:      22 163  74;   /* darker green for contrast on white */
   --upcoming:  37  99 235;
