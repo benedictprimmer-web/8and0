@@ -2071,46 +2071,41 @@ export default function EightZeroGame() {
 
   return (
     <div className="space-y-6 animate-fade-up pb-24">
-      <section className="overflow-hidden rounded-xl border border-surface-700 bg-surface-900">
-        <div className="grid gap-0 lg:grid-cols-[1fr_260px]">
-          <div className="p-5 sm:p-6">
-            <div className="flex flex-wrap items-start justify-between gap-4">
-              <div>
-                <button
-                  type="button"
-                  onClick={resetToSetup}
-                  className="inline-flex items-center gap-2 text-sm font-semibold text-gray-400 hover:text-white"
-                >
-                  <ArrowLeft size={16} />
-                  Options
-                </button>
-                <h1 className="mt-4 font-serif text-3xl sm:text-5xl font-black tracking-normal text-white">8-0</h1>
-                <p className="mt-2 max-w-2xl text-sm leading-6 text-gray-400">
-                  {getFormation(draftState.formationId).label} · {titleCase(draftState.difficulty)} ·{" "}
-                  {draftState.draftMode === "squad-first" ? "Squad first" : "Position first"}
-                  {draftState.blindMode ? " · Blind ratings" : ""}
-                  {draftState.legendMode !== "none" && (
-                    <span className="ml-1 text-gold-400">· Last Dance: {titleCase(draftState.legendMode)}</span>
-                  )}
-                </p>
-              </div>
-              <button
-                type="button"
-                onClick={() => startDraft(draftState.formationId, options)}
-                className="inline-flex items-center gap-2 rounded-lg border border-surface-700 bg-surface-800 px-4 py-2 text-sm font-bold text-white transition-colors hover:border-gold-600/40"
-              >
-                <RefreshCw size={16} />
-                New run
-              </button>
-            </div>
+      <section className="rounded-xl border border-surface-700 bg-surface-900 p-5 sm:p-6">
+        <div className="flex items-start justify-between gap-4">
+          <button
+            type="button"
+            onClick={resetToSetup}
+            className="inline-flex items-center gap-2 text-sm font-semibold text-gray-400 hover:text-white"
+          >
+            <ArrowLeft size={16} />
+            Options
+          </button>
+          <div className="text-right leading-none">
+            <p className="text-2xl sm:text-4xl font-black text-gold-400 tabular-nums">{bestRun?.score ?? 0}</p>
+            <p className="section-label mt-1">Best</p>
           </div>
-
-          <div className="border-t border-surface-700 bg-surface-950/60 p-5 lg:border-l lg:border-t-0">
-            <div className="text-right">
-              <p className="text-3xl sm:text-5xl font-black text-gold-400 tabular-nums">{bestRun?.score ?? 0}</p>
-              <p className="section-label">Best</p>
-            </div>
+        </div>
+        <div className="mt-3 flex flex-wrap items-end justify-between gap-3">
+          <div className="min-w-0">
+            <h1 className="font-serif text-3xl sm:text-5xl font-black tracking-normal text-white">8-0</h1>
+            <p className="mt-1 max-w-2xl text-sm leading-6 text-gray-400">
+              {getFormation(draftState.formationId).label} · {titleCase(draftState.difficulty)} ·{" "}
+              {draftState.draftMode === "squad-first" ? "Squad first" : "Position first"}
+              {draftState.blindMode ? " · Blind ratings" : ""}
+              {draftState.legendMode !== "none" && (
+                <span className="ml-1 text-gold-400">· Last Dance: {titleCase(draftState.legendMode)}</span>
+              )}
+            </p>
           </div>
+          <button
+            type="button"
+            onClick={() => startDraft(draftState.formationId, options)}
+            className="inline-flex shrink-0 items-center gap-2 rounded-lg border border-surface-700 bg-surface-800 px-4 py-2 text-sm font-bold text-white transition-colors hover:border-gold-600/40"
+          >
+            <RefreshCw size={16} />
+            New run
+          </button>
         </div>
       </section>
 
