@@ -4,22 +4,147 @@
 @tailwind components;
 @tailwind utilities;
 
+/* ── Theme tokens ─────────────────────────────────────────────────────────────
+   All colour is driven by CSS variables so the app can switch between light and
+   dark themes and re-tint its accent colour at runtime. Two attributes on <html>
+   select the active palette:
+     • data-theme  = "light" | "dark"   → surfaces + foreground ramp
+     • data-accent = "gold" | "blue" …  → the accent (gold) ramp
+   JavaScript only toggles those two attributes; every value below is static CSS,
+   which keeps the theme logic tiny and avoids any flash of the wrong colours.
+
+   Variables are stored as space-separated RGB channels ("13 17 23") so Tailwind's
+   opacity utilities (e.g. bg-surface-900/40) keep working via rgb(var(--x)/α). */
+:root {
+  /* Foreground ramp — remaps Tailwind's white/gray so text adapts per theme.
+     text-white → --fg, text-gray-300/400/500/600 → --fg-300/400/500/600. */
+  --fg:      255 255 255;
+  --fg-300:  209 213 219;
+  --fg-400:  156 163 175;
+  --fg-500:  107 114 128;
+  --fg-600:   75  85  99;
+
+  /* Surface ramp (deep navy-black in dark). */
+  --surface-950:  6   8  16;
+  --surface-900: 13  17  23;
+  --surface-800: 22  27  39;
+  --surface-700: 30  36  51;
+  --surface-600: 42  49  69;
+  --surface-panel: 17 17 31;   /* section panels / modals (was hardcoded #11111f) */
+
+  /* Semantic colours (kept meaningful across themes). */
+  --live:      74 222 128;
+  --upcoming:  96 165 250;
+  --home:     244  63  94;
+  --away:     139  92 246;
+  --draw:      55  65  81;
+
+  /* Accent ramp default (gold). Overridden by [data-accent] blocks below. */
+  --gold-300: 252 211  77;
+  --gold-400: 251 191  36;
+  --gold-500: 245 158  11;
+  --gold-600: 217 119   6;
+}
+
+/* ── Dark theme (default) ─────────────────────────────────────────────────── */
+:root[data-theme="dark"] {
+  --fg:      255 255 255;
+  --fg-300:  209 213 219;
+  --fg-400:  156 163 175;
+  --fg-500:  107 114 128;
+  --fg-600:   75  85  99;
+
+  --surface-950:  6   8  16;
+  --surface-900: 13  17  23;
+  --surface-800: 22  27  39;
+  --surface-700: 30  36  51;
+  --surface-600: 42  49  69;
+  --surface-panel: 17 17 31;
+
+  --live:      74 222 128;
+  --upcoming:  96 165 250;
+  --home:     244  63  94;
+  --away:     139  92 246;
+  --draw:      55  65  81;
+
+  --border-glow: 255 255 255;   /* subtle top highlight on cards */
+}
+
+/* ── Light theme ──────────────────────────────────────────────────────────── */
+:root[data-theme="light"] {
+  --fg:       15  23  42;   /* slate-900 → primary text */
+  --fg-300:   30  41  59;   /* slate-800 → bright secondary */
+  --fg-400:   71  85 105;   /* slate-600 → muted */
+  --fg-500:  100 116 139;   /* slate-500 → subtle */
+  --fg-600:  148 163 184;   /* slate-400 → faint */
+
+  --surface-950: 247 248 250;  /* page background */
+  --surface-900: 255 255 255;  /* cards */
+  --surface-800: 241 244 248;  /* raised */
+  --surface-700: 226 230 236;  /* borders */
+  --surface-600: 203 210 220;  /* border hover */
+  --surface-panel: 255 255 255; /* section panels / modals (white, lifted by shadow) */
+
+  --live:      22 163  74;   /* darker green for contrast on white */
+  --upcoming:  37  99 235;
+  --home:     225  29  72;
+  --away:     124  58 237;
+  --draw:     148 163 184;
+
+  --border-glow: 15 23 42;   /* dark hairline instead of light glow */
+}
+
+/* ── Accent ramps ─────────────────────────────────────────────────────────────
+   Each accent defines a dark ramp (base rule) and a light override. The four
+   shades play distinct ROLES rather than a strict light→dark ramp, so the light
+   override is tuned per role rather than uniformly darkened:
+     • 500/600 are used as button FILLS (bg-gold-500 + text-black, and
+       bg-gold-600 + text-white where `white` is theme-remapped to dark) — in
+       light mode these stay VIVID so the fixed text colour keeps contrast.
+     • 300/400 are used as accent TEXT (text-gold-400/300 on light surfaces) —
+       in light mode these go DARK so the text is readable on white.
+   Keeping the fills vivid is what makes primary CTAs legible in light mode. */
+:root[data-accent="gold"]                       { --gold-300: 252 211 77; --gold-400: 251 191 36; --gold-500: 245 158 11; --gold-600: 217 119 6; }
+:root[data-theme="light"][data-accent="gold"]   { --gold-300: 180 83 9;   --gold-400: 180 83 9;   --gold-500: 245 158 11; --gold-600: 251 191 36; }
+
+:root[data-accent="blue"]                       { --gold-300: 147 197 253; --gold-400: 96 165 250; --gold-500: 59 130 246; --gold-600: 37 99 235; }
+:root[data-theme="light"][data-accent="blue"]   { --gold-300: 29 78 216;   --gold-400: 29 78 216;  --gold-500: 59 130 246; --gold-600: 96 165 250; }
+
+:root[data-accent="green"]                      { --gold-300: 110 231 183; --gold-400: 52 211 153; --gold-500: 16 185 129; --gold-600: 5 150 105; }
+:root[data-theme="light"][data-accent="green"]  { --gold-300: 4 120 87;    --gold-400: 4 120 87;   --gold-500: 16 185 129; --gold-600: 52 211 153; }
+
+:root[data-accent="purple"]                     { --gold-300: 196 181 253; --gold-400: 167 139 250; --gold-500: 139 92 246; --gold-600: 124 58 237; }
+:root[data-theme="light"][data-accent="purple"] { --gold-300: 109 40 217;  --gold-400: 109 40 217; --gold-500: 139 92 246; --gold-600: 167 139 250; }
+
+:root[data-accent="crimson"]                    { --gold-300: 253 164 175; --gold-400: 251 113 133; --gold-500: 244 63 94; --gold-600: 225 29 72; }
+:root[data-theme="light"][data-accent="crimson"]{ --gold-300: 190 18 60;   --gold-400: 190 18 60;  --gold-500: 244 63 94;  --gold-600: 251 113 133; }
+
+:root[data-accent="teal"]                       { --gold-300: 94 234 212; --gold-400: 45 212 191; --gold-500: 20 184 166; --gold-600: 13 148 136; }
+:root[data-theme="light"][data-accent="teal"]   { --gold-300: 15 118 110;  --gold-400: 15 118 110; --gold-500: 20 184 166; --gold-600: 45 212 191; }
+
+:root[data-accent="pink"]                       { --gold-300: 249 168 212; --gold-400: 244 114 182; --gold-500: 236 72 153; --gold-600: 219 39 119; }
+:root[data-theme="light"][data-accent="pink"]   { --gold-300: 190 24 93;   --gold-400: 190 24 93;  --gold-500: 236 72 153; --gold-600: 244 114 182; }
+
+:root[data-accent="orange"]                     { --gold-300: 253 186 116; --gold-400: 251 146 60; --gold-500: 249 115 22; --gold-600: 234 88 12; }
+:root[data-theme="light"][data-accent="orange"] { --gold-300: 194 65 12;   --gold-400: 194 65 12;  --gold-500: 249 115 22; --gold-600: 251 146 60; }
+
 /* ── Base ─────────────────────────────────────────────────────────────────── */
 @layer base {
   html { @apply scroll-smooth; }
 
   body {
-    background-color: #060810;
-    color: #f3f4f6;
+    background-color: rgb(var(--surface-950));
+    color: rgb(var(--fg));
     font-family: 'Inter', system-ui, sans-serif;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
+    transition: background-color 200ms ease, color 200ms ease;
   }
 
   ::-webkit-scrollbar { width: 5px; height: 5px; }
-  ::-webkit-scrollbar-track { background: #0D1117; }
-  ::-webkit-scrollbar-thumb { background: #2A3145; border-radius: 9999px; }
-  ::-webkit-scrollbar-thumb:hover { background: #3a4560; }
+  ::-webkit-scrollbar-track { background: rgb(var(--surface-900)); }
+  ::-webkit-scrollbar-thumb { background: rgb(var(--surface-600)); border-radius: 9999px; }
+  ::-webkit-scrollbar-thumb:hover { background: rgb(var(--surface-600) / 0.8); }
 
   * { box-sizing: border-box; }
 }
@@ -29,36 +154,36 @@
 
   /* Cards */
   .stat-card {
-    background: linear-gradient(135deg, rgba(255,255,255,0.025) 0%, transparent 60%),
-                #0D1117;
-    border: 1px solid #1E2433;
+    background: linear-gradient(135deg, rgb(var(--border-glow) / 0.025) 0%, transparent 60%),
+                rgb(var(--surface-900));
+    border: 1px solid rgb(var(--surface-700));
     border-radius: 0.75rem;
     padding: 1rem;
   }
 
   .fixture-card {
-    background: #0D1117;
-    border: 1px solid #1E2433;
+    background: rgb(var(--surface-900));
+    border: 1px solid rgb(var(--surface-700));
     border-radius: 0.75rem;
     padding: 1rem;
     cursor: pointer;
     transition: border-color 150ms, background-color 150ms, box-shadow 150ms;
   }
   .fixture-card:hover {
-    border-color: #2A3145;
-    background-color: #161B27;
-    box-shadow: 0 0 0 1px rgba(251,191,36,0.06);
+    border-color: rgb(var(--surface-600));
+    background-color: rgb(var(--surface-800));
+    box-shadow: 0 0 0 1px rgb(var(--gold-400) / 0.06);
   }
 
   .fixture-card-compact {
-    background: #161B27;
-    border: 1px solid #1E2433;
+    background: rgb(var(--surface-800));
+    border: 1px solid rgb(var(--surface-700));
     border-radius: 0.5rem;
     padding: 0.75rem;
     cursor: pointer;
     transition: border-color 150ms;
   }
-  .fixture-card-compact:hover { border-color: #2A3145; }
+  .fixture-card-compact:hover { border-color: rgb(var(--surface-600)); }
 
   /* Section labels */
   .section-label {
@@ -66,7 +191,7 @@
     font-weight: 700;
     text-transform: uppercase;
     letter-spacing: 0.12em;
-    color: #8a93a6;
+    color: rgb(var(--fg-400));
   }
 
   /* Status badges */
@@ -76,9 +201,9 @@
     gap: 0.25rem;
     font-size: 0.7rem;
     font-weight: 700;
-    background-color: rgba(20, 83, 45, 0.5);
-    color: #4ade80;
-    border: 1px solid rgba(22, 101, 52, 0.5);
+    background-color: rgb(var(--live) / 0.16);
+    color: rgb(var(--live));
+    border: 1px solid rgb(var(--live) / 0.4);
     padding: 0.125rem 0.5rem;
     border-radius: 9999px;
     letter-spacing: 0.05em;
@@ -88,9 +213,9 @@
     align-items: center;
     font-size: 0.7rem;
     font-weight: 600;
-    background-color: rgba(30, 58, 138, 0.3);
-    color: #60a5fa;
-    border: 1px solid rgba(37, 99, 235, 0.35);
+    background-color: rgb(var(--upcoming) / 0.16);
+    color: rgb(var(--upcoming));
+    border: 1px solid rgb(var(--upcoming) / 0.35);
     padding: 0.125rem 0.5rem;
     border-radius: 9999px;
   }
@@ -99,8 +224,8 @@
     align-items: center;
     font-size: 0.7rem;
     font-weight: 600;
-    background-color: #1E2433;
-    color: #6b7280;
+    background-color: rgb(var(--surface-700));
+    color: rgb(var(--fg-500));
     padding: 0.125rem 0.5rem;
     border-radius: 9999px;
   }
@@ -108,8 +233,8 @@
   /* Panel header */
   .panel-header {
     padding: 0.75rem 1.25rem;
-    background: linear-gradient(90deg, #161B27, #0D1117);
-    border-bottom: 1px solid #1E2433;
+    background: linear-gradient(90deg, rgb(var(--surface-800)), rgb(var(--surface-900)));
+    border-bottom: 1px solid rgb(var(--surface-700));
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -118,33 +243,33 @@
   /* SHAP / attribution bars */
   .shap-bar-pos {
     height: 0.5rem;
-    background: linear-gradient(90deg, #D97706, #FBBF24);
+    background: linear-gradient(90deg, rgb(var(--gold-600)), rgb(var(--gold-400)));
     border-radius: 0 0.25rem 0.25rem 0;
     transition: width 400ms ease-out;
   }
   .shap-bar-neg {
     height: 0.5rem;
-    background: linear-gradient(270deg, #7c3aed, #6d28d9);
+    background: linear-gradient(270deg, rgb(var(--away)), rgb(var(--away) / 0.85));
     border-radius: 0.25rem 0 0 0.25rem;
     transition: width 400ms ease-out;
   }
 
   /* Skeleton loader */
   .skeleton {
-    background: linear-gradient(90deg, #1E2433 25%, #2A3145 50%, #1E2433 75%);
+    background: linear-gradient(90deg, rgb(var(--surface-700)) 25%, rgb(var(--surface-600)) 50%, rgb(var(--surface-700)) 75%);
     background-size: 200% 100%;
     animation: shimmer 2s linear infinite;
     border-radius: 0.375rem;
   }
 
   /* Probability bar segments */
-  .prob-home  { height: 100%; background: linear-gradient(90deg, #e11d48, #f43f5e); transition: width 500ms ease-out; }
-  .prob-draw  { height: 100%; background-color: #374151; transition: width 500ms ease-out; }
-  .prob-away  { height: 100%; background: linear-gradient(90deg, #7c3aed, #8b5cf6); transition: width 500ms ease-out; }
+  .prob-home  { height: 100%; background: linear-gradient(90deg, rgb(var(--home) / 0.85), rgb(var(--home))); transition: width 500ms ease-out; }
+  .prob-draw  { height: 100%; background-color: rgb(var(--draw)); transition: width 500ms ease-out; }
+  .prob-away  { height: 100%; background: linear-gradient(90deg, rgb(var(--away)), rgb(var(--away) / 0.85)); transition: width 500ms ease-out; }
 
   /* Glows */
-  .glow-gold { box-shadow: 0 0 40px rgba(251, 191, 36, 0.2); }
-  .glow-red  { box-shadow: 0 0 40px rgba(225, 29, 72, 0.2); }
+  .glow-gold { box-shadow: 0 0 40px rgb(var(--gold-400) / 0.2); }
+  .glow-red  { box-shadow: 0 0 40px rgb(var(--home) / 0.2); }
 
   /* Tab buttons */
   .tab-btn {
@@ -152,22 +277,22 @@
     font-size: 0.875rem;
     font-weight: 500;
     border-radius: 0.5rem;
-    color: #9ca3af;
+    color: rgb(var(--fg-400));
     transition: color 150ms, background-color 150ms;
     border: none;
     background: transparent;
     cursor: pointer;
   }
-  .tab-btn:hover { color: #ffffff; background-color: #1E2433; }
+  .tab-btn:hover { color: rgb(var(--fg)); background-color: rgb(var(--surface-700)); }
 
   .tab-btn-active {
     padding: 0.375rem 0.875rem;
     font-size: 0.875rem;
     font-weight: 600;
     border-radius: 0.5rem;
-    background-color: rgba(217, 119, 6, 0.15);
-    color: #FBBF24;
-    border: 1px solid rgba(217, 119, 6, 0.35);
+    background-color: rgb(var(--gold-600) / 0.15);
+    color: rgb(var(--gold-400));
+    border: 1px solid rgb(var(--gold-600) / 0.35);
     cursor: pointer;
   }
 
@@ -177,39 +302,39 @@
     font-size: 0.7rem;
     font-weight: 600;
     border-radius: 9999px;
-    border: 1px solid #2A3145;
-    color: #9ca3af;
+    border: 1px solid rgb(var(--surface-600));
+    color: rgb(var(--fg-400));
     cursor: pointer;
     user-select: none;
     transition: border-color 150ms, color 150ms;
     background: transparent;
   }
-  .filter-pill:hover { border-color: #3a4560; color: #d1d5db; }
+  .filter-pill:hover { border-color: rgb(var(--surface-600) / 0.8); color: rgb(var(--fg-300)); }
 
   .filter-pill-active {
     padding: 0.2rem 0.75rem;
     font-size: 0.7rem;
     font-weight: 700;
     border-radius: 9999px;
-    border: 1px solid rgba(217, 119, 6, 0.5);
-    background-color: rgba(217, 119, 6, 0.12);
-    color: #FBBF24;
+    border: 1px solid rgb(var(--gold-600) / 0.5);
+    background-color: rgb(var(--gold-600) / 0.12);
+    color: rgb(var(--gold-400));
     cursor: pointer;
     user-select: none;
   }
 
   /* Premium card variant (for advisor / detail panels) */
   .premium-card {
-    background: linear-gradient(135deg, rgba(255,255,255,0.03) 0%, transparent 50%),
-                #0D1117;
-    border: 1px solid #1E2433;
+    background: linear-gradient(135deg, rgb(var(--border-glow) / 0.03) 0%, transparent 50%),
+                rgb(var(--surface-900));
+    border: 1px solid rgb(var(--surface-700));
     border-radius: 1rem;
     overflow: hidden;
     transition: border-color 200ms, box-shadow 200ms;
   }
   .premium-card:hover {
-    border-color: rgba(251,191,36,0.15);
-    box-shadow: 0 4px 32px rgba(0,0,0,0.6), 0 0 0 1px rgba(251,191,36,0.08);
+    border-color: rgb(var(--gold-400) / 0.15);
+    box-shadow: 0 4px 32px rgba(0,0,0,0.6), 0 0 0 1px rgb(var(--gold-400) / 0.08);
   }
 
   /* ── Breaking News Ticker ─────────────────────────────────────────────────── */
@@ -217,8 +342,8 @@
     display: flex;
     align-items: center;
     overflow: hidden;
-    background: linear-gradient(90deg, #0a0d18, #0d1117);
-    border-bottom: 1px solid #1e2433;
+    background: linear-gradient(90deg, rgb(var(--surface-950)), rgb(var(--surface-900)));
+    border-bottom: 1px solid rgb(var(--surface-700));
     height: 2.25rem;
     flex-shrink: 0;
   }
@@ -232,19 +357,19 @@
     font-weight: 800;
     letter-spacing: 0.1em;
     text-transform: uppercase;
-    color: #FBBF24;
+    color: rgb(var(--gold-400));
     white-space: nowrap;
-    border-right: 1px solid #1e2433;
+    border-right: 1px solid rgb(var(--surface-700));
     height: 100%;
     flex-shrink: 0;
-    background: linear-gradient(90deg, rgba(217,119,6,0.12), transparent);
+    background: linear-gradient(90deg, rgb(var(--gold-600) / 0.12), transparent);
   }
 
   .live-dot {
     width: 6px;
     height: 6px;
     border-radius: 9999px;
-    background: #4ade80;
+    background: rgb(var(--live));
     animation: pulseLive 1.5s ease-in-out infinite;
     flex-shrink: 0;
   }
@@ -265,19 +390,19 @@
   .ticker-item {
     font-size: 0.75rem;
     font-weight: 500;
-    color: #d1d5db;
+    color: rgb(var(--fg-300));
     padding: 0 1rem;
   }
 
   .ticker-sep {
-    color: #374151;
+    color: rgb(var(--fg-600));
     margin: 0 0.25rem;
     font-size: 0.6rem;
   }
 
   /* gradient text */
   .gradient-text {
-    background: linear-gradient(90deg, #FBBF24, #F59E0B, #D97706);
+    background: linear-gradient(90deg, rgb(var(--gold-400)), rgb(var(--gold-500)), rgb(var(--gold-600)));
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
@@ -285,9 +410,9 @@
 
   /* glass card */
   .glass-card {
-    background: rgba(13,17,23,0.7);
+    background: rgb(var(--surface-900) / 0.7);
     backdrop-filter: blur(12px);
-    border: 1px solid rgba(255,255,255,0.06);
+    border: 1px solid rgb(var(--border-glow) / 0.06);
     border-radius: 1rem;
   }
 }
