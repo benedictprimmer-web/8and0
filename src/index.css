@@ -1,5 +1,24 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:ital,wght@0,400;0,500;0,600;0,700;0,800;0,900;1,400&display=swap');
 
+/* Retro "boutique" skin: Silkscreen — a refined pixel face — for the 8-0 mark
+   and micro-labels (via font-serif remap + .section-label). Body stays Inter.
+   Self-hosted (not a CDN import) so the retro identity always loads and never
+   flashes a serif fallback. Files in public/fonts/. */
+@font-face {
+  font-family: 'Silkscreen';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url('/fonts/silkscreen-400.woff2') format('woff2');
+}
+@font-face {
+  font-family: 'Silkscreen';
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+  src: url('/fonts/silkscreen-700.woff2') format('woff2');
+}
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -39,6 +58,7 @@
   --home:     244  63  94;
   --away:     139  92 246;
   --draw:      55  65  81;
+  --teal:      79 199 192;   /* live / active / "PLAY" — the cool counterpoint */
 
   /* Accent ramp default (brass). Overridden by [data-accent] blocks below. */
   --gold-300: 244 205 130;
@@ -68,6 +88,7 @@
   --home:     244  63  94;
   --away:     139  92 246;
   --draw:      55  65  81;
+  --teal:      79 199 192;   /* live / active / "PLAY" — the cool counterpoint */
 
   --border-glow: 255 255 255;   /* subtle top highlight on cards */
 }
@@ -93,6 +114,7 @@
   --home:     190  60  40;
   --away:     124  58 237;
   --draw:     170 160 142;
+  --teal:      44 128 121;   /* deeper teal for contrast on cream */
 
   --border-glow: 42 33 24;   /* warm-ink hairline instead of light glow */
 }
@@ -188,13 +210,42 @@
   }
   .fixture-card-compact:hover { border-color: rgb(var(--surface-600)); }
 
-  /* Section labels */
+  /* Section labels — retro pixel face (Silkscreen) for short uppercase labels */
   .section-label {
-    font-size: 0.65rem;
-    font-weight: 700;
+    font-family: 'Silkscreen', 'Inter', monospace;
+    font-size: 0.6rem;
+    font-weight: 400;
     text-transform: uppercase;
-    letter-spacing: 0.12em;
+    letter-spacing: 0.06em;
     color: rgb(var(--fg-400));
+  }
+
+  /* Retro state pills (teal = live/active, muted = off, teal = play) */
+  .pill-on {
+    display: inline-flex; align-items: center;
+    font-family: 'Silkscreen', monospace;
+    font-size: 0.55rem; letter-spacing: 0.04em; text-transform: uppercase;
+    color: rgb(var(--teal));
+    background-color: rgb(var(--teal) / 0.12);
+    border: 1px solid rgb(var(--teal) / 0.5);
+    padding: 0.3rem 0.5rem; border-radius: 0.375rem;
+  }
+  .pill-off {
+    display: inline-flex; align-items: center;
+    font-family: 'Silkscreen', monospace;
+    font-size: 0.55rem; letter-spacing: 0.04em; text-transform: uppercase;
+    color: rgb(var(--fg-500));
+    border: 1px solid rgb(var(--surface-600));
+    padding: 0.3rem 0.5rem; border-radius: 0.375rem;
+  }
+  .pill-play {
+    display: inline-flex; align-items: center; gap: 0.25rem;
+    font-family: 'Silkscreen', monospace;
+    font-size: 0.55rem; letter-spacing: 0.04em; text-transform: uppercase;
+    color: rgb(var(--teal));
+    background-color: rgb(var(--teal) / 0.12);
+    border: 1px solid rgb(var(--teal) / 0.5);
+    padding: 0.3rem 0.5rem; border-radius: 0.375rem;
   }
 
   /* Status badges */
@@ -418,6 +469,26 @@
     border: 1px solid rgb(var(--border-glow) / 0.06);
     border-radius: 1rem;
   }
+
+  /* ── Retro CRT flourish ─────────────────────────────────────────────────────
+     A subtle scanline + vignette layer over the whole app. Static by default
+     (no flicker); a barely-there scan drift is added only when motion is OK.
+     Kept low-alpha so body text stays legible on both themes. */
+  .crt-overlay {
+    position: fixed; inset: 0; z-index: 40; pointer-events: none;
+    background:
+      repeating-linear-gradient(180deg, rgb(0 0 0 / 0.06) 0 1px, transparent 1px 3px),
+      radial-gradient(120% 90% at 50% 40%, transparent 62%, rgb(var(--surface-950) / 0.55) 100%);
+    mix-blend-mode: multiply;
+  }
+
+  /* Brass glow on the primary CTA (the one solid-fill element). */
+  .btn-glow {
+    box-shadow: 0 0 0 1px rgb(var(--gold-400) / 0.25),
+                0 8px 26px rgb(var(--gold-500) / 0.32);
+  }
+  /* Soft brass halo behind the pixel "8-0" mark. */
+  .retro-mark { text-shadow: 0 0 22px rgb(var(--gold-400) / 0.28); }
 }
 
 /* ── Animations ───────────────────────────────────────────────────────────── */

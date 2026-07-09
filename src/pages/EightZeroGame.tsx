@@ -3,7 +3,6 @@ import { useMutation, useQuery } from "@tanstack/react-query";
 import { Link } from "react-router-dom";
 import {
   ArrowLeft,
-  ArrowUpDown,
   Check,
   Copy,
   Globe,
@@ -22,6 +21,7 @@ import { api, leaderboardApi, type LeaderboardResponse, type RankedEntry, type S
 import { buildSubmission } from "../game8/leaderboard";
 import Celebration from "../components/Celebration";
 import Flag from "../components/Flag";
+import { PixelIcon } from "../components/PixelIcon";
 import LiveMatch from "../components/LiveMatch";
 import PenaltyShootout from "../components/PenaltyShootout";
 import HigherLower from "../components/HigherLower";
@@ -146,7 +146,7 @@ function OptionButton({
       disabled={disabled}
       className={`rounded-xl border px-4 py-3 text-center font-bold transition-colors ${
         active
-          ? "border-gold-600 bg-gold-500 text-black"
+          ? "border-gold-400 bg-gold-500/10 text-gold-300 shadow-[inset_0_0_0_1px_rgb(var(--gold-400))]"
           : "border-surface-700 bg-surface-950 text-gray-400 hover:border-gold-600/40 hover:text-white"
       } ${disabled ? "cursor-not-allowed opacity-50 hover:border-surface-700 hover:text-gray-400" : ""} ${className}`}
     >
@@ -163,6 +163,7 @@ function ModeCard({
   active,
   disabled = false,
   onClick,
+  pillKind = "toggle",
 }: {
   icon: React.ReactNode;
   title: string;
@@ -171,6 +172,7 @@ function ModeCard({
   active: boolean;
   disabled?: boolean;
   onClick: () => void;
+  pillKind?: "toggle" | "play";
 }) {
   return (
     <button
@@ -188,11 +190,7 @@ function ModeCard({
           <span className={`shrink-0 ${active ? "text-gold-400" : "text-gray-400"}`}>{icon}</span>
           <span className="truncate">{title}</span>
         </span>
-        <span
-          className={`shrink-0 rounded-full px-2 py-0.5 text-[10px] font-black uppercase tracking-wide ${
-            active ? "bg-gold-500 text-black" : "bg-surface-800 text-gray-500"
-          }`}
-        >
+        <span className={`shrink-0 ${pillKind === "play" ? "pill-play" : active ? "pill-on" : "pill-off"}`}>
           {rightLabel}
         </span>
       </div>
@@ -204,7 +202,7 @@ function ModeCard({
 function FormationGlyph({ formationId, active }: { formationId: string; active: boolean }) {
   const formation = getFormation(formationId);
   const rows: SlotCategory[] = ["FWD", "MID", "DEF", "GK"];
-  const dot = active ? "bg-black/80" : "bg-gold-500/70";
+  const dot = active ? "bg-gold-300" : "bg-gold-500/50";
   return (
     <span className="flex flex-col items-center gap-[3px]" aria-hidden="true">
       {rows.map((category) => {
@@ -697,7 +695,7 @@ function SetupScreen({
     <div className="mx-auto max-w-6xl space-y-7 animate-fade-up pb-28 sm:pb-7">
       <div className="flex items-start justify-between gap-4">
         <div>
-          <h1 className="font-serif text-4xl sm:text-6xl font-black tracking-normal text-white">8-0</h1>
+          <h1 className="retro-mark font-serif text-3xl sm:text-5xl tracking-normal text-white">8-0</h1>
           <p className="mt-2 max-w-md text-lg leading-7 text-gray-400">
             Spin a random World Cup XI, then go unbeaten — win all 8 and climb the global board.
           </p>
@@ -744,7 +742,7 @@ function SetupScreen({
               className="flex flex-col items-center justify-center px-2 py-2.5"
             >
               <span className="block text-base sm:text-lg">{difficulty.label}</span>
-              <span className={`mt-0.5 block text-[11px] leading-tight ${options.difficulty === difficulty.id ? "text-black/70" : "text-gray-500"}`}>
+              <span className={`mt-0.5 block text-[11px] leading-tight ${options.difficulty === difficulty.id ? "text-gold-300/70" : "text-gray-500"}`}>
                 {difficulty.detail}
               </span>
             </OptionButton>
@@ -753,11 +751,11 @@ function SetupScreen({
       </section>
 
       <section className="rounded-2xl border border-surface-700 bg-surface-panel p-5 shadow-2xl shadow-black/20">
-        <p className="section-label text-base tracking-[0.18em]">Game modes</p>
+        <p className="section-label text-base tracking-[0.18em]">Modifiers</p>
         <p className="mt-1 text-sm text-gray-500">Stack any combination — each one shows on your run.</p>
         <div className="mt-4 grid gap-2 sm:grid-cols-2 sm:gap-3">
           <ModeCard
-            icon={<span className="text-lg leading-none">🔥</span>}
+            icon={<PixelIcon name="flame" />}
             title="Live Ratings"
             desc={`${LIVE_BOOSTS.length} in-form players get a boost — Vozinha 66→90, Mbappé, Bellingham, Diomande…`}
             rightLabel={options.liveRatings ? "On" : "Off"}
@@ -765,7 +763,7 @@ function SetupScreen({
             onClick={() => updateOptions({ liveRatings: !options.liveRatings })}
           />
           <ModeCard
-            icon={<span className="text-lg leading-none">🔗</span>}
+            icon={<PixelIcon name="link" />}
             title="Club Chemistry"
             desc="Same-club players link up and lift your OVR. Ball-knowledge reward, capped at +3."
             rightLabel={options.chemistry ? "On" : "Off"}
@@ -773,7 +771,7 @@ function SetupScreen({
             onClick={() => updateOptions({ chemistry: !options.chemistry })}
           />
           <ModeCard
-            icon={<span className="text-lg leading-none">⚡</span>}
+            icon={<PixelIcon name="bolt" />}
             title="Super-Sub"
             desc="Draft a 12th man before kickoff — a bench impact sub who threatens late winners and lifts your pens in the knockouts."
             rightLabel={options.superSub ? "On" : "Off"}
@@ -781,7 +779,7 @@ function SetupScreen({
             onClick={() => updateOptions({ superSub: !options.superSub })}
           />
           <ModeCard
-            icon={<span className="text-lg leading-none">🙈</span>}
+            icon={<PixelIcon name="eyeoff" />}
             title="Blind Ratings"
             desc={
               options.difficulty === "hard"
@@ -794,31 +792,13 @@ function SetupScreen({
             onClick={() => updateOptions({ blindMode: !options.blindMode })}
           />
           <ModeCard
-            icon={<span className="text-lg leading-none">🏆</span>}
+            icon={<PixelIcon name="trophy" />}
             title={options.legendMode !== "none" ? `Last Dance: ${titleCase(options.legendMode)}` : "Last Dance"}
             desc="Lock a legend — Messi, Ronaldo or Neymar — as your guaranteed first pick."
             rightLabel={options.legendMode !== "none" ? titleCase(options.legendMode) : "Pick"}
             active={options.legendMode !== "none"}
             disabled={loading}
             onClick={() => (options.legendMode !== "none" ? onLegendSelect("none") : setShowLegendModal(true))}
-          />
-          <ModeCard
-            icon={<span className="text-lg leading-none">🎯</span>}
-            title="Practice Penalties"
-            desc="Warm up with a standalone shootout — no draft, just you and the keeper."
-            rightLabel="Play"
-            active={false}
-            disabled={loading}
-            onClick={() => onStartPracticePenalties?.()}
-          />
-          <ModeCard
-            icon={<ArrowUpDown size={18} />}
-            title="Higher or Lower"
-            desc="Ball-knowledge quiz: tap the player with the higher EA rating and build a streak. No draft."
-            rightLabel="Play"
-            active={false}
-            disabled={loading}
-            onClick={() => onStartHigherLower?.()}
           />
         </div>
         {showLegendModal && (
@@ -830,6 +810,33 @@ function SetupScreen({
             onClose={() => setShowLegendModal(false)}
           />
         )}
+      </section>
+
+      <section className="rounded-2xl border border-surface-700 bg-surface-panel p-5 shadow-2xl shadow-black/20">
+        <p className="section-label text-base tracking-[0.18em]">Solo games</p>
+        <p className="mt-1 text-sm text-gray-500">Standalone — no draft, jump straight in.</p>
+        <div className="mt-4 grid gap-2 sm:grid-cols-2 sm:gap-3">
+          <ModeCard
+            icon={<PixelIcon name="target" />}
+            title="Practice Penalties"
+            desc="Warm up with a standalone shootout — no draft, just you and the keeper."
+            rightLabel="Play"
+            pillKind="play"
+            active={false}
+            disabled={loading}
+            onClick={() => onStartPracticePenalties?.()}
+          />
+          <ModeCard
+            icon={<PixelIcon name="swap" />}
+            title="Higher or Lower"
+            desc="Ball-knowledge quiz: tap the player with the higher EA rating and build a streak. No draft."
+            rightLabel="Play"
+            pillKind="play"
+            active={false}
+            disabled={loading}
+            onClick={() => onStartHigherLower?.()}
+          />
+        </div>
       </section>
 
       <GlobalTopFive />
@@ -848,9 +855,9 @@ function SetupScreen({
             type="button"
             onClick={onStart}
             disabled={loading}
-            className="inline-flex w-full items-center justify-center rounded-xl bg-gold-500 px-6 py-5 text-xl font-black text-black transition-colors hover:bg-gold-400 disabled:cursor-not-allowed disabled:opacity-50"
+            className="btn-glow inline-flex w-full items-center justify-center gap-2 rounded-xl bg-gold-500 px-6 py-5 font-serif text-lg tracking-wide text-black transition-colors hover:bg-gold-400 disabled:cursor-not-allowed disabled:opacity-50"
           >
-            Start draft →
+            <Play size={18} className="fill-current" /> START
           </button>
         </div>
       </div>
