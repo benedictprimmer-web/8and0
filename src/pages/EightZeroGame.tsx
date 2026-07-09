@@ -3,6 +3,7 @@ import { useMutation, useQuery } from "@tanstack/react-query";
 import { Link } from "react-router-dom";
 import {
   ArrowLeft,
+  ArrowUpDown,
   Check,
   Copy,
   Globe,
@@ -23,6 +24,7 @@ import Celebration from "../components/Celebration";
 import Flag from "../components/Flag";
 import LiveMatch from "../components/LiveMatch";
 import PenaltyShootout from "../components/PenaltyShootout";
+import HigherLower from "../components/HigherLower";
 import TournamentBracket from "../components/TournamentBracket";
 import { buildEightZeroData, type RawPlayer, type RawTeam } from "../game8/data";
 import { selectKeeper, selectPenaltyTakers } from "../game8/penaltyLineup";
@@ -667,6 +669,7 @@ function SetupScreen({
   onStart,
   onLegendSelect,
   onStartPracticePenalties,
+  onStartHigherLower,
 }: {
   formationId: string;
   options: DraftOptions;
@@ -679,6 +682,7 @@ function SetupScreen({
   onStart: () => void;
   onLegendSelect: (legendMode: "none" | "messi" | "ronaldo" | "neymar") => void;
   onStartPracticePenalties?: () => void;
+  onStartHigherLower?: () => void;
 }) {
   const [showLegendModal, setShowLegendModal] = useState(false);
   const [showHowItWorks, setShowHowItWorks] = useState(false);
@@ -807,6 +811,15 @@ function SetupScreen({
             disabled={loading}
             onClick={() => onStartPracticePenalties?.()}
           />
+          <ModeCard
+            icon={<ArrowUpDown size={18} />}
+            title="Higher or Lower"
+            desc="Ball-knowledge quiz: tap the player with the higher EA rating and build a streak. No draft."
+            rightLabel="Play"
+            active={false}
+            disabled={loading}
+            onClick={() => onStartHigherLower?.()}
+          />
         </div>
         {showLegendModal && (
           <LegendModal
@@ -862,7 +875,7 @@ function SquadPanel({
   showPitch: boolean;
   matchGoalScorers?: Record<string, number>[];
   currentMatchIndex?: number;
-  tournamentPhase?: "idle" | "ready" | "live" | "penalties" | "practice_penalties" | "complete";
+  tournamentPhase?: "idle" | "ready" | "live" | "penalties" | "practice_penalties" | "higher_lower" | "complete";
 }) {
   // Accumulate goals only from completed matches
   const goalScorers: Record<string, number> = {};
@@ -964,7 +977,7 @@ function TeamSheet({
   hideRatings: boolean;
   matchGoalScorers?: Record<string, number>[];
   currentMatchIndex?: number;
-  tournamentPhase?: "idle" | "ready" | "live" | "penalties" | "practice_penalties" | "complete";
+  tournamentPhase?: "idle" | "ready" | "live" | "penalties" | "practice_penalties" | "higher_lower" | "complete";
   onClose: () => void;
 }) {
   // Mirror SquadPanel's goal accumulation so the sheet pitch shows the same scorers.
@@ -1397,7 +1410,7 @@ export default function EightZeroGame() {
   const [categoryFilter, setCategoryFilter] = useState<SlotCategory | "ALL">("ALL");
   const [showLeaderboard, setShowLeaderboard] = useState(false);
   const [showTeamSheet, setShowTeamSheet] = useState(false);
-  const [tournamentPhase, setTournamentPhase] = useState<"idle" | "ready" | "live" | "penalties" | "practice_penalties" | "complete">("idle");
+  const [tournamentPhase, setTournamentPhase] = useState<"idle" | "ready" | "live" | "penalties" | "practice_penalties" | "higher_lower" | "complete">("idle");
   const [currentMatchIndex, setCurrentMatchIndex] = useState(0);
   const [allMatchEvents, setAllMatchEvents] = useState<MatchEvent[][]>([]);
   // Active full-screen confetti celebration (knockout wins + the final), or
@@ -2065,7 +2078,26 @@ export default function EightZeroGame() {
           setStarted(true);
           setTournamentPhase("practice_penalties");
         }}
+        onStartHigherLower={() => {
+          setStarted(true);
+          setTournamentPhase("higher_lower");
+        }}
       />
+    );
+  }
+
+  if (started && tournamentPhase === "higher_lower") {
+    // Higher or Lower runs on the BASE EA ratings (never the Live Ratings boosts).
+    return gameData ? (
+      <HigherLower
+        players={gameData.players}
+        onExit={() => {
+          setStarted(false);
+          setTournamentPhase("idle");
+        }}
+      />
+    ) : (
+      <div className="py-20 text-center text-sm text-gray-500">Loading players…</div>
     );
   }
 
