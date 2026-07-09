@@ -3,6 +3,13 @@ export default {
   content: ["./index.html", "./src/**/*.{js,ts,jsx,tsx}"],
   theme: {
     extend: {
+      fontFamily: {
+        // Retro skin: the "8-0" mark / big display headings use the Silkscreen
+        // pixel face. `font-serif` is remapped so every existing mark picks it
+        // up app-wide; body copy stays on the default Inter sans.
+        serif: ["Silkscreen", "Georgia", "serif"],
+        pixel: ["Silkscreen", "monospace"],
+      },
       colors: {
         // Foreground ramp — remaps Tailwind's white/gray to theme variables so
         // text adapts between light and dark. Values live in src/index.css.
