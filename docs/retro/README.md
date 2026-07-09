@@ -32,20 +32,35 @@ already provide, and every CRT/pulse effect must die under reduced-motion.
 2. **Retro accent** — keep the current layout, adopt just the pixel icons +
    the sunset CTA. Much smaller change; most of the personality, little risk.
 
-## `pixel-icons.mjs`
+## Boutique cut (sleeker follow-up)
 
-The reusable generator for the icon set. Icons are authored as ASCII grids with
-a shared neon palette and compiled to a crisp SVG `<symbol>` sprite
-(`shape-rendering` pixels; use with `image-rendering:pixelated`). Vector, so
+A refined, less-neon take on the same idea: **brass + teal** instead of the
+arcade sunset (pink retired), a **redrawn monochrome icon set**, and
+**Silkscreen + Sora** instead of Press Start 2P — presented as two grounds,
+**Midnight Brass** (dark) and **Cream Console** (warm light). Also a concept
+artifact; no product code changed.
+
+## Icon generators
+
+Two reusable generators. Both author icons as ASCII grids and compile them to a
+crisp SVG `<symbol>` sprite (use with `image-rendering:pixelated`); vector, so
 they stay sharp at any size and recolour with the theme.
 
+- **`pixel-icons.mjs`** — the original **neon/duotone** set (per-icon colours).
+  Writes `/tmp/pixel-sprite.html`. Set: ball, flame, link, bolt, blind, trophy,
+  target, updown, gear, star.
+- **`pixel-icons-mono.mjs`** — the **monochrome** set used in the boutique cut:
+  one weight, `fill="currentColor"`, recolourable (brass at rest, teal when
+  live). Writes `/tmp/sprite2.html`. Set: flame, link, bolt, eyeoff, trophy,
+  target, swap, ball, gear, star. **Prefer this one** — it's the higher-fidelity,
+  cohesive set.
+
 ```bash
-node docs/retro/pixel-icons.mjs   # writes /tmp/pixel-sprite.html
+node docs/retro/pixel-icons-mono.mjs   # writes /tmp/sprite2.html
 ```
 
 To add or edit an icon, change its grid in the `ICONS` map — one char per pixel,
-`.` = transparent, letters map to the `P` palette. Current set: ball, flame,
-link, bolt, blind, trophy, target, updown, gear, star.
+`.` = transparent, `#` = filled (mono) or a palette letter (neon set).
 
 ## Fonts
 
