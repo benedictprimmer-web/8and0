@@ -1,0 +1,513 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="8and0 team talk — four ball-knowledge mechanic options, for James & Ramsay to vote on.">
+<title>8and0 — Team Talk: Ball Knowledge</title>
+<style>
+  :root {
+    --paper:      #E8EDE7;
+    --card:       #F3F6F1;
+    --ink:        #14241C;
+    --muted:      #52655B;
+    --line:       #C7D2C7;
+    --pitch:      #1C4D3A;
+    --pitch-deep: #143A2B;
+    --chalk:      rgba(255,255,255,.72);
+    --gold:       #B07E17;
+    --gold-soft:  #E6C86A;
+    --pick:       #1C6E4E;
+    --pick-bg:    rgba(28,110,78,.10);
+    --shadow:     0 1px 0 rgba(20,36,28,.05), 0 12px 30px -18px rgba(20,36,28,.35);
+    --font-disp:  "Helvetica Neue", Helvetica, Arial, system-ui, sans-serif;
+    --font-body:  system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+    --font-serif: Georgia, "Times New Roman", serif;
+    --font-mono:  ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --paper:      #0D140F;
+      --card:       #14201A;
+      --ink:        #E6EFE7;
+      --muted:      #8AA294;
+      --line:       #26362D;
+      --pitch:      #163D2E;
+      --pitch-deep: #0F2C21;
+      --chalk:      rgba(255,255,255,.70);
+      --gold:       #E8B23A;
+      --gold-soft:  #F0CF86;
+      --pick:       #46C48A;
+      --pick-bg:    rgba(70,196,138,.12);
+      --shadow:     0 12px 34px -20px rgba(0,0,0,.8);
+    }
+  }
+  :root[data-theme="light"] {
+    --paper:#E8EDE7; --card:#F3F6F1; --ink:#14241C; --muted:#52655B; --line:#C7D2C7;
+    --pitch:#1C4D3A; --pitch-deep:#143A2B; --chalk:rgba(255,255,255,.72);
+    --gold:#B07E17; --gold-soft:#E6C86A; --pick:#1C6E4E; --pick-bg:rgba(28,110,78,.10);
+    --shadow:0 1px 0 rgba(20,36,28,.05),0 12px 30px -18px rgba(20,36,28,.35);
+  }
+  :root[data-theme="dark"] {
+    --paper:#0D140F; --card:#14201A; --ink:#E6EFE7; --muted:#8AA294; --line:#26362D;
+    --pitch:#163D2E; --pitch-deep:#0F2C21; --chalk:rgba(255,255,255,.70);
+    --gold:#E8B23A; --gold-soft:#F0CF86; --pick:#46C48A; --pick-bg:rgba(70,196,138,.12);
+    --shadow:0 12px 34px -20px rgba(0,0,0,.8);
+  }
+
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: var(--paper);
+    color: var(--ink);
+    font-family: var(--font-body);
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+  }
+  .sheet { max-width: 860px; margin: 0 auto; padding: 0 20px 72px; }
+
+  /* ── Header: the team talk / tactics board ── */
+  .teamtalk {
+    position: relative;
+    margin: 0 -20px 40px;
+    padding: 44px 34px 40px;
+    background:
+      radial-gradient(circle at 50% 118%, transparent 0 118px, var(--chalk) 118px 119.5px, transparent 119.5px),
+      linear-gradient(160deg, var(--pitch) 0%, var(--pitch-deep) 100%);
+    color: #fff;
+    overflow: hidden;
+  }
+  .teamtalk::before {
+    content: "";
+    position: absolute; left: 34px; right: 34px; top: 50%;
+    height: 1.5px; background: var(--chalk); opacity: .5;
+  }
+  .eyebrow {
+    font-family: var(--font-mono);
+    font-size: 11.5px; letter-spacing: .22em; text-transform: uppercase;
+    color: var(--gold-soft); margin: 0 0 16px;
+  }
+  h1 {
+    font-family: var(--font-disp);
+    font-weight: 800; font-size: clamp(30px, 6vw, 50px); line-height: .98;
+    letter-spacing: -.02em; text-transform: uppercase; text-wrap: balance;
+    margin: 0 0 20px; max-width: 15ch;
+  }
+  h1 .hl { color: var(--gold-soft); }
+  .lede {
+    font-family: var(--font-serif);
+    font-size: 17px; line-height: 1.55; max-width: 56ch;
+    color: rgba(255,255,255,.9); margin: 0 0 22px;
+  }
+  .lede em { color: var(--gold-soft); font-style: italic; }
+  .meta {
+    display: flex; flex-wrap: wrap; gap: 8px 20px;
+    font-family: var(--font-mono); font-size: 12px; letter-spacing: .04em;
+    color: rgba(255,255,255,.72);
+    border-top: 1px solid rgba(255,255,255,.22); padding-top: 16px;
+  }
+  .meta b { color: #fff; font-weight: 600; }
+
+  /* ── Section scaffolding ── */
+  section { margin-top: 44px; }
+  .kicker {
+    display: flex; align-items: center; gap: 12px;
+    font-family: var(--font-mono); font-size: 12px; letter-spacing: .18em;
+    text-transform: uppercase; color: var(--muted); margin: 0 0 4px;
+  }
+  .kicker .num {
+    display: inline-grid; place-items: center;
+    width: 22px; height: 22px; border-radius: 50%;
+    background: var(--pitch); color: #fff; font-size: 11px; font-weight: 700;
+  }
+  .sec-title {
+    font-family: var(--font-disp); font-weight: 800;
+    font-size: clamp(21px, 3.5vw, 27px); letter-spacing: -.01em;
+    text-transform: uppercase; margin: 8px 0 18px;
+  }
+  .sec-intro { color: var(--muted); max-width: 62ch; margin: -8px 0 22px; font-size: 15px; }
+
+  /* ── "Where we're at" evidence chips ── */
+  .evidence { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 14px; }
+  .chip {
+    background: var(--card); border: 1px solid var(--line); border-radius: 14px;
+    padding: 16px 18px; box-shadow: var(--shadow);
+  }
+  .chip .tag {
+    font-family: var(--font-mono); font-size: 10.5px; letter-spacing: .14em;
+    text-transform: uppercase; color: var(--gold); margin: 0 0 8px;
+  }
+  .chip p { margin: 0; font-size: 14px; color: var(--ink); }
+  .chip p .q { color: var(--muted); }
+
+  /* ── Option cards ── */
+  .options { display: grid; gap: 16px; }
+  .opt {
+    position: relative;
+    background: var(--card); border: 1px solid var(--line); border-radius: 16px;
+    padding: 22px 22px 20px; box-shadow: var(--shadow);
+    display: grid; grid-template-columns: 44px 1fr; gap: 4px 18px;
+    transition: border-color .18s, box-shadow .18s, background .18s;
+  }
+  .opt.chosen { border-color: var(--pick); background: var(--pick-bg); }
+  .opt .badge {
+    grid-row: 1 / span 3;
+    font-family: var(--font-disp); font-weight: 800; font-size: 20px;
+    width: 44px; height: 44px; border-radius: 11px;
+    display: grid; place-items: center;
+    background: var(--pitch); color: #fff;
+  }
+  .opt.chosen .badge { background: var(--pick); }
+  .opt h3 { margin: 2px 0 2px; font-family: var(--font-disp); font-weight: 800; font-size: 19px; letter-spacing: -.01em; }
+  .opt .sub { color: var(--muted); font-size: 13px; margin: 0 0 12px; }
+  .opt .why { font-size: 14.5px; margin: 0 0 12px; }
+  .opt .why b { color: var(--ink); }
+  .opt .proof {
+    font-family: var(--font-mono); font-size: 12px; color: var(--muted);
+    border-left: 2px solid var(--gold); padding: 3px 0 3px 12px; margin: 0 0 16px;
+    line-height: 1.45;
+  }
+  .opt .foot { grid-column: 2; display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
+  .effort { font-family: var(--font-mono); font-size: 11.5px; letter-spacing: .04em; color: var(--muted); }
+  .effort b { color: var(--ink); font-weight: 600; }
+  .pickbtn {
+    font-family: var(--font-body); font-weight: 650; font-size: 13px;
+    border: 1.5px solid var(--pick); color: var(--pick); background: transparent;
+    border-radius: 999px; padding: 8px 16px; cursor: pointer;
+    transition: background .15s, color .15s;
+  }
+  .pickbtn:hover { background: var(--pick-bg); }
+  .opt.chosen .pickbtn { background: var(--pick); color: #fff; }
+  .pickbtn:focus-visible { outline: 2px solid var(--gold); outline-offset: 2px; }
+
+  /* ── Ballot ── */
+  .ballot { display: grid; gap: 22px; }
+  .qblock { }
+  .qblock .q {
+    font-family: var(--font-disp); font-weight: 700; font-size: 17px; margin: 0 0 4px;
+  }
+  .qblock .hint { color: var(--muted); font-size: 13.5px; margin: 0 0 12px; }
+  .choices { display: flex; flex-wrap: wrap; gap: 10px; }
+  .choice {
+    flex: 1 1 180px;
+    border: 1px solid var(--line); background: var(--card); border-radius: 12px;
+    padding: 13px 15px; cursor: pointer; box-shadow: var(--shadow);
+    transition: border-color .15s, background .15s;
+  }
+  .choice:hover { border-color: var(--gold); }
+  .choice.on { border-color: var(--pick); background: var(--pick-bg); }
+  .choice .ct { font-weight: 650; font-size: 14px; display: flex; align-items: center; gap: 8px; }
+  .choice .dot {
+    width: 14px; height: 14px; border-radius: 50%; border: 1.5px solid var(--muted); flex: none;
+  }
+  .choice.on .dot { border-color: var(--pick); background: var(--pick); box-shadow: inset 0 0 0 2.5px var(--card); }
+  .choice .cd { color: var(--muted); font-size: 12.5px; margin-top: 5px; }
+
+  /* ── Summary ── */
+  .summary {
+    margin-top: 40px; border: 1.5px dashed var(--gold); border-radius: 16px;
+    background: var(--card); padding: 22px 22px 20px; box-shadow: var(--shadow);
+  }
+  .summary h3 {
+    font-family: var(--font-disp); font-weight: 800; text-transform: uppercase;
+    font-size: 16px; letter-spacing: .02em; margin: 0 0 4px;
+    display: flex; align-items: center; gap: 9px;
+  }
+  .summary h3 .ball { font-size: 18px; }
+  .summary .note { color: var(--muted); font-size: 13px; margin: 0 0 14px; }
+  #verdict {
+    font-family: var(--font-mono); font-size: 13px; line-height: 1.75;
+    background: var(--paper); border: 1px solid var(--line); border-radius: 10px;
+    padding: 14px 16px; white-space: pre-wrap; color: var(--ink);
+    min-height: 90px;
+  }
+  #verdict .ph { color: var(--muted); }
+  .copyrow { display: flex; align-items: center; gap: 12px; margin-top: 14px; }
+  .copybtn {
+    font-family: var(--font-body); font-weight: 650; font-size: 13.5px;
+    background: var(--gold); color: #1a1405; border: none; border-radius: 999px;
+    padding: 10px 20px; cursor: pointer;
+  }
+  .copybtn:focus-visible { outline: 2px solid var(--pick); outline-offset: 2px; }
+  .copied { font-family: var(--font-mono); font-size: 12px; color: var(--pick); opacity: 0; transition: opacity .2s; }
+  .copied.show { opacity: 1; }
+
+  footer {
+    margin-top: 40px; padding-top: 18px; border-top: 1px solid var(--line);
+    color: var(--muted); font-size: 12.5px; font-family: var(--font-mono);
+    letter-spacing: .03em;
+  }
+
+  @media (max-width: 520px) {
+    .opt { grid-template-columns: 1fr; }
+    .opt .badge { grid-row: auto; }
+    .opt .foot { grid-column: 1; }
+  }
+  @media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+</style>
+</head>
+<body>
+<div class="sheet">
+
+  <header class="teamtalk">
+    <p class="eyebrow">8and0 · design team talk</p>
+    <h1>Ball knowledge: <span class="hl">which mechanic do we build next?</span></h1>
+    <p class="lede">
+      Right now the only way the game rewards <em>actually knowing football</em> is
+      chemistry — spotting when two of your drafted players share a club. I want more
+      ways to reward the art of knowing your stuff, and I trust you two more than any
+      focus group. Read the four options, then <em>cast your votes at the bottom</em>.
+    </p>
+    <div class="meta">
+      <span>To: <b>James &amp; Ramsay</b></span>
+      <span>From: <b>Ben</b></span>
+      <span>Re: <b>8and0.app</b></span>
+      <span>Reply by: <b>whenever, over a pint</b></span>
+    </div>
+  </header>
+
+  <!-- WHERE WE'RE AT -->
+  <section>
+    <p class="kicker"><span class="num">1</span> where we're at</p>
+    <h2 class="sec-title">What's already on the pitch</h2>
+    <p class="sec-intro">
+      Quick lay of the land so your vote is informed. Three things already exist — the
+      new ideas build on this foundation rather than start from scratch.
+    </p>
+    <div class="evidence">
+      <div class="chip">
+        <p class="tag">Live now</p>
+        <p><b>Chemistry.</b> <span class="q">Two players from the same real club quietly lift your team's rating. It's deliberately hard to farm from random nation spins — a flex, not a crutch.</span></p>
+      </div>
+      <div class="chip">
+        <p class="tag">Live now</p>
+        <p><b>Higher or Lower.</b> <span class="q">A side quiz — guess which of two players is rated higher. Tracks your best streak. Proof people enjoy a pure knowledge test.</span></p>
+      </div>
+      <div class="chip">
+        <p class="tag">In the data, unused</p>
+        <p><b>Fame ≠ quality.</b> <span class="q">Every player carries a "fame" score separate from their rating. The gap between who casuals recognise and who's actually good is sitting there waiting to be used.</span></p>
+      </div>
+    </div>
+  </section>
+
+  <!-- THE OPTIONS -->
+  <section>
+    <p class="kicker"><span class="num">2</span> the shortlist</p>
+    <h2 class="sec-title">Four ways to reward ball knowledge</h2>
+    <p class="sec-intro">
+      Each one rewards a different kind of knowing. Tap <b>“Make this #1”</b> on your favourite
+      as you read — that feeds the ballot at the bottom.
+    </p>
+
+    <div class="options" id="options">
+
+      <article class="opt" data-opt="A">
+        <div class="badge">A</div>
+        <h3>Scout's Eye</h3>
+        <p class="sub">Reward spotting the best player — when the game won't tell you</p>
+        <p class="why">
+          In blind/hard mode ratings are hidden. If you pick the genuinely best player
+          available for that slot <b>without being shown the numbers</b>, you get a
+          “Perfect Pick” — a small boost and a streak. Pure eye for a player.
+        </p>
+        <p class="proof">EVIDENCE — Blind mode already hides ratings, so the hard part is built. This just scores whether your gut was right. Rewards the exact skill: knowing who's good.</p>
+        <div class="foot">
+          <span class="effort">Effort: <b>Low</b> · uses what's already there</span>
+          <button class="pickbtn" data-pick="A">Make this #1</button>
+        </div>
+      </article>
+
+      <article class="opt" data-opt="B">
+        <div class="badge">B</div>
+        <h3>Knowledge is currency</h3>
+        <p class="sub">Answer trivia mid-draft to earn an edge</p>
+        <p class="why">
+          When a nation lands, get a quick question about <b>that</b> country
+          (“Portugal's all-time top scorer?”). Nail it and you win an extra re-spin —
+          or, in blind mode, you get to <b>reveal one hidden rating</b>. Knowledge you
+          can literally spend.
+        </p>
+        <p class="proof">EVIDENCE — Higher or Lower proves the quiz is fun on its own. This wires it into the main game so knowing your stuff changes the draft, not just a side score.</p>
+        <div class="foot">
+          <span class="effort">Effort: <b>Medium</b> · needs a trivia bank</span>
+          <button class="pickbtn" data-pick="B">Make this #1</button>
+        </div>
+      </article>
+
+      <article class="opt" data-opt="C">
+        <div class="badge">C</div>
+        <h3>Chemistry 2.0</h3>
+        <p class="sub">Reward the deep cuts, not just club-mates</p>
+        <p class="why">
+          Go beyond “same club.” Reward a real <b>national spine</b> (club + country
+          together) and famous real-life <b>partnerships</b> — a keeper and his centre-back,
+          a classic full-back/winger duo. The stuff only a proper fan spots.
+        </p>
+        <p class="proof">EVIDENCE — Chemistry already works and players like it. This widens what counts as knowledge while keeping it hard to fluke from random spins.</p>
+        <div class="foot">
+          <span class="effort">Effort: <b>Medium</b> · needs a partnerships list</span>
+          <button class="pickbtn" data-pick="C">Make this #1</button>
+        </div>
+      </article>
+
+      <article class="opt" data-opt="D">
+        <div class="badge">D</div>
+        <h3>Ball Knowledge Rating</h3>
+        <p class="sub">One number that grows the more you show you know</p>
+        <p class="why">
+          A personal stat that climbs across games — from perfect picks, spotting
+          underrated gems, chemistry built, quiz streaks. A <b>second leaderboard</b>
+          that isn't about your team's rating, it's about <b>you</b>. Turns a vibe into
+          a score you chase.
+        </p>
+        <p class="proof">EVIDENCE — The abstract idea becomes tangible and competitive. Best built last, on top of A–C, since it counts up everything they produce.</p>
+        <div class="foot">
+          <span class="effort">Effort: <b>Higher</b> · sits on top of the others</span>
+          <button class="pickbtn" data-pick="D">Make this #1</button>
+        </div>
+      </article>
+
+    </div>
+  </section>
+
+  <!-- YOUR CALL -->
+  <section>
+    <p class="kicker"><span class="num">3</span> your call</p>
+    <h2 class="sec-title">Three decisions I need you on</h2>
+
+    <div class="ballot">
+
+      <div class="qblock">
+        <p class="q">1 · Your #1 to build first</p>
+        <p class="hint">Set above by tapping “Make this #1.” Current pick shows in the summary.</p>
+      </div>
+
+      <div class="qblock" data-group="tone">
+        <p class="q">2 · How loud should it be?</p>
+        <p class="hint">Should knowing football be a quiet bonus, or an obvious part of the game?</p>
+        <div class="choices">
+          <div class="choice" data-val="Subtle — keep it a quiet reward">
+            <div class="ct"><span class="dot"></span>Keep it subtle</div>
+            <div class="cd">A bonus the sharp players notice. No pop-ups.</div>
+          </div>
+          <div class="choice" data-val="A mix of subtle and overt">
+            <div class="ct"><span class="dot"></span>A bit of both</div>
+            <div class="cd">Passive rewards + the odd celebrated moment.</div>
+          </div>
+          <div class="choice" data-val="Overt — make it a proper game-show feature">
+            <div class="ct"><span class="dot"></span>Make it loud</div>
+            <div class="cd">Trivia, streaks, badges — front and centre.</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="qblock" data-group="fame">
+        <p class="q">3 · The fame question</p>
+        <p class="hint">Casuals pick the famous name; the sharp pick the better player. Do we punish the lazy pick?</p>
+        <div class="choices">
+          <div class="choice" data-val="Yes — reward picking the underrated over the famous">
+            <div class="ct"><span class="dot"></span>Yes, reward the smart pick</div>
+            <div class="cd">Underrated gem &gt; famous name.</div>
+          </div>
+          <div class="choice" data-val="Only inside a special hard mode">
+            <div class="ct"><span class="dot"></span>Only in a hard mode</div>
+            <div class="cd">Keep normal play friendly; opt in for the challenge.</div>
+          </div>
+          <div class="choice" data-val="No — never punish picking a legend">
+            <div class="ct"><span class="dot"></span>Leave fame alone</div>
+            <div class="cd">Picking a legend should always feel good.</div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- SUMMARY -->
+    <div class="summary">
+      <h3><span class="ball">⚽</span> Your verdict</h3>
+      <p class="note">Updates as you choose. Hit copy and paste it straight into the group chat.</p>
+      <div id="verdict"><span class="ph">Make your picks above and your team talk back to me appears here…</span></div>
+      <div class="copyrow">
+        <button class="copybtn" id="copy">Copy for the group chat</button>
+        <span class="copied" id="copied">Copied ✓</span>
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    8and0.app · design note for James &amp; Ramsay · no wrong answers, only strong opinions
+  </footer>
+
+</div>
+
+<script>
+  const state = { top: null, tone: null, fame: null };
+  const optNames = {
+    A: "A · Scout's Eye",
+    B: "B · Knowledge is currency",
+    C: "C · Chemistry 2.0",
+    D: "D · Ball Knowledge Rating",
+  };
+
+  // Option "Make this #1"
+  document.querySelectorAll(".pickbtn").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      state.top = btn.dataset.pick;
+      document.querySelectorAll(".opt").forEach((o) =>
+        o.classList.toggle("chosen", o.dataset.opt === state.top)
+      );
+      document.querySelectorAll(".pickbtn").forEach((b) => {
+        b.textContent = b.dataset.pick === state.top ? "Your #1 ✓" : "Make this #1";
+      });
+      render();
+    });
+  });
+
+  // Single-select choice groups
+  document.querySelectorAll("[data-group]").forEach((group) => {
+    const key = group.dataset.group;
+    group.querySelectorAll(".choice").forEach((c) => {
+      c.addEventListener("click", () => {
+        state[key] = c.dataset.val;
+        group.querySelectorAll(".choice").forEach((x) => x.classList.toggle("on", x === c));
+        render();
+      });
+    });
+  });
+
+  function render() {
+    const v = document.getElementById("verdict");
+    if (!state.top && !state.tone && !state.fame) {
+      v.innerHTML = '<span class="ph">Make your picks above and your team talk back to me appears here…</span>';
+      return;
+    }
+    const lines = ["MY VERDICT — 8and0 ball knowledge", ""];
+    lines.push("• Build first:  " + (state.top ? optNames[state.top] : "— (not picked)"));
+    lines.push("• Loudness:     " + (state.tone || "— (not picked)"));
+    lines.push("• Fame:         " + (state.fame || "— (not picked)"));
+    lines.push("");
+    lines.push("— " + (nameGuess() || "your mate"));
+    v.textContent = lines.join("\n");
+  }
+
+  // small flourish: no real name known, leave a blank they can edit after paste
+  function nameGuess() { return ""; }
+
+  document.getElementById("copy").addEventListener("click", async () => {
+    const text = document.getElementById("verdict").innerText;
+    try {
+      await navigator.clipboard.writeText(text);
+    } catch (e) {
+      const r = document.createRange();
+      r.selectNodeContents(document.getElementById("verdict"));
+      const sel = window.getSelection();
+      sel.removeAllRanges(); sel.addRange(r);
+      document.execCommand("copy"); sel.removeAllRanges();
+    }
+    const c = document.getElementById("copied");
+    c.classList.add("show");
+    setTimeout(() => c.classList.remove("show"), 1600);
+  });
+</script>
+</body>
+</html>
