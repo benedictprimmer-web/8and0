@@ -17,20 +17,21 @@
    opacity utilities (e.g. bg-surface-900/40) keep working via rgb(var(--x)/α). */
 :root {
   /* Foreground ramp — remaps Tailwind's white/gray so text adapts per theme.
-     text-white → --fg, text-gray-300/400/500/600 → --fg-300/400/500/600. */
-  --fg:      255 255 255;
-  --fg-300:  209 213 219;
-  --fg-400:  156 163 175;
-  --fg-500:  107 114 128;
-  --fg-600:   75  85  99;
+     text-white → --fg, text-gray-300/400/500/600 → --fg-300/400/500/600.
+     "Midnight Brass" dark cut: warm bone text on a teal-biased near-black. */
+  --fg:      239 231 214;
+  --fg-300:  199 205 205;
+  --fg-400:  159 171 174;
+  --fg-500:  109 122 126;
+  --fg-600:   80  92  96;
 
-  /* Surface ramp (deep navy-black in dark). */
-  --surface-950:  6   8  16;
-  --surface-900: 13  17  23;
-  --surface-800: 22  27  39;
-  --surface-700: 30  36  51;
-  --surface-600: 42  49  69;
-  --surface-panel: 17 17 31;   /* section panels / modals (was hardcoded #11111f) */
+  /* Surface ramp — "Midnight Brass" (deep teal-black in dark). */
+  --surface-950: 11  18  22;   /* #0B1216 page ground */
+  --surface-900: 17  31  36;   /* #111F24 cards */
+  --surface-800: 22  38  44;   /* #16262C raised */
+  --surface-700: 34  52  58;   /* #22343A borders */
+  --surface-600: 45  64  70;   /* #2D4046 border hover */
+  --surface-panel: 17 31 36;   /* #111F24 section panels / modals */
 
   /* Semantic colours (kept meaningful across themes). */
   --live:      74 222 128;
@@ -39,27 +40,28 @@
   --away:     139  92 246;
   --draw:      55  65  81;
 
-  /* Accent ramp default (gold). Overridden by [data-accent] blocks below. */
-  --gold-300: 252 211  77;
-  --gold-400: 251 191  36;
-  --gold-500: 245 158  11;
-  --gold-600: 217 119   6;
+  /* Accent ramp default (brass). Overridden by [data-accent] blocks below. */
+  --gold-300: 244 205 130;
+  --gold-400: 232 183  98;
+  --gold-500: 224 169  74;
+  --gold-600: 201 138  46;
 }
 
 /* ── Dark theme (default) ─────────────────────────────────────────────────── */
 :root[data-theme="dark"] {
-  --fg:      255 255 255;
-  --fg-300:  209 213 219;
-  --fg-400:  156 163 175;
-  --fg-500:  107 114 128;
-  --fg-600:   75  85  99;
+  /* "Midnight Brass" — warm bone on teal-biased near-black. */
+  --fg:      239 231 214;
+  --fg-300:  199 205 205;
+  --fg-400:  159 171 174;
+  --fg-500:  109 122 126;
+  --fg-600:   80  92  96;
 
-  --surface-950:  6   8  16;
-  --surface-900: 13  17  23;
-  --surface-800: 22  27  39;
-  --surface-700: 30  36  51;
-  --surface-600: 42  49  69;
-  --surface-panel: 17 17 31;
+  --surface-950: 11  18  22;
+  --surface-900: 17  31  36;
+  --surface-800: 22  38  44;
+  --surface-700: 34  52  58;
+  --surface-600: 45  64  70;
+  --surface-panel: 17 31 36;
 
   --live:      74 222 128;
   --upcoming:  96 165 250;
@@ -72,26 +74,27 @@
 
 /* ── Light theme ──────────────────────────────────────────────────────────── */
 :root[data-theme="light"] {
-  --fg:       15  23  42;   /* slate-900 → primary text */
-  --fg-300:   30  41  59;   /* slate-800 → bright secondary */
-  --fg-400:   71  85 105;   /* slate-600 → muted */
-  --fg-500:  100 116 139;   /* slate-500 → subtle */
-  --fg-600:  148 163 184;   /* slate-400 → faint */
+  /* "Cream Console" — warm ink on antique parchment. */
+  --fg:       42  33  24;   /* #2A2118 → primary text */
+  --fg-300:   61  52  40;   /* #3D3428 → bright secondary */
+  --fg-400:  106  97  82;   /* #6A6152 → muted */
+  --fg-500:  138 128 112;   /* #8A8070 → subtle */
+  --fg-600:  170 160 142;   /* #AAA08E → faint */
 
-  --surface-950: 247 248 250;  /* page background */
-  --surface-900: 255 255 255;  /* cards */
-  --surface-800: 241 244 248;  /* raised */
-  --surface-700: 226 230 236;  /* borders */
-  --surface-600: 203 210 220;  /* border hover */
-  --surface-panel: 255 255 255; /* section panels / modals (white, lifted by shadow) */
+  --surface-950: 236 228 211;  /* #ECE4D3 page background */
+  --surface-900: 251 247 236;  /* #FBF7EC cards */
+  --surface-800: 243 236 219;  /* #F3ECDB raised */
+  --surface-700: 224 214 193;  /* #E0D6C1 borders */
+  --surface-600: 209 197 173;  /* #D1C5AD border hover */
+  --surface-panel: 251 247 236; /* #FBF7EC section panels / modals */
 
-  --live:      22 163  74;   /* darker green for contrast on white */
+  --live:      22 130  74;   /* deeper green for contrast on cream */
   --upcoming:  37  99 235;
-  --home:     225  29  72;
+  --home:     190  60  40;
   --away:     124  58 237;
-  --draw:     148 163 184;
+  --draw:     170 160 142;
 
-  --border-glow: 15 23 42;   /* dark hairline instead of light glow */
+  --border-glow: 42 33 24;   /* warm-ink hairline instead of light glow */
 }
 
 /* ── Accent ramps ─────────────────────────────────────────────────────────────
@@ -104,8 +107,8 @@
      • 300/400 are used as accent TEXT (text-gold-400/300 on light surfaces) —
        in light mode these go DARK so the text is readable on white.
    Keeping the fills vivid is what makes primary CTAs legible in light mode. */
-:root[data-accent="gold"]                       { --gold-300: 252 211 77; --gold-400: 251 191 36; --gold-500: 245 158 11; --gold-600: 217 119 6; }
-:root[data-theme="light"][data-accent="gold"]   { --gold-300: 180 83 9;   --gold-400: 180 83 9;   --gold-500: 245 158 11; --gold-600: 251 191 36; }
+:root[data-accent="gold"]                       { --gold-300: 244 205 130; --gold-400: 232 183 98; --gold-500: 224 169 74; --gold-600: 201 138 46; }
+:root[data-theme="light"][data-accent="gold"]   { --gold-300: 176 118 28;  --gold-400: 176 118 28; --gold-500: 201 138 46; --gold-600: 224 169 74; }
 
 :root[data-accent="blue"]                       { --gold-300: 147 197 253; --gold-400: 96 165 250; --gold-500: 59 130 246; --gold-600: 37 99 235; }
 :root[data-theme="light"][data-accent="blue"]   { --gold-300: 29 78 216;   --gold-400: 29 78 216;  --gold-500: 59 130 246; --gold-600: 96 165 250; }
@@ -437,11 +440,11 @@
   100% { transform: scale(1.0); opacity: 1; }
 }
 @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
-/* Slot-machine landing: brief scale overshoot with a gold glow flash. */
+/* Slot-machine landing: brief scale overshoot with a brass glow flash. */
 @keyframes reelLand {
-  0%   { transform: scale(1.0); box-shadow: 0 0 0 0 rgba(250, 204, 21, 0); }
-  40%  { transform: scale(1.12); box-shadow: 0 0 22px 6px rgba(250, 204, 21, 0.55); }
-  100% { transform: scale(1.0); box-shadow: 0 0 0 0 rgba(250, 204, 21, 0); }
+  0%   { transform: scale(1.0); box-shadow: 0 0 0 0 rgba(224, 169, 74, 0); }
+  40%  { transform: scale(1.12); box-shadow: 0 0 22px 6px rgba(224, 169, 74, 0.55); }
+  100% { transform: scale(1.0); box-shadow: 0 0 0 0 rgba(224, 169, 74, 0); }
 }
 /* Floating "+1 GOAL" callout: rises and fades out. */
 @keyframes goalFloat {
