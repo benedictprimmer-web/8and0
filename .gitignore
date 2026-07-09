@@ -5,3 +5,6 @@ dist
 .DS_Store
 .gstack/
 probe_report.md
+
+# local UI review renders (throwaway)
+scratchpad-shots/
