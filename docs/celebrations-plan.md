@@ -41,31 +41,41 @@ runtime, no keys in the browser, sim untouched, deterministic.
 
 ## The Higgsfield pipeline (per celebration, offline)
 
-### Step 1 — Pixel-art still (`generate_image`)
+### Step 1 — Pixel-art pose stills (`generate_image`)
 
-- **Model:** `nano_banana_pro` (strong prompt adherence) — or `z_image` for a fast/cheap draft.
-- **Aspect:** `3:4` (portrait card).
+Generate the **celebration as keyframes** — the same character in 2–3 poses — so
+the video has a start and an end to interpolate between (much cleaner motion,
+guaranteed signature pose).
+
+- **Model:** `nano_banana_pro` (~2 credits each). **Aspect:** `3:4`.
+- **Poses (one still each):**
+  - **`run`** — sprinting away after scoring, arms back, head up (goal → run-off).
+  - **`jump`** _(optional)_ — mid-leap, about to set the pose.
+  - **`cross`** — landed, **arms crossed**, proud/calm (Mbappé signature).
+- **Consistency:** pass the first still as `medias: [{ role: "image_references", value: "<job_id>" }]` on the others so it stays the same player (or train a **Soul** character later for the hero set).
+- **Shared prompt base:**
+
+  > 16-bit pixel-art sprite of a football (soccer) player, royal-blue #10 home kit,
+  > white shorts, dark boots. Chunky retro game pixels, limited palette, crisp hard
+  > edges, no anti-aliasing, plain dark background, full body, centred.
+  > &nbsp;&nbsp;• run → "…sprinting to the right, arms swept back, celebrating a goal."
+  > &nbsp;&nbsp;• jump → "…mid-air leap, fists clenched."
+  > &nbsp;&nbsp;• cross → "…standing, arms crossed over the chest, proud and calm."
+
+- Keep each **job_id**. The current spike's `cross` still already exists:
+  `3ad71956-09e3-4f56-a4f6-d4d65f0ad75e` (2 credits, done).
+
+### Step 2 — Animate between keyframes (`generate_video`)
+
+- **Model:** **`seedance_2_0_mini`** — budget variant, supports **`start_image` + `end_image`** keyframes. `480p`, `generate_audio:false` → **~5 credits / 5s**. (Cheap. `kling3_0` also does start+end but costs more.)
+- **Input:** `medias: [{ role:"start_image", value:"<run job_id>" }, { role:"end_image", value:"<cross job_id>" }]`, `duration:5`, `resolution:"480p"`, `generate_audio:false`.
 - **Prompt:**
 
-  > 16-bit pixel-art sprite of a football (soccer) player mid-celebration, arms
-  > crossed confidently across the chest, calm proud expression. Royal-blue home
-  > kit with a white number 10 and red/white trim, white shorts. Full body,
-  > front-facing, centred. Chunky retro game pixels, limited palette, crisp hard
-  > edges, no anti-aliasing, plain dark background. Arcade sports-game hero pose.
+  > Pixel-art footballer runs in from a goal, leaps and lands into a proud
+  > arms-crossed pose with a slight bounce. Camera locked, minimal background
+  > motion, retro game feel, seamless loop.
 
-- Iterate until the sprite reads clean at small size. Keep the **job_id** for step 2.
-
-### Step 2 — Animate (`generate_video`, image→video)
-
-- **Model:** `kling3_0_turbo` (fast single-start-frame animation) — or `seedance_2_0` when identity consistency matters.
-- **Input:** `medias: [{ role: "start_image", value: "<image job_id>" }]`, `duration: 5`.
-- **Prompt:**
-
-  > The player holds the arms-crossed pose, then a subtle proud celebration — a
-  > small confident nod and slight bounce — and re-crosses the arms. Camera
-  > locked, minimal background motion, retro game feel, seamless loop.
-
-- **Consistency across legends:** train a **Soul** character (`show_characters action='train'`, 5–20 refs) so the same stylised player recurs on-model. Optional for the spike.
+- Optional 3-keyframe version: two clips (`run→jump`, `jump→cross`) concatenated. Start with the simple 2-keyframe clip first.
 
 ### Step 3 — Re-pixelate + loop (local, `ffmpeg`)
 
@@ -157,10 +167,54 @@ Tune `crf`/scale to hit the size budget. Store both `.webm` and `.png`.
 ## Continuing in a fresh session
 
 Recommended: a new session on branch `feat/pixel-celebrations`, Higgsfield MCP
-connected. Point it at this file and run the Phase-0 spike.
+connected. Key facts:
 
 - **Mbappé** = `player_id: 121` (FRA, FW, shirt #10) in `public/data/players.json`.
   Key the manifest and the `LiveMatch` goal-scorer check off the **id**, never the
   hard-coded name (house rule).
 - The spike clip lands at `public/celebrations/121.webm` + `121.png`.
+- Existing `cross` still (arms crossed): job `3ad71956-09e3-4f56-a4f6-d4d65f0ad75e`.
+
+### Copy-paste starter prompt
+
+```
+Read docs/celebrations-plan.md end to end — that's the game plan. Do the
+Phase-0 "Pixel Celebrations" spike for 8and0 on a new branch
+feat/pixel-celebrations. The Higgsfield MCP is connected. Decisions are locked:
+real named legend (Mbappé, player_id 121), trigger = a drafted legend scores a
+goal → clip plays in LiveMatch, cheap models only, don't merge.
+
+1. KEYFRAMES (generate_image, nano_banana_pro, 3:4, ~2 credits each): make the
+   celebration as poses of the SAME pixel player — `run` (sprinting off after a
+   goal) and `cross` (arms crossed, Mbappé signature). Reuse the existing cross
+   still 3ad71956-09e3-4f56-a4f6-d4d65f0ad75e if it still looks good; otherwise
+   regenerate. Keep them consistent (pass one as image_references on the other).
+   Show me the stills before the video.
+
+2. VIDEO (generate_video, seedance_2_0_mini, ~5 credits): preflight cost first
+   (get_cost:true). Then start_image = run, end_image = cross, duration 5,
+   resolution 480p, generate_audio false. Prompt: "Pixel-art footballer runs in
+   from a goal, leaps and lands into a proud arms-crossed pose, slight bounce,
+   camera locked, minimal background, seamless loop." Show me before spending
+   more.
+
+3. RE-PIXELATE + LOOP (ffmpeg, see this doc): nearest-neighbour down/up, ~12fps,
+   boomerang loop, vp9 webm < 300KB, plus a poster PNG. Save as
+   public/celebrations/121.webm and 121.png.
+
+4. WIRE THE SPIKE: add src/components/CelebrationClip.tsx (autoplay/muted/loop,
+   poster; prefers-reduced-motion → poster only) + public/celebrations/
+   celebrations.json manifest keyed by player_id. In LiveMatch, when the goal
+   scorer's player_id has a clip, overlay <CelebrationClip> for ~2-3s. Purely
+   presentational — do NOT touch game8/ sim or the seed. PenaltyShootout.tsx is
+   off-limits.
+
+5. VERIFY in the real app (npm run dev + a phone-viewport screenshot), both
+   themes, and the reduced-motion fallback. Run npm test + npm run lint +
+   npm run build. DON'T merge — show me the result first.
+
+Note: the sandbox proxy blocks the Higgsfield CDN + the live domain, so use the
+job_display widget to show me generated media, and drive the app locally for
+screenshots.
+```
 </content>
