@@ -35,29 +35,19 @@ interface InteractivePenaltyKick {
 
 type PenaltyMode = "shooter" | "goalkeeper" | "both";
 
-// Pixel-art art direction: two generated sprite sets the player can flip between
-// in practice. Each style ships a stadium background plus keeper/ball sprites,
-// and its own goal geometry (the generated goalmouth sits at a different height
-// in each backdrop), so all overlay positions are driven off GOAL_RECT.
-type SpriteStyle = "16" | "32";
 // How the shooter aims. Two experiments toggled in practice: a 6-zone target
 // grid, or a timed power/placement meter. See resolvePlacedKick / resolvePoweredKick.
 type AimMode = "sixzone" | "power";
 
+// Pixel-art sprite set (16-bit look) — stadium background plus keeper poses.
 const A = "/assets/penalty";
-const STYLE_ASSETS: Record<SpriteStyle, { bg: string; ready: string; dive: string; jump: string }> = {
-  "16": { bg: `${A}/bg16.png`, ready: `${A}/keeper16_ready.png`, dive: `${A}/keeper16_dive.png`, jump: `${A}/keeper16_jump.png` },
-  "32": { bg: `${A}/bg32.png`, ready: `${A}/keeper32_ready.png`, dive: `${A}/keeper32_dive.png`, jump: `${A}/keeper32_jump.png` },
-};
+const ASSETS = { bg: `${A}/bg16.png`, ready: `${A}/keeper16_ready.png`, dive: `${A}/keeper16_dive.png`, jump: `${A}/keeper16_jump.png` };
 const BALL_SRC = `${A}/ball.png`;
 
-// Goalmouth rectangle within the 16:9 arena, as percentages. Measured from the
-// generated backgrounds; nudge here if a sprite drifts off the posts.
-interface GoalRect { left: number; right: number; top: number; bottom: number; keeperH: number; }
-const GOAL_RECT: Record<SpriteStyle, GoalRect> = {
-  "16": { left: 28, right: 71, top: 19, bottom: 51, keeperH: 34 },
-  "32": { left: 29, right: 71, top: 42, bottom: 70, keeperH: 30 },
-};
+// Goalmouth rectangle within the 16:9 arena, as percentages of the backdrop.
+// All overlay positions (zones, keeper, ball) are driven off this; nudge if a
+// sprite drifts off the posts.
+const RECT = { left: 28, right: 71, top: 19, bottom: 51, keeperH: 34 };
 const SPOT = { top: 84, left: 50 }; // penalty spot in the arena
 
 interface PenaltyShootoutProps {
@@ -198,9 +188,7 @@ export default function PenaltyShootout({
   const [currentKick, setCurrentKick] = useState<InteractivePenaltyKick | null>(null);
   const [userWon, setUserWon] = useState<boolean | null>(null);
   const [selectedMode, setSelectedMode] = useState<PenaltyMode | null>(mode || null);
-  // Art direction + aim experiment. Default to the 16-bit look and the 6-zone
-  // grid; both can be flipped live from the practice control strip.
-  const [spriteStyle, setSpriteStyle] = useState<SpriteStyle>("16");
+  // Aim experiment: default to the 6-zone grid; flip to power from the practice strip.
   const [aimMode, setAimMode] = useState<AimMode>("sixzone");
   // Power-mode meter: a marker sweeps 0→100→0; the shooter locks a side first,
   // then taps to fire. Accuracy = how close the marker is to the sweet spot (50).
@@ -211,8 +199,8 @@ export default function PenaltyShootout({
   // flips and they move — so the CSS transition eases instead of snapping (a
   // value + transition set in the same commit skips the animation).
   const [launched, setLaunched] = useState(false);
-  const activeRect = GOAL_RECT[spriteStyle];
-  const assets = STYLE_ASSETS[spriteStyle];
+  const activeRect = RECT;
+  const assets = ASSETS;
 
   const effectiveMode = useMemo(() => {
     if (selectedMode) return selectedMode;
@@ -702,18 +690,6 @@ export default function PenaltyShootout({
                 {practiceMode && (
                   <div className="mb-3 flex flex-wrap items-center justify-center gap-2">
                     <div className="inline-flex overflow-hidden rounded-lg border border-surface-700 text-xs font-black">
-                      {(["16", "32"] as SpriteStyle[]).map((s) => (
-                        <button
-                          key={s}
-                          type="button"
-                          onClick={() => setSpriteStyle(s)}
-                          className={`px-3 py-1.5 transition-colors ${spriteStyle === s ? "bg-gold-500 text-black" : "bg-surface-900 text-gray-400 hover:text-white"}`}
-                        >
-                          {s}-bit
-                        </button>
-                      ))}
-                    </div>
-                    <div className="inline-flex overflow-hidden rounded-lg border border-surface-700 text-xs font-black">
                       {([["sixzone", "6-Zone"], ["power", "Power"]] as [AimMode, string][]).map(([m, label]) => (
                         <button
                           key={m}
@@ -728,7 +704,7 @@ export default function PenaltyShootout({
                   </div>
                 )}
 
-                {/* THE ARENA — generated pixel-art stadium; all actors positioned off GOAL_RECT */}
+                {/* THE ARENA — generated pixel-art stadium; all actors positioned off RECT */}
                 {(() => {
                   const shooterTurn = phase === "waiting" && isUserTurn && (effectiveMode === "shooter" || effectiveMode === "both");
                   const diveTurn = phase === "selecting_dive" && (effectiveMode === "goalkeeper" || effectiveMode === "both");
