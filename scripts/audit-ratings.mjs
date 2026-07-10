@@ -27,12 +27,17 @@ const estimated = players.filter((p) => (p.rating_confidence ?? "") === "estimat
 const badRange = players.filter((p) => typeof p.ea_overall === "number" && (p.ea_overall < 40 || p.ea_overall > 99));
 const noRating = players.filter((p) => typeof p.ea_overall !== "number");
 
+const preserved = players.filter((p) => (p.rating_confidence ?? "") === "preserved");
+const sourced = players.filter((p) => (p.rating_confidence ?? "") === "sourced");
+
 console.log(`8and0 — rating audit\n`);
 console.log(`players:            ${players.length}`);
 console.log(`missing rating:     ${noRating.length}`);
 console.log(`out of range:       ${badRange.length}`);
-console.log(`estimated (not EA): ${estimated.length}  (${((estimated.length / players.length) * 100).toFixed(0)}%)`);
-console.log(`preserved:          ${players.length - estimated.length}`);
+console.log(`preserved (curated):${preserved.length}`);
+console.log(`sourced (FIFA edn): ${sourced.length}`);
+console.log(`estimated fallback: ${estimated.length}  (${((estimated.length / players.length) * 100).toFixed(0)}%)`);
+console.log(`real-data coverage: ${preserved.length + sourced.length}  (${(((preserved.length + sourced.length) / players.length) * 100).toFixed(0)}%)`);
 
 const values = rated.map((p) => p.ea_overall);
 const buckets = {};
@@ -62,7 +67,29 @@ if (showList) {
 }
 
 console.log(
-  `\nNote: estimated ratings were derived from club/team strength and can inflate` +
-    `\nsquad players at big clubs. Higher/Lower uses base EA ratings with a >=5-point` +
-    `\ngap so questions stay fair; a full fix needs a real EA source.`
+  `\nNote: 'sourced' = real EA rating from a FIFA edition (age-adjusted where the` +
+    `\nedition predates 2026). 'estimated' = club-neutral fallback, capped at 80, for` +
+    `\nplayers with no card. Refresh with: node scripts/backfill-2026-ratings.mjs --write`
 );
+
+// --ci: fail the build on the signatures that actually matter — an inflated
+// fallback masquerading as a star, or an implausibly star-heavy squad. Raw
+// estimated % is NOT a failure: honest club-neutral estimates are fine.
+if (process.argv.includes("--ci")) {
+  const problems = [];
+  const inflatedFallback = estimated.filter((p) => p.ea_overall >= 83);
+  if (inflatedFallback.length > 0) {
+    problems.push(`${inflatedFallback.length} estimated players rated >=83 (fallback must stay below the star band)`);
+  }
+  const overloaded = [...byTeam.entries()].filter(([, n]) => n > 12);
+  if (overloaded.length > 0) {
+    problems.push(`${overloaded.length} team(s) carry >12 players rated 85+ (inflation signature)`);
+  }
+  if (badRange.length > 0) problems.push(`${badRange.length} ratings out of 40–99 range`);
+  if (noRating.length > 0) problems.push(`${noRating.length} players missing a rating`);
+  if (problems.length > 0) {
+    console.error(`\n✗ rating audit FAILED:\n  - ${problems.join("\n  - ")}`);
+    process.exit(1);
+  }
+  console.log(`\n✓ rating audit passed`);
+}

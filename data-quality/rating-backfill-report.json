@@ -1,0 +1,7083 @@
+{
+  "edition": "FIFA 22",
+  "target_year": 2026,
+  "kept_preserved": 210,
+  "matched": [
+    {
+      "name": "Chris Brady",
+      "fifa_code": "USA",
+      "before": 77,
+      "edition_overall": 51,
+      "after": 68,
+      "matched_as": "Christopher Brady"
+    },
+    {
+      "name": "Matt Freese",
+      "fifa_code": "USA",
+      "before": 78,
+      "edition_overall": 64,
+      "after": 65,
+      "matched_as": "Matthew Freese"
+    },
+    {
+      "name": "Mark McKenzie",
+      "fifa_code": "USA",
+      "before": 77,
+      "edition_overall": 70,
+      "after": 71,
+      "matched_as": "Mark Alexander McKenzie"
+    },
+    {
+      "name": "Tim Ream",
+      "fifa_code": "USA",
+      "before": 77,
+      "edition_overall": 69,
+      "after": 69,
+      "matched_as": "Timothy Michael Ream"
+    },
+    {
+      "name": "Chris Richards",
+      "fifa_code": "USA",
+      "before": 80,
+      "edition_overall": 71,
+      "after": 74,
+      "matched_as": "Christopher Jeffrey Richards"
+    },
+    {
+      "name": "Miles Robinson",
+      "fifa_code": "USA",
+      "before": 78,
+      "edition_overall": 70,
+      "after": 70,
+      "matched_as": "Miles Gordon Robinson"
+    },
+    {
+      "name": "Auston Trusty",
+      "fifa_code": "USA",
+      "before": 76,
+      "edition_overall": 68,
+      "after": 69,
+      "matched_as": "Auston Levi-Jesaiah Trusty"
+    },
+    {
+      "name": "Brenden Aaronson",
+      "fifa_code": "USA",
+      "before": 77,
+      "edition_overall": 70,
+      "after": 74,
+      "matched_as": "Brenden Russell Aaronson"
+    },
+    {
+      "name": "Sebastian Berhalter",
+      "fifa_code": "USA",
+      "before": 77,
+      "edition_overall": 59,
+      "after": 63,
+      "matched_as": "Sebastian Berhalter"
+    },
+    {
+      "name": "Cristian Roldan",
+      "fifa_code": "USA",
+      "before": 77,
+      "edition_overall": 75,
+      "after": 75,
+      "matched_as": "Cristian Roldán León"
+    },
+    {
+      "name": "Haji Wright",
+      "fifa_code": "USA",
+      "before": 76,
+      "edition_overall": 66,
+      "after": 66,
+      "matched_as": "Haji Wright"
+    },
+    {
+      "name": "Luis Mejia",
+      "fifa_code": "PAN",
+      "before": 70,
+      "edition_overall": 75,
+      "after": 75,
+      "matched_as": "Luis Ricardo Mejía Cajar"
+    },
+    {
+      "name": "Amir Murillo",
+      "fifa_code": "PAN",
+      "before": 71,
+      "edition_overall": 75,
+      "after": 75,
+      "matched_as": "Michael Amir Murillo Bermudez"
+    },
+    {
+      "name": "Fidel Escobar",
+      "fifa_code": "PAN",
+      "before": 70,
+      "edition_overall": 66,
+      "after": 66,
+      "matched_as": "Fidel Escobar Mendieta"
+    },
+    {
+      "name": "Anibal Godoy",
+      "fifa_code": "PAN",
+      "before": 70,
+      "edition_overall": 71,
+      "after": 71,
+      "matched_as": "Aníbal Cesis Godoy Lemus"
+    },
+    {
+      "name": "Carlos Harvey",
+      "fifa_code": "PAN",
+      "before": 70,
+      "edition_overall": 51,
+      "after": 54,
+      "matched_as": "Carlos Miguel Harvey Cesneros"
+    },
+    {
+      "name": "Jose Luis Rodriguez",
+      "fifa_code": "PAN",
+      "before": 70,
+      "edition_overall": 65,
+      "after": 65,
+      "matched_as": "José Luis Rodríguez Francis"
+    },
+    {
+      "name": "Cesar Yanis",
+      "fifa_code": "PAN",
+      "before": 69,
+      "edition_overall": 65,
+      "after": 65,
+      "matched_as": "César Yanis"
+    },
+    {
+      "name": "Yoel Barcenas",
+      "fifa_code": "PAN",
+      "before": 69,
+      "edition_overall": 70,
+      "after": 70,
+      "matched_as": "Edgar Yoel Bárcenas Herrera"
+    },
+    {
+      "name": "Alberto Quintero",
+      "fifa_code": "PAN",
+      "before": 69,
+      "edition_overall": 72,
+      "after": 72,
+      "matched_as": "Alberto Abdiel Quintero Medina"
+    },
+    {
+      "name": "Aissa Mandi",
+      "fifa_code": "ALG",
+      "before": 69,
+      "edition_overall": 80,
+      "after": 80,
+      "matched_as": "Aïssa Mandi"
+    },
+    {
+      "name": "Ramy Bensebaini",
+      "fifa_code": "ALG",
+      "before": 73,
+      "edition_overall": 79,
+      "after": 79,
+      "matched_as": "Ramy Bensebaini"
+    },
+    {
+      "name": "Hicham Boudaoui",
+      "fifa_code": "ALG",
+      "before": 69,
+      "edition_overall": 75,
+      "after": 77,
+      "matched_as": "Hicham Boudaoui"
+    },
+    {
+      "name": "Ramiz Zerrouki",
+      "fifa_code": "ALG",
+      "before": 68,
+      "edition_overall": 67,
+      "after": 67,
+      "matched_as": "Ramiz Larbi Zerrouki"
+    },
+    {
+      "name": "Krepin Diatta",
+      "fifa_code": "SEN",
+      "before": 75,
+      "edition_overall": 76,
+      "after": 77,
+      "matched_as": "Krépin Diatta"
+    },
+    {
+      "name": "Abdoulaye Seck",
+      "fifa_code": "SEN",
+      "before": 74,
+      "edition_overall": 73,
+      "after": 73,
+      "matched_as": "Abdoulaye Seck"
+    },
+    {
+      "name": "Idrissa Gana Gueye",
+      "fifa_code": "SEN",
+      "before": 75,
+      "edition_overall": 82,
+      "after": 82,
+      "matched_as": "Idrissa Gana Gueye"
+    },
+    {
+      "name": "Pathe Ciss",
+      "fifa_code": "SEN",
+      "before": 74,
+      "edition_overall": 70,
+      "after": 70,
+      "matched_as": "Ismaila Pathé Ciss"
+    },
+    {
+      "name": "Pape Matar Sarr",
+      "fifa_code": "SEN",
+      "before": 78,
+      "edition_overall": 70,
+      "after": 77,
+      "matched_as": "Pape Matar Sarr"
+    },
+    {
+      "name": "Bamba Dieng",
+      "fifa_code": "SEN",
+      "before": 73,
+      "edition_overall": 68,
+      "after": 71,
+      "matched_as": "Cheikh Ahmadou Bamba Mbacke Dieng"
+    },
+    {
+      "name": "Cherif Ndiaye",
+      "fifa_code": "SEN",
+      "before": 73,
+      "edition_overall": 69,
+      "after": 69,
+      "matched_as": "Pape Cherif Ndiaye"
+    },
+    {
+      "name": "Carlos Acevedo",
+      "fifa_code": "MEX",
+      "before": 75,
+      "edition_overall": 76,
+      "after": 76,
+      "matched_as": "Carlos Acevedo López"
+    },
+    {
+      "name": "Israel Reyes",
+      "fifa_code": "MEX",
+      "before": 76,
+      "edition_overall": 65,
+      "after": 68,
+      "matched_as": "Israel Reyes Romero"
+    },
+    {
+      "name": "Jesus Gallardo",
+      "fifa_code": "MEX",
+      "before": 76,
+      "edition_overall": 75,
+      "after": 75,
+      "matched_as": "Jesús Daniel Gallardo Vasconcelos"
+    },
+    {
+      "name": "Johan Vásquez",
+      "fifa_code": "MEX",
+      "before": 75,
+      "edition_overall": 71,
+      "after": 72,
+      "matched_as": "Johan Felipe Vásquez Ibarra"
+    },
+    {
+      "name": "Erik Lira",
+      "fifa_code": "MEX",
+      "before": 76,
+      "edition_overall": 69,
+      "after": 72,
+      "matched_as": "Erik Antonio Lira Méndez"
+    },
+    {
+      "name": "Luis Romo",
+      "fifa_code": "MEX",
+      "before": 76,
+      "edition_overall": 77,
+      "after": 77,
+      "matched_as": "Luis Francisco Romo Barrón"
+    },
+    {
+      "name": "Orbelin Pineda",
+      "fifa_code": "MEX",
+      "before": 75,
+      "edition_overall": 77,
+      "after": 77,
+      "matched_as": "Orbelín Pineda Alvarado"
+    },
+    {
+      "name": "Cesar Huerta",
+      "fifa_code": "MEX",
+      "before": 75,
+      "edition_overall": 65,
+      "after": 69,
+      "matched_as": "César Saúl Huerta Valera"
+    },
+    {
+      "name": "Roberto Alvarado",
+      "fifa_code": "MEX",
+      "before": 75,
+      "edition_overall": 76,
+      "after": 77,
+      "matched_as": "Roberto Carlos Alvarado Hernández"
+    },
+    {
+      "name": "Guillermo Martinez",
+      "fifa_code": "MEX",
+      "before": 75,
+      "edition_overall": 61,
+      "after": 61,
+      "matched_as": "Guillermo Martínez Ayala"
+    },
+    {
+      "name": "Moises Ramirez",
+      "fifa_code": "ECU",
+      "before": 72,
+      "edition_overall": 67,
+      "after": 71,
+      "matched_as": "Wellington Moisés Ramírez Preciado"
+    },
+    {
+      "name": "Gonzalo Valle",
+      "fifa_code": "ECU",
+      "before": 72,
+      "edition_overall": 64,
+      "after": 64,
+      "matched_as": "Gonzalo Roberto Valle Bustamante"
+    },
+    {
+      "name": "Felix Torres",
+      "fifa_code": "ECU",
+      "before": 72,
+      "edition_overall": 68,
+      "after": 68,
+      "matched_as": "Félix Eduardo Torres Caicedo"
+    },
+    {
+      "name": "Pervis Estupinan",
+      "fifa_code": "ECU",
+      "before": 76,
+      "edition_overall": 79,
+      "after": 79,
+      "matched_as": "Pervis Josué Estupiñán Tenorio"
+    },
+    {
+      "name": "Angelo Preciado",
+      "fifa_code": "ECU",
+      "before": 77,
+      "edition_overall": 69,
+      "after": 69,
+      "matched_as": "Ángelo Smit Preciado Quiñónez"
+    },
+    {
+      "name": "Jackson Porozo",
+      "fifa_code": "ECU",
+      "before": 72,
+      "edition_overall": 67,
+      "after": 70,
+      "matched_as": "Jackson Gabriel Porozo Vernaza"
+    },
+    {
+      "name": "Jordy Alcivar",
+      "fifa_code": "ECU",
+      "before": 73,
+      "edition_overall": 68,
+      "after": 69,
+      "matched_as": "Jordy José Alcívar Macías"
+    },
+    {
+      "name": "Pedro Vite",
+      "fifa_code": "ECU",
+      "before": 72,
+      "edition_overall": 64,
+      "after": 72,
+      "matched_as": "Pedro Jeampierre Vite Uca"
+    },
+    {
+      "name": "Alan Minda",
+      "fifa_code": "ECU",
+      "before": 77,
+      "edition_overall": 54,
+      "after": 66,
+      "matched_as": "Alan Steve Minda García"
+    },
+    {
+      "name": "Nilson Angulo",
+      "fifa_code": "ECU",
+      "before": 71,
+      "edition_overall": 53,
+      "after": 66,
+      "matched_as": "Nilson Angulo"
+    },
+    {
+      "name": "Alex Paulsen",
+      "fifa_code": "NZL",
+      "before": 63,
+      "edition_overall": 58,
+      "after": 68,
+      "matched_as": "Alex Paulsen"
+    },
+    {
+      "name": "Michael Woud",
+      "fifa_code": "NZL",
+      "before": 63,
+      "edition_overall": 65,
+      "after": 66,
+      "matched_as": "Michael Cornelis Woud"
+    },
+    {
+      "name": "Tim Payne",
+      "fifa_code": "NZL",
+      "before": 64,
+      "edition_overall": 66,
+      "after": 66,
+      "matched_as": "Timothy Payne"
+    },
+    {
+      "name": "Michael Boxall",
+      "fifa_code": "NZL",
+      "before": 63,
+      "edition_overall": 69,
+      "after": 69,
+      "matched_as": "Michael Joseph Boxall"
+    },
+    {
+      "name": "Nando Pijnaker",
+      "fifa_code": "NZL",
+      "before": 63,
+      "edition_overall": 64,
+      "after": 65,
+      "matched_as": "Nando Zen Pijnaker"
+    },
+    {
+      "name": "Callan Elliot",
+      "fifa_code": "NZL",
+      "before": 63,
+      "edition_overall": 61,
+      "after": 63,
+      "matched_as": "Callan Rennie Elliot"
+    },
+    {
+      "name": "Joe Bell",
+      "fifa_code": "NZL",
+      "before": 63,
+      "edition_overall": 68,
+      "after": 69,
+      "matched_as": "Joe Zen Robert Bell"
+    },
+    {
+      "name": "Marko Stamenić",
+      "fifa_code": "NZL",
+      "before": 63,
+      "edition_overall": 62,
+      "after": 71,
+      "matched_as": "Marko Seufatu Nikola Stamenic"
+    },
+    {
+      "name": "Alex Rufer",
+      "fifa_code": "NZL",
+      "before": 63,
+      "edition_overall": 61,
+      "after": 61,
+      "matched_as": "Alex Arthur Rufer"
+    },
+    {
+      "name": "Ryan Thomas",
+      "fifa_code": "NZL",
+      "before": 63,
+      "edition_overall": 74,
+      "after": 74,
+      "matched_as": "Ryan Jared Thomas"
+    },
+    {
+      "name": "Sarpreet Singh",
+      "fifa_code": "NZL",
+      "before": 63,
+      "edition_overall": 66,
+      "after": 67,
+      "matched_as": "Sarpreet Singh"
+    },
+    {
+      "name": "Eli Just",
+      "fifa_code": "NZL",
+      "before": 63,
+      "edition_overall": 64,
+      "after": 67,
+      "matched_as": "Elijah Henry Just"
+    },
+    {
+      "name": "Kosta Barbarouses",
+      "fifa_code": "NZL",
+      "before": 63,
+      "edition_overall": 69,
+      "after": 69,
+      "matched_as": "Kosta Barbarouses"
+    },
+    {
+      "name": "Ben Waine",
+      "fifa_code": "NZL",
+      "before": 63,
+      "edition_overall": 64,
+      "after": 68,
+      "matched_as": "Benjamin Peter Waine"
+    },
+    {
+      "name": "Ben Old",
+      "fifa_code": "NZL",
+      "before": 63,
+      "edition_overall": 57,
+      "after": 66,
+      "matched_as": "Benjamin Craig Old"
+    },
+    {
+      "name": "Callum McCowatt",
+      "fifa_code": "NZL",
+      "before": 62,
+      "edition_overall": 64,
+      "after": 65,
+      "matched_as": "Callum William McCowatt"
+    },
+    {
+      "name": "Lukas Hornicek",
+      "fifa_code": "CZE",
+      "before": 72,
+      "edition_overall": 63,
+      "after": 69,
+      "matched_as": "Lukáš Horníček"
+    },
+    {
+      "name": "Vladimir Coufal",
+      "fifa_code": "CZE",
+      "before": 73,
+      "edition_overall": 80,
+      "after": 80,
+      "matched_as": "Vladimír Coufal"
+    },
+    {
+      "name": "Tomas Holes",
+      "fifa_code": "CZE",
+      "before": 73,
+      "edition_overall": 77,
+      "after": 77,
+      "matched_as": "Tomáš Holeš"
+    },
+    {
+      "name": "Ladislav Krejci",
+      "fifa_code": "CZE",
+      "before": 72,
+      "edition_overall": 74,
+      "after": 75,
+      "matched_as": "Ladislav Krejčí"
+    },
+    {
+      "name": "David Zima",
+      "fifa_code": "CZE",
+      "before": 72,
+      "edition_overall": 74,
+      "after": 77,
+      "matched_as": "David Zima"
+    },
+    {
+      "name": "Vladimir Darida",
+      "fifa_code": "CZE",
+      "before": 72,
+      "edition_overall": 76,
+      "after": 76,
+      "matched_as": "Vladimír Darida"
+    },
+    {
+      "name": "Lukas Provod",
+      "fifa_code": "CZE",
+      "before": 72,
+      "edition_overall": 77,
+      "after": 77,
+      "matched_as": "Lukáš Provod"
+    },
+    {
+      "name": "Michal Sadilek",
+      "fifa_code": "CZE",
+      "before": 72,
+      "edition_overall": 72,
+      "after": 73,
+      "matched_as": "Michal Sadílek"
+    },
+    {
+      "name": "Pavel Sulc",
+      "fifa_code": "CZE",
+      "before": 71,
+      "edition_overall": 69,
+      "after": 73,
+      "matched_as": "Pavel Šulc"
+    },
+    {
+      "name": "Adam Hlozek",
+      "fifa_code": "CZE",
+      "before": 72,
+      "edition_overall": 76,
+      "after": 83,
+      "matched_as": "Adam Hložek"
+    },
+    {
+      "name": "Tomas Chory",
+      "fifa_code": "CZE",
+      "before": 72,
+      "edition_overall": 68,
+      "after": 68,
+      "matched_as": "Tomáš Chorý"
+    },
+    {
+      "name": "Jan Kuchta",
+      "fifa_code": "CZE",
+      "before": 71,
+      "edition_overall": 75,
+      "after": 75,
+      "matched_as": "Jan Kuchta"
+    },
+    {
+      "name": "Dayne St. Clair",
+      "fifa_code": "CAN",
+      "before": 72,
+      "edition_overall": 68,
+      "after": 68,
+      "matched_as": "Dayne St. Clair"
+    },
+    {
+      "name": "Maxime Crépeau",
+      "fifa_code": "CAN",
+      "before": 71,
+      "edition_overall": 73,
+      "after": 73,
+      "matched_as": "Maxime Crépeau"
+    },
+    {
+      "name": "Derek Cornelius",
+      "fifa_code": "CAN",
+      "before": 72,
+      "edition_overall": 65,
+      "after": 65,
+      "matched_as": "Derek Cornelius"
+    },
+    {
+      "name": "Richie Laryea",
+      "fifa_code": "CAN",
+      "before": 73,
+      "edition_overall": 71,
+      "after": 71,
+      "matched_as": "Richie Mamah Laryea"
+    },
+    {
+      "name": "Joel Waterman",
+      "fifa_code": "CAN",
+      "before": 71,
+      "edition_overall": 62,
+      "after": 62,
+      "matched_as": "Joel Waterman"
+    },
+    {
+      "name": "Stephen Eustáquio",
+      "fifa_code": "CAN",
+      "before": 74,
+      "edition_overall": 76,
+      "after": 76,
+      "matched_as": "Stephen Antunes Eustáquio"
+    },
+    {
+      "name": "Mathieu Choiniere",
+      "fifa_code": "CAN",
+      "before": 71,
+      "edition_overall": 62,
+      "after": 63,
+      "matched_as": "Mathieu Choinière"
+    },
+    {
+      "name": "Nathan Saliba",
+      "fifa_code": "CAN",
+      "before": 71,
+      "edition_overall": 47,
+      "after": 61,
+      "matched_as": "Nathan-Dylan Saliba"
+    },
+    {
+      "name": "Jacob Shaffelburg",
+      "fifa_code": "CAN",
+      "before": 71,
+      "edition_overall": 61,
+      "after": 63,
+      "matched_as": "Jacob Shaffelburg"
+    },
+    {
+      "name": "Nawaf Al Aqidi",
+      "fifa_code": "KSA",
+      "before": 69,
+      "edition_overall": 52,
+      "after": 55,
+      "matched_as": "Nawaf Dhahi Al-Aqidi"
+    },
+    {
+      "name": "Abdulelah Al Amri",
+      "fifa_code": "KSA",
+      "before": 70,
+      "edition_overall": 72,
+      "after": 72,
+      "matched_as": "Abdulelah Ali Al-Amri"
+    },
+    {
+      "name": "Hassan Tambakti",
+      "fifa_code": "KSA",
+      "before": 69,
+      "edition_overall": 64,
+      "after": 65,
+      "matched_as": "Hassan Mohammed Al-Tambakti"
+    },
+    {
+      "name": "Ali Lajami",
+      "fifa_code": "KSA",
+      "before": 69,
+      "edition_overall": 63,
+      "after": 63,
+      "matched_as": "Ali Mohammed Ali Lajami"
+    },
+    {
+      "name": "Hassan Kadesh",
+      "fifa_code": "KSA",
+      "before": 69,
+      "edition_overall": 67,
+      "after": 67,
+      "matched_as": "Hassan Kadesh Mahboob"
+    },
+    {
+      "name": "Nawaf Boushal",
+      "fifa_code": "KSA",
+      "before": 69,
+      "edition_overall": 62,
+      "after": 65,
+      "matched_as": "Nawaf Boushal"
+    },
+    {
+      "name": "Ali Majrashi",
+      "fifa_code": "KSA",
+      "before": 69,
+      "edition_overall": 62,
+      "after": 65,
+      "matched_as": "Ali Majrashi"
+    },
+    {
+      "name": "Ziyad Al Johani",
+      "fifa_code": "KSA",
+      "before": 69,
+      "edition_overall": 53,
+      "after": 61,
+      "matched_as": "Ziyad Al Johani"
+    },
+    {
+      "name": "Nasser Al Dawsari",
+      "fifa_code": "KSA",
+      "before": 69,
+      "edition_overall": 65,
+      "after": 66,
+      "matched_as": "Nasser Eissa Al-Dawsari"
+    },
+    {
+      "name": "Abdullah Al Khaibari",
+      "fifa_code": "KSA",
+      "before": 69,
+      "edition_overall": 65,
+      "after": 65,
+      "matched_as": "Abdullah Mohammed Al khaibari"
+    },
+    {
+      "name": "Sultan Mandash",
+      "fifa_code": "KSA",
+      "before": 68,
+      "edition_overall": 62,
+      "after": 62,
+      "matched_as": "Sultan Ahmed Mohammed Mandash"
+    },
+    {
+      "name": "Ayman Yahya",
+      "fifa_code": "KSA",
+      "before": 68,
+      "edition_overall": 59,
+      "after": 65,
+      "matched_as": "Ayman Yahya Salem"
+    },
+    {
+      "name": "Khalid Al Ghannam",
+      "fifa_code": "KSA",
+      "before": 68,
+      "edition_overall": 63,
+      "after": 69,
+      "matched_as": "Khalid Essa Al Ghannam"
+    },
+    {
+      "name": "Abdullah Al Hamdan",
+      "fifa_code": "KSA",
+      "before": 69,
+      "edition_overall": 64,
+      "after": 67,
+      "matched_as": "Abdullah Al Hamdan"
+    },
+    {
+      "name": "Saleh Al Shehri",
+      "fifa_code": "KSA",
+      "before": 68,
+      "edition_overall": 68,
+      "after": 68,
+      "matched_as": "Saleh Khalid Al-Shehri"
+    },
+    {
+      "name": "Nikola Vasilj",
+      "fifa_code": "BIH",
+      "before": 68,
+      "edition_overall": 67,
+      "after": 67,
+      "matched_as": "Nikola Vasilj"
+    },
+    {
+      "name": "Amir Hadžiahmetović",
+      "fifa_code": "BIH",
+      "before": 69,
+      "edition_overall": 71,
+      "after": 71,
+      "matched_as": "Amir Hadžiahmetović"
+    },
+    {
+      "name": "Alisson",
+      "fifa_code": "BRA",
+      "before": 85,
+      "edition_overall": 89,
+      "after": 89,
+      "matched_as": "Alisson Ramsés Becker"
+    },
+    {
+      "name": "Wesley",
+      "fifa_code": "BRA",
+      "before": 81,
+      "edition_overall": 76,
+      "after": 76,
+      "matched_as": "Wesley Moraes Ferreira da Silva"
+    },
+    {
+      "name": "Douglas Santos",
+      "fifa_code": "BRA",
+      "before": 81,
+      "edition_overall": 69,
+      "after": 69,
+      "matched_as": "Douglas Pereira dos Santos"
+    },
+    {
+      "name": "Alex Sandro",
+      "fifa_code": "BRA",
+      "before": 81,
+      "edition_overall": 83,
+      "after": 83,
+      "matched_as": "Alex Sandro Lobo Silva"
+    },
+    {
+      "name": "Danilo",
+      "fifa_code": "BRA",
+      "before": 80,
+      "edition_overall": 73,
+      "after": 73,
+      "matched_as": "Danilo Larangeira"
+    },
+    {
+      "name": "Bremer",
+      "fifa_code": "BRA",
+      "before": 85,
+      "edition_overall": 76,
+      "after": 76,
+      "matched_as": "Gleison Bremer Silva Nascimento"
+    },
+    {
+      "name": "Ibanez",
+      "fifa_code": "BRA",
+      "before": 80,
+      "edition_overall": 77,
+      "after": 78,
+      "matched_as": "Roger Ibañez Da Silva"
+    },
+    {
+      "name": "Leo Pereira",
+      "fifa_code": "BRA",
+      "before": 80,
+      "edition_overall": 69,
+      "after": 69,
+      "matched_as": "Leonardo De Sousa Pereira"
+    },
+    {
+      "name": "Vinicius Junior",
+      "fifa_code": "BRA",
+      "before": 87,
+      "edition_overall": 80,
+      "after": 84,
+      "matched_as": "Vinícius José Paixão de Oliveira Júnior"
+    },
+    {
+      "name": "Matheus Cunha",
+      "fifa_code": "BRA",
+      "before": 84,
+      "edition_overall": 78,
+      "after": 78,
+      "matched_as": "Matheus Jadson Bardeira Cunha"
+    },
+    {
+      "name": "Gabriel Martinelli",
+      "fifa_code": "BRA",
+      "before": 85,
+      "edition_overall": 76,
+      "after": 80,
+      "matched_as": "Gabriel Teodoro Martinelli Silva"
+    },
+    {
+      "name": "Gregor Kobel",
+      "fifa_code": "SUI",
+      "before": 78,
+      "edition_overall": 79,
+      "after": 79,
+      "matched_as": "Gregor Kobel"
+    },
+    {
+      "name": "Yvon Mvogo",
+      "fifa_code": "SUI",
+      "before": 74,
+      "edition_overall": 76,
+      "after": 76,
+      "matched_as": "Yvon Landry Mvogo Nganoma"
+    },
+    {
+      "name": "Eray Comert",
+      "fifa_code": "SUI",
+      "before": 75,
+      "edition_overall": 71,
+      "after": 71,
+      "matched_as": "Eray Ervin Cömert"
+    },
+    {
+      "name": "Nico Elvedi",
+      "fifa_code": "SUI",
+      "before": 74,
+      "edition_overall": 79,
+      "after": 79,
+      "matched_as": "Nico Elvedi"
+    },
+    {
+      "name": "Miro Muheim",
+      "fifa_code": "SUI",
+      "before": 74,
+      "edition_overall": 69,
+      "after": 69,
+      "matched_as": "Miro Max Maria Muheim"
+    },
+    {
+      "name": "Ricardo Rodríguez",
+      "fifa_code": "SUI",
+      "before": 74,
+      "edition_overall": 76,
+      "after": 76,
+      "matched_as": "Ricardo Iván Rodríguez Araya"
+    },
+    {
+      "name": "Silvan Widmer",
+      "fifa_code": "SUI",
+      "before": 74,
+      "edition_overall": 75,
+      "after": 75,
+      "matched_as": "Silvan Dominic Widmer"
+    },
+    {
+      "name": "Michel Aebischer",
+      "fifa_code": "SUI",
+      "before": 75,
+      "edition_overall": 75,
+      "after": 75,
+      "matched_as": "Michel Aebischer"
+    },
+    {
+      "name": "Ardon Jashari",
+      "fifa_code": "SUI",
+      "before": 78,
+      "edition_overall": 53,
+      "after": 64,
+      "matched_as": "Ardon Jashari"
+    },
+    {
+      "name": "Fabian Rieder",
+      "fifa_code": "SUI",
+      "before": 74,
+      "edition_overall": 64,
+      "after": 72,
+      "matched_as": "Fabian Rieder"
+    },
+    {
+      "name": "Djibril Sow",
+      "fifa_code": "SUI",
+      "before": 74,
+      "edition_overall": 77,
+      "after": 77,
+      "matched_as": "Djibril Sow"
+    },
+    {
+      "name": "Denis Zakaria",
+      "fifa_code": "SUI",
+      "before": 74,
+      "edition_overall": 80,
+      "after": 80,
+      "matched_as": "Denis Lemi Zakaria Lako Lado"
+    },
+    {
+      "name": "Zeki Amdouni",
+      "fifa_code": "SUI",
+      "before": 74,
+      "edition_overall": 64,
+      "after": 68,
+      "matched_as": "Zeki Amdouni"
+    },
+    {
+      "name": "Dan Ndoye",
+      "fifa_code": "SUI",
+      "before": 74,
+      "edition_overall": 69,
+      "after": 72,
+      "matched_as": "Dan Ndoye"
+    },
+    {
+      "name": "Noah Okafor",
+      "fifa_code": "SUI",
+      "before": 74,
+      "edition_overall": 71,
+      "after": 73,
+      "matched_as": "Noah Arinzechukwu Okafor"
+    },
+    {
+      "name": "Ruben Vargas",
+      "fifa_code": "SUI",
+      "before": 74,
+      "edition_overall": 75,
+      "after": 76,
+      "matched_as": "Ruben Estephan Vargas Martínez"
+    },
+    {
+      "name": "Christian Fassnacht",
+      "fifa_code": "SUI",
+      "before": 74,
+      "edition_overall": 75,
+      "after": 75,
+      "matched_as": "Christian Fassnacht"
+    },
+    {
+      "name": "Cedric Itten",
+      "fifa_code": "SUI",
+      "before": 73,
+      "edition_overall": 71,
+      "after": 71,
+      "matched_as": "Cédric Jan Itten"
+    },
+    {
+      "name": "Noussair Mazraoui",
+      "fifa_code": "MAR",
+      "before": 81,
+      "edition_overall": 80,
+      "after": 80,
+      "matched_as": "Noussair Mazraoui"
+    },
+    {
+      "name": "Soufiane Rahimi",
+      "fifa_code": "MAR",
+      "before": 76,
+      "edition_overall": 73,
+      "after": 73,
+      "matched_as": "Soufiane Rahimi"
+    },
+    {
+      "name": "Geronimo Rulli",
+      "fifa_code": "ARG",
+      "before": 82,
+      "edition_overall": 80,
+      "after": 80,
+      "matched_as": "Gerónimo Rulli"
+    },
+    {
+      "name": "Juan Musso",
+      "fifa_code": "ARG",
+      "before": 87,
+      "edition_overall": 81,
+      "after": 81,
+      "matched_as": "Juan Agustín Musso"
+    },
+    {
+      "name": "Gonzalo Montiel",
+      "fifa_code": "ARG",
+      "before": 83,
+      "edition_overall": 78,
+      "after": 78,
+      "matched_as": "Gonzalo Ariel Montiel"
+    },
+    {
+      "name": "Nahuel Molina",
+      "fifa_code": "ARG",
+      "before": 88,
+      "edition_overall": 73,
+      "after": 73,
+      "matched_as": "Nahuel Molina Lucero"
+    },
+    {
+      "name": "Nicolas Otamendi",
+      "fifa_code": "ARG",
+      "before": 86,
+      "edition_overall": 81,
+      "after": 81,
+      "matched_as": "Nicolás Hernán Gonzalo Otamendi"
+    },
+    {
+      "name": "Leonardo Balerdi",
+      "fifa_code": "ARG",
+      "before": 82,
+      "edition_overall": 74,
+      "after": 75,
+      "matched_as": "Leonardo Julián Balerdi Rossa"
+    },
+    {
+      "name": "Facundo Medina",
+      "fifa_code": "ARG",
+      "before": 82,
+      "edition_overall": 75,
+      "after": 76,
+      "matched_as": "Facundo Axel Medina"
+    },
+    {
+      "name": "Nicolas Tagliafico",
+      "fifa_code": "ARG",
+      "before": 82,
+      "edition_overall": 82,
+      "after": 82,
+      "matched_as": "Nicolás Alejandro Tagliafico"
+    },
+    {
+      "name": "Leandro Paredes",
+      "fifa_code": "ARG",
+      "before": 83,
+      "edition_overall": 81,
+      "after": 81,
+      "matched_as": "Leandro Daniel Paredes"
+    },
+    {
+      "name": "Exequiel Palacios",
+      "fifa_code": "ARG",
+      "before": 86,
+      "edition_overall": 77,
+      "after": 78,
+      "matched_as": "Exequiel Alejandro Palacios"
+    },
+    {
+      "name": "Giovani Lo Celso",
+      "fifa_code": "ARG",
+      "before": 82,
+      "edition_overall": 81,
+      "after": 81,
+      "matched_as": "Giovani Lo Celso"
+    },
+    {
+      "name": "Valentin Barco",
+      "fifa_code": "ARG",
+      "before": 82,
+      "edition_overall": 63,
+      "after": 76,
+      "matched_as": "Valentín Barco"
+    },
+    {
+      "name": "Thiago Almada",
+      "fifa_code": "ARG",
+      "before": 87,
+      "edition_overall": 74,
+      "after": 78,
+      "matched_as": "Thiago Ezequiel Almada"
+    },
+    {
+      "name": "Nicolas Gonzalez",
+      "fifa_code": "ARG",
+      "before": 87,
+      "edition_overall": 77,
+      "after": 77,
+      "matched_as": "Nicolás Iván González"
+    },
+    {
+      "name": "Giuliano Simeone",
+      "fifa_code": "ARG",
+      "before": 87,
+      "edition_overall": 65,
+      "after": 75,
+      "matched_as": "Giuliano Simeone"
+    },
+    {
+      "name": "Jose Manuel Lopez",
+      "fifa_code": "ARG",
+      "before": 81,
+      "edition_overall": 66,
+      "after": 71,
+      "matched_as": "José Manuel Alberto López"
+    },
+    {
+      "name": "Carlens Arcus",
+      "fifa_code": "HTI",
+      "before": 66,
+      "edition_overall": 70,
+      "after": 70,
+      "matched_as": "Carlens Jean Fedlaire Ruby Arcus"
+    },
+    {
+      "name": "Leverton Pierre",
+      "fifa_code": "HTI",
+      "before": 66,
+      "edition_overall": 64,
+      "after": 64,
+      "matched_as": "Leverton Pierre"
+    },
+    {
+      "name": "Duckens Nazon",
+      "fifa_code": "HTI",
+      "before": 65,
+      "edition_overall": 66,
+      "after": 66,
+      "matched_as": "Duckens Moses Nazon"
+    },
+    {
+      "name": "Ivor Pandur",
+      "fifa_code": "HRV",
+      "before": 76,
+      "edition_overall": 72,
+      "after": 74,
+      "matched_as": "Ivor Pandur"
+    },
+    {
+      "name": "Duje Caleta-Car",
+      "fifa_code": "HRV",
+      "before": 77,
+      "edition_overall": 78,
+      "after": 78,
+      "matched_as": "Duje Ćaleta-Car"
+    },
+    {
+      "name": "Josip Sutalo",
+      "fifa_code": "HRV",
+      "before": 80,
+      "edition_overall": 67,
+      "after": 70,
+      "matched_as": "Josip Šutalo"
+    },
+    {
+      "name": "Josip Stanisic",
+      "fifa_code": "HRV",
+      "before": 83,
+      "edition_overall": 64,
+      "after": 67,
+      "matched_as": "Josip Stanišić"
+    },
+    {
+      "name": "Marin Pongracic",
+      "fifa_code": "HRV",
+      "before": 76,
+      "edition_overall": 75,
+      "after": 75,
+      "matched_as": "Marin Pongračić"
+    },
+    {
+      "name": "Martin Erlic",
+      "fifa_code": "HRV",
+      "before": 76,
+      "edition_overall": 71,
+      "after": 71,
+      "matched_as": "Martin Erlić"
+    },
+    {
+      "name": "Mario Pasalic",
+      "fifa_code": "HRV",
+      "before": 76,
+      "edition_overall": 78,
+      "after": 78,
+      "matched_as": "Mario Pašalić"
+    },
+    {
+      "name": "Nikola Vlasic",
+      "fifa_code": "HRV",
+      "before": 76,
+      "edition_overall": 80,
+      "after": 80,
+      "matched_as": "Nikola Vlašić"
+    },
+    {
+      "name": "Luka Sucic",
+      "fifa_code": "HRV",
+      "before": 76,
+      "edition_overall": 69,
+      "after": 77,
+      "matched_as": "Luka Sučić"
+    },
+    {
+      "name": "Martin Baturina",
+      "fifa_code": "HRV",
+      "before": 76,
+      "edition_overall": 64,
+      "after": 75,
+      "matched_as": "Martin Baturina"
+    },
+    {
+      "name": "Kristijan Jakic",
+      "fifa_code": "HRV",
+      "before": 76,
+      "edition_overall": 73,
+      "after": 73,
+      "matched_as": "Kristijan Jakić"
+    },
+    {
+      "name": "Ante Budimir",
+      "fifa_code": "HRV",
+      "before": 76,
+      "edition_overall": 78,
+      "after": 78,
+      "matched_as": "Ante Budimir"
+    },
+    {
+      "name": "Marco Pasalic",
+      "fifa_code": "HRV",
+      "before": 76,
+      "edition_overall": 64,
+      "after": 67,
+      "matched_as": "Marco Pašalić"
+    },
+    {
+      "name": "Petar Musa",
+      "fifa_code": "HRV",
+      "before": 75,
+      "edition_overall": 71,
+      "after": 71,
+      "matched_as": "Petar Musa"
+    },
+    {
+      "name": "Dayot Upamecano",
+      "fifa_code": "FRA",
+      "before": 88,
+      "edition_overall": 82,
+      "after": 83,
+      "matched_as": "Dayotchanculle Oswald Upamecano"
+    },
+    {
+      "name": "Lucas Digne",
+      "fifa_code": "FRA",
+      "before": 86,
+      "edition_overall": 84,
+      "after": 84,
+      "matched_as": "Lucas Digne"
+    },
+    {
+      "name": "Lucas Hernandez",
+      "fifa_code": "FRA",
+      "before": 88,
+      "edition_overall": 83,
+      "after": 83,
+      "matched_as": "Lucas François Bernard Hernández Pi"
+    },
+    {
+      "name": "Ibrahima Konate",
+      "fifa_code": "FRA",
+      "before": 87,
+      "edition_overall": 78,
+      "after": 79,
+      "matched_as": "Ibrahima Konaté"
+    },
+    {
+      "name": "Malo Gusto",
+      "fifa_code": "FRA",
+      "before": 87,
+      "edition_overall": 66,
+      "after": 74,
+      "matched_as": "Malo Gusto"
+    },
+    {
+      "name": "Maxence Lacroix",
+      "fifa_code": "FRA",
+      "before": 85,
+      "edition_overall": 79,
+      "after": 81,
+      "matched_as": "Maxence Lacroix"
+    },
+    {
+      "name": "N’Golo Kante",
+      "fifa_code": "FRA",
+      "before": 82,
+      "edition_overall": 90,
+      "after": 90,
+      "matched_as": "N'Golo Kanté"
+    },
+    {
+      "name": "Adrien Rabiot",
+      "fifa_code": "FRA",
+      "before": 86,
+      "edition_overall": 81,
+      "after": 81,
+      "matched_as": "Adrien Rabiot"
+    },
+    {
+      "name": "Michael Olise",
+      "fifa_code": "FRA",
+      "before": 88,
+      "edition_overall": 73,
+      "after": 79,
+      "matched_as": "Michael Olise"
+    },
+    {
+      "name": "Rayan Cherki",
+      "fifa_code": "FRA",
+      "before": 88,
+      "edition_overall": 73,
+      "after": 83,
+      "matched_as": "Rayan Mathis Cherki"
+    },
+    {
+      "name": "Jean-Philippe Mateta",
+      "fifa_code": "FRA",
+      "before": 84,
+      "edition_overall": 75,
+      "after": 75,
+      "matched_as": "Jean-Philippe Mateta"
+    },
+    {
+      "name": "Bos",
+      "fifa_code": "AUS",
+      "before": 74,
+      "edition_overall": 52,
+      "after": 62,
+      "matched_as": "Jordan Bos"
+    },
+    {
+      "name": "Burgess",
+      "fifa_code": "AUS",
+      "before": 74,
+      "edition_overall": 65,
+      "after": 65,
+      "matched_as": "Max Burgess"
+    },
+    {
+      "name": "Degenek",
+      "fifa_code": "AUS",
+      "before": 73,
+      "edition_overall": 73,
+      "after": 73,
+      "matched_as": "Miloš Degenek"
+    },
+    {
+      "name": "Geria",
+      "fifa_code": "AUS",
+      "before": 73,
+      "edition_overall": 63,
+      "after": 63,
+      "matched_as": "Jason Kato Geria"
+    },
+    {
+      "name": "Italiano",
+      "fifa_code": "AUS",
+      "before": 73,
+      "edition_overall": 61,
+      "after": 67,
+      "matched_as": "Jacob Michael Italiano"
+    },
+    {
+      "name": "Trewin",
+      "fifa_code": "AUS",
+      "before": 73,
+      "edition_overall": 59,
+      "after": 63,
+      "matched_as": "Kai Trewin"
+    },
+    {
+      "name": "Devlin",
+      "fifa_code": "AUS",
+      "before": 73,
+      "edition_overall": 70,
+      "after": 70,
+      "matched_as": "Cameron Peter Devlin"
+    },
+    {
+      "name": "Hrustic",
+      "fifa_code": "AUS",
+      "before": 73,
+      "edition_overall": 70,
+      "after": 70,
+      "matched_as": "Ajdin Hrustić"
+    },
+    {
+      "name": "Metcalfe",
+      "fifa_code": "AUS",
+      "before": 73,
+      "edition_overall": 66,
+      "after": 68,
+      "matched_as": "Connor Isaac Metcalfe"
+    },
+    {
+      "name": "O’Neill",
+      "fifa_code": "AUS",
+      "before": 73,
+      "edition_overall": 69,
+      "after": 69,
+      "matched_as": "Brandon O'Neill"
+    },
+    {
+      "name": "Leckie",
+      "fifa_code": "AUS",
+      "before": 73,
+      "edition_overall": 71,
+      "after": 71,
+      "matched_as": "Mathew Allan Leckie"
+    },
+    {
+      "name": "Mabil",
+      "fifa_code": "AUS",
+      "before": 73,
+      "edition_overall": 69,
+      "after": 69,
+      "matched_as": "Awer Bul Mabil"
+    },
+    {
+      "name": "Toure",
+      "fifa_code": "AUS",
+      "before": 73,
+      "edition_overall": 60,
+      "after": 63,
+      "matched_as": "Al Hassan Toure"
+    },
+    {
+      "name": "Yengi",
+      "fifa_code": "AUS",
+      "before": 72,
+      "edition_overall": 58,
+      "after": 59,
+      "matched_as": "Kusini Yengi"
+    },
+    {
+      "name": "Sergio Rochet",
+      "fifa_code": "URU",
+      "before": 76,
+      "edition_overall": 76,
+      "after": 76,
+      "matched_as": "Sergio Ramón Rochet Álvarez"
+    },
+    {
+      "name": "Fernando Muslera",
+      "fifa_code": "URU",
+      "before": 76,
+      "edition_overall": 80,
+      "after": 80,
+      "matched_as": "Néstor Fernando Muslera Micol"
+    },
+    {
+      "name": "Santiago Bueno",
+      "fifa_code": "URU",
+      "before": 79,
+      "edition_overall": 67,
+      "after": 68,
+      "matched_as": "Santiago Ignacio Bueno Sciutto"
+    },
+    {
+      "name": "Mathias Olivera",
+      "fifa_code": "URU",
+      "before": 81,
+      "edition_overall": 76,
+      "after": 76,
+      "matched_as": "Mathías Olivera Miramontes"
+    },
+    {
+      "name": "Matias Vina",
+      "fifa_code": "URU",
+      "before": 76,
+      "edition_overall": 76,
+      "after": 76,
+      "matched_as": "Matías Viña"
+    },
+    {
+      "name": "Manuel Ugarte",
+      "fifa_code": "URU",
+      "before": 81,
+      "edition_overall": 72,
+      "after": 76,
+      "matched_as": "Manuel Ugarte Ribeiro"
+    },
+    {
+      "name": "Agustin Canobbio",
+      "fifa_code": "URU",
+      "before": 76,
+      "edition_overall": 69,
+      "after": 70,
+      "matched_as": "Agustín Canobbio Graviz"
+    },
+    {
+      "name": "Juan Manuel Sanabria",
+      "fifa_code": "URU",
+      "before": 76,
+      "edition_overall": 65,
+      "after": 68,
+      "matched_as": "Juan Manuel Sanabria Magole"
+    },
+    {
+      "name": "Nicolas de la Cruz",
+      "fifa_code": "URU",
+      "before": 75,
+      "edition_overall": 78,
+      "after": 78,
+      "matched_as": "Diego Nicolás De La Cruz Arcosa"
+    },
+    {
+      "name": "Rodrigo Zalazar",
+      "fifa_code": "URU",
+      "before": 75,
+      "edition_overall": 70,
+      "after": 72,
+      "matched_as": "Rodrigo Zalazar Martínez"
+    },
+    {
+      "name": "Facundo Pellistri",
+      "fifa_code": "URU",
+      "before": 75,
+      "edition_overall": 70,
+      "after": 78,
+      "matched_as": "Facundo Pellistri Rebollo"
+    },
+    {
+      "name": "Maximiliano Araujo",
+      "fifa_code": "URU",
+      "before": 75,
+      "edition_overall": 60,
+      "after": 63,
+      "matched_as": "Maximiliano Javier Araújo Vilches"
+    },
+    {
+      "name": "Brian Rodriguez",
+      "fifa_code": "URU",
+      "before": 75,
+      "edition_overall": 69,
+      "after": 72,
+      "matched_as": "Paul Brian Rodríguez Bravo"
+    },
+    {
+      "name": "Rodrigo Aguirre",
+      "fifa_code": "URU",
+      "before": 76,
+      "edition_overall": 69,
+      "after": 69,
+      "matched_as": "Rodrigo Sebastián Aguirre Soto"
+    },
+    {
+      "name": "Federico Vinas",
+      "fifa_code": "URU",
+      "before": 75,
+      "edition_overall": 74,
+      "after": 74,
+      "matched_as": "Federico Sebastián Viñas Barboza"
+    },
+    {
+      "name": "Dean Henderson",
+      "fifa_code": "ENG",
+      "before": 85,
+      "edition_overall": 80,
+      "after": 80,
+      "matched_as": "Dean Henderson"
+    },
+    {
+      "name": "James Trafford",
+      "fifa_code": "ENG",
+      "before": 88,
+      "edition_overall": 59,
+      "after": 70,
+      "matched_as": "James Trafford"
+    },
+    {
+      "name": "Reece James",
+      "fifa_code": "ENG",
+      "before": 88,
+      "edition_overall": 81,
+      "after": 82,
+      "matched_as": "Reece James"
+    },
+    {
+      "name": "Marc Guehi",
+      "fifa_code": "ENG",
+      "before": 88,
+      "edition_overall": 73,
+      "after": 77,
+      "matched_as": "Marc Guéhi"
+    },
+    {
+      "name": "Ezri Konsa",
+      "fifa_code": "ENG",
+      "before": 85,
+      "edition_overall": 78,
+      "after": 78,
+      "matched_as": "Ezri Konsa Ngoyo"
+    },
+    {
+      "name": "Dan Burn",
+      "fifa_code": "ENG",
+      "before": 86,
+      "edition_overall": 75,
+      "after": 75,
+      "matched_as": "Dan Burn"
+    },
+    {
+      "name": "Djed Spence",
+      "fifa_code": "ENG",
+      "before": 86,
+      "edition_overall": 65,
+      "after": 70,
+      "matched_as": "Djed Spence"
+    },
+    {
+      "name": "Jordan Henderson",
+      "fifa_code": "ENG",
+      "before": 85,
+      "edition_overall": 84,
+      "after": 84,
+      "matched_as": "Jordan Henderson"
+    },
+    {
+      "name": "Morgan Rogers",
+      "fifa_code": "ENG",
+      "before": 85,
+      "edition_overall": 66,
+      "after": 77,
+      "matched_as": "Morgan Rogers"
+    },
+    {
+      "name": "Eberechi Eze",
+      "fifa_code": "ENG",
+      "before": 86,
+      "edition_overall": 77,
+      "after": 77,
+      "matched_as": "Eberechi Eze"
+    },
+    {
+      "name": "Ivan Toney",
+      "fifa_code": "ENG",
+      "before": 82,
+      "edition_overall": 76,
+      "after": 76,
+      "matched_as": "Ivan Toney"
+    },
+    {
+      "name": "Ollie Watkins",
+      "fifa_code": "ENG",
+      "before": 85,
+      "edition_overall": 78,
+      "after": 78,
+      "matched_as": "Ollie Watkins"
+    },
+    {
+      "name": "Marcus Rashford",
+      "fifa_code": "ENG",
+      "before": 88,
+      "edition_overall": 85,
+      "after": 85,
+      "matched_as": "Marcus Rashford"
+    },
+    {
+      "name": "Seyed Hossein Hosseini",
+      "fifa_code": "IRN",
+      "before": 73,
+      "edition_overall": 67,
+      "after": 67,
+      "matched_as": "Seyed Majid Hosseini"
+    },
+    {
+      "name": "Payam Niazmand",
+      "fifa_code": "IRN",
+      "before": 73,
+      "edition_overall": 68,
+      "after": 68,
+      "matched_as": "Seyed Payam Niazmand"
+    },
+    {
+      "name": "Saeid Ezatolahi",
+      "fifa_code": "IRN",
+      "before": 73,
+      "edition_overall": 67,
+      "after": 67,
+      "matched_as": "Saeid Ezatolahi Afagh"
+    },
+    {
+      "name": "Saman Ghoddos",
+      "fifa_code": "IRN",
+      "before": 73,
+      "edition_overall": 70,
+      "after": 70,
+      "matched_as": "Saman Ghoddos"
+    },
+    {
+      "name": "Mohammad Mohebi",
+      "fifa_code": "IRN",
+      "before": 73,
+      "edition_overall": 67,
+      "after": 67,
+      "matched_as": "Mohammad Mohebi"
+    },
+    {
+      "name": "Ali Alipour",
+      "fifa_code": "IRN",
+      "before": 73,
+      "edition_overall": 66,
+      "after": 66,
+      "matched_as": "Ali Alipour"
+    },
+    {
+      "name": "David Ospina",
+      "fifa_code": "COL",
+      "before": 81,
+      "edition_overall": 79,
+      "after": 79,
+      "matched_as": "David Ospina Ramírez"
+    },
+    {
+      "name": "Alvaro Montero",
+      "fifa_code": "COL",
+      "before": 76,
+      "edition_overall": 72,
+      "after": 72,
+      "matched_as": "Álvaro David Montero Perales"
+    },
+    {
+      "name": "Johan Mojica",
+      "fifa_code": "COL",
+      "before": 77,
+      "edition_overall": 74,
+      "after": 74,
+      "matched_as": "Johan Andrés Mojica Palacio"
+    },
+    {
+      "name": "Daniel Munoz",
+      "fifa_code": "COL",
+      "before": 80,
+      "edition_overall": 76,
+      "after": 76,
+      "matched_as": "Daniel Muñoz Mejía"
+    },
+    {
+      "name": "Santiago Arias",
+      "fifa_code": "COL",
+      "before": 76,
+      "edition_overall": 79,
+      "after": 79,
+      "matched_as": "Santiago Arias Naranjo"
+    },
+    {
+      "name": "Yerry Mina",
+      "fifa_code": "COL",
+      "before": 76,
+      "edition_overall": 79,
+      "after": 79,
+      "matched_as": "Yerry Fernando Mina González"
+    },
+    {
+      "name": "Jhon Lucumi",
+      "fifa_code": "COL",
+      "before": 76,
+      "edition_overall": 74,
+      "after": 74,
+      "matched_as": "Jhon Janer Lucumí Bonilla"
+    },
+    {
+      "name": "Willer Ditta",
+      "fifa_code": "COL",
+      "before": 76,
+      "edition_overall": 66,
+      "after": 66,
+      "matched_as": "Willer Emilio Ditta Pérez"
+    },
+    {
+      "name": "Jefferson Lerma",
+      "fifa_code": "COL",
+      "before": 79,
+      "edition_overall": 75,
+      "after": 75,
+      "matched_as": "Jefferson Andrés Lerma Solís"
+    },
+    {
+      "name": "Juan Fernando Quintero",
+      "fifa_code": "COL",
+      "before": 76,
+      "edition_overall": 79,
+      "after": 79,
+      "matched_as": "Juan Fernando Quintero Paniagua"
+    },
+    {
+      "name": "Jorge Carrascal",
+      "fifa_code": "COL",
+      "before": 76,
+      "edition_overall": 73,
+      "after": 73,
+      "matched_as": "Jorge Andrés Carrascal Guardo"
+    },
+    {
+      "name": "Juan Camilo Hernandez",
+      "fifa_code": "COL",
+      "before": 77,
+      "edition_overall": 75,
+      "after": 76,
+      "matched_as": "Juan Camilo Hernández Suárez"
+    },
+    {
+      "name": "Puerta",
+      "fifa_code": "COL",
+      "before": 74,
+      "edition_overall": 74,
+      "after": 74,
+      "matched_as": "Michael David Barrios Puerta"
+    },
+    {
+      "name": "Suarez",
+      "fifa_code": "COL",
+      "before": 79,
+      "edition_overall": 77,
+      "after": 77,
+      "matched_as": "Luis Javier Suárez Charris"
+    },
+    {
+      "name": "Liam Kelly",
+      "fifa_code": "SCO",
+      "before": 71,
+      "edition_overall": 68,
+      "after": 68,
+      "matched_as": "Liam Kelly"
+    },
+    {
+      "name": "Grant Hanley",
+      "fifa_code": "SCO",
+      "before": 72,
+      "edition_overall": 75,
+      "after": 75,
+      "matched_as": "Grant Hanley"
+    },
+    {
+      "name": "Jack Hendry",
+      "fifa_code": "SCO",
+      "before": 72,
+      "edition_overall": 69,
+      "after": 69,
+      "matched_as": "Jack Hendry"
+    },
+    {
+      "name": "Aaron Hickey",
+      "fifa_code": "SCO",
+      "before": 75,
+      "edition_overall": 69,
+      "after": 75,
+      "matched_as": "Aaron Hickey"
+    },
+    {
+      "name": "Dom Hyam",
+      "fifa_code": "SCO",
+      "before": 71,
+      "edition_overall": 69,
+      "after": 69,
+      "matched_as": "Dominic Hyam"
+    },
+    {
+      "name": "Scott McKenna",
+      "fifa_code": "SCO",
+      "before": 71,
+      "edition_overall": 70,
+      "after": 70,
+      "matched_as": "Scott McKenna"
+    },
+    {
+      "name": "Nathan Patterson",
+      "fifa_code": "SCO",
+      "before": 71,
+      "edition_overall": 66,
+      "after": 73,
+      "matched_as": "Nathan Patterson"
+    },
+    {
+      "name": "Anthony Ralston",
+      "fifa_code": "SCO",
+      "before": 71,
+      "edition_overall": 64,
+      "after": 65,
+      "matched_as": "Anthony Ralston"
+    },
+    {
+      "name": "John Souttar",
+      "fifa_code": "SCO",
+      "before": 71,
+      "edition_overall": 68,
+      "after": 68,
+      "matched_as": "John Souttar"
+    },
+    {
+      "name": "Kieran Tierney",
+      "fifa_code": "SCO",
+      "before": 70,
+      "edition_overall": 80,
+      "after": 80,
+      "matched_as": "Kieran Tierney"
+    },
+    {
+      "name": "Ryan Christie",
+      "fifa_code": "SCO",
+      "before": 74,
+      "edition_overall": 74,
+      "after": 74,
+      "matched_as": "Ryan Christie"
+    },
+    {
+      "name": "Lewis Ferguson",
+      "fifa_code": "SCO",
+      "before": 71,
+      "edition_overall": 71,
+      "after": 74,
+      "matched_as": "Lewis Ferguson"
+    },
+    {
+      "name": "John McGinn",
+      "fifa_code": "SCO",
+      "before": 73,
+      "edition_overall": 78,
+      "after": 78,
+      "matched_as": "John McGinn"
+    },
+    {
+      "name": "Kenny McLean",
+      "fifa_code": "SCO",
+      "before": 70,
+      "edition_overall": 73,
+      "after": 73,
+      "matched_as": "Kenny McLean"
+    },
+    {
+      "name": "Che Adams",
+      "fifa_code": "SCO",
+      "before": 71,
+      "edition_overall": 76,
+      "after": 76,
+      "matched_as": "Ché Adams"
+    },
+    {
+      "name": "Lyndon Dykes",
+      "fifa_code": "SCO",
+      "before": 71,
+      "edition_overall": 70,
+      "after": 70,
+      "matched_as": "Lyndon John Dykes"
+    },
+    {
+      "name": "Ross Stewart",
+      "fifa_code": "SCO",
+      "before": 70,
+      "edition_overall": 66,
+      "after": 66,
+      "matched_as": "Ross Cameron Stewart"
+    },
+    {
+      "name": "David Raya",
+      "fifa_code": "ESP",
+      "before": 86,
+      "edition_overall": 74,
+      "after": 74,
+      "matched_as": "David Raya Martin"
+    },
+    {
+      "name": "Joan Garcia",
+      "fifa_code": "ESP",
+      "before": 88,
+      "edition_overall": 67,
+      "after": 73,
+      "matched_as": "Joan García Pons"
+    },
+    {
+      "name": "Marc Cucurella",
+      "fifa_code": "ESP",
+      "before": 87,
+      "edition_overall": 81,
+      "after": 82,
+      "matched_as": "Marc Cucurella Saseta"
+    },
+    {
+      "name": "Aymeric Laporte",
+      "fifa_code": "ESP",
+      "before": 81,
+      "edition_overall": 86,
+      "after": 86,
+      "matched_as": "Aymeric Laporte"
+    },
+    {
+      "name": "Eric Garcia",
+      "fifa_code": "ESP",
+      "before": 88,
+      "edition_overall": 77,
+      "after": 80,
+      "matched_as": "Eric García Martret"
+    },
+    {
+      "name": "Marcos Llorente",
+      "fifa_code": "ESP",
+      "before": 86,
+      "edition_overall": 86,
+      "after": 86,
+      "matched_as": "Marcos Llorente Moreno"
+    },
+    {
+      "name": "Pedro Porro",
+      "fifa_code": "ESP",
+      "before": 85,
+      "edition_overall": 80,
+      "after": 82,
+      "matched_as": "Pedro Antonio Porro Sauceda"
+    },
+    {
+      "name": "Fabian Ruiz",
+      "fifa_code": "ESP",
+      "before": 88,
+      "edition_overall": 82,
+      "after": 82,
+      "matched_as": "Fabián Ruiz Peña"
+    },
+    {
+      "name": "Martin Zubimendi",
+      "fifa_code": "ESP",
+      "before": 86,
+      "edition_overall": 74,
+      "after": 75,
+      "matched_as": "Martín Zubimendi Ibáñez"
+    },
+    {
+      "name": "Mikel Merino",
+      "fifa_code": "ESP",
+      "before": 81,
+      "edition_overall": 83,
+      "after": 83,
+      "matched_as": "Mikel Merino Zazón"
+    },
+    {
+      "name": "Mikel Oyarzabal",
+      "fifa_code": "ESP",
+      "before": 81,
+      "edition_overall": 85,
+      "after": 85,
+      "matched_as": "Mikel Oyarzabal Ugarte"
+    },
+    {
+      "name": "Ferran Torres",
+      "fifa_code": "ESP",
+      "before": 88,
+      "edition_overall": 82,
+      "after": 84,
+      "matched_as": "Ferran Torres García"
+    },
+    {
+      "name": "Borja Iglesias",
+      "fifa_code": "ESP",
+      "before": 81,
+      "edition_overall": 80,
+      "after": 80,
+      "matched_as": "Borja Iglesias Quintas"
+    },
+    {
+      "name": "Eloy Room",
+      "fifa_code": "CUR",
+      "before": 65,
+      "edition_overall": 74,
+      "after": 74,
+      "matched_as": "Eloy Victor Room"
+    },
+    {
+      "name": "Jurien Gaari",
+      "fifa_code": "CUR",
+      "before": 65,
+      "edition_overall": 66,
+      "after": 66,
+      "matched_as": "Juriën Godfried Juan Gaari"
+    },
+    {
+      "name": "Juninho Bacuna",
+      "fifa_code": "CUR",
+      "before": 66,
+      "edition_overall": 70,
+      "after": 70,
+      "matched_as": "Juninho Bacuna"
+    },
+    {
+      "name": "Kenji Gorre",
+      "fifa_code": "CUR",
+      "before": 65,
+      "edition_overall": 69,
+      "after": 69,
+      "matched_as": "Kenji Joel Gorré"
+    },
+    {
+      "name": "Gervane Kastaneer",
+      "fifa_code": "CUR",
+      "before": 65,
+      "edition_overall": 63,
+      "after": 63,
+      "matched_as": "Gervane Zjandric Adonnis Kastaneer"
+    },
+    {
+      "name": "Sphephelo Sithole",
+      "fifa_code": "RSA",
+      "before": 67,
+      "edition_overall": 70,
+      "after": 71,
+      "matched_as": "Sphephelo S'Miso Sithole"
+    },
+    {
+      "name": "Patrick Pentz",
+      "fifa_code": "AUT",
+      "before": 73,
+      "edition_overall": 72,
+      "after": 72,
+      "matched_as": "Patrick Pentz"
+    },
+    {
+      "name": "Alexander Schlager",
+      "fifa_code": "AUT",
+      "before": 73,
+      "edition_overall": 74,
+      "after": 74,
+      "matched_as": "Alexander Schlager"
+    },
+    {
+      "name": "David Affengruber",
+      "fifa_code": "AUT",
+      "before": 74,
+      "edition_overall": 64,
+      "after": 68,
+      "matched_as": "David Affengruber"
+    },
+    {
+      "name": "Kevin Danso",
+      "fifa_code": "AUT",
+      "before": 78,
+      "edition_overall": 73,
+      "after": 74,
+      "matched_as": "Kevin Danso"
+    },
+    {
+      "name": "Marco Friedl",
+      "fifa_code": "AUT",
+      "before": 73,
+      "edition_overall": 73,
+      "after": 73,
+      "matched_as": "Marco Friedl"
+    },
+    {
+      "name": "Philipp Lienhart",
+      "fifa_code": "AUT",
+      "before": 73,
+      "edition_overall": 76,
+      "after": 76,
+      "matched_as": "Philipp Lienhart"
+    },
+    {
+      "name": "Phillipp Mwene",
+      "fifa_code": "AUT",
+      "before": 73,
+      "edition_overall": 72,
+      "after": 72,
+      "matched_as": "Phillipp Mwene"
+    },
+    {
+      "name": "Stefan Posch",
+      "fifa_code": "AUT",
+      "before": 73,
+      "edition_overall": 75,
+      "after": 75,
+      "matched_as": "Stefan Posch"
+    },
+    {
+      "name": "Alexander Prass",
+      "fifa_code": "AUT",
+      "before": 73,
+      "edition_overall": 64,
+      "after": 68,
+      "matched_as": "Alexander Prass"
+    },
+    {
+      "name": "Michael Svoboda",
+      "fifa_code": "AUT",
+      "before": 73,
+      "edition_overall": 66,
+      "after": 67,
+      "matched_as": "Michael Svoboda"
+    },
+    {
+      "name": "Florian Grillitsch",
+      "fifa_code": "AUT",
+      "before": 73,
+      "edition_overall": 78,
+      "after": 78,
+      "matched_as": "Florian Grillitsch"
+    },
+    {
+      "name": "Konrad Laimer",
+      "fifa_code": "AUT",
+      "before": 80,
+      "edition_overall": 81,
+      "after": 81,
+      "matched_as": "Konrad Laimer"
+    },
+    {
+      "name": "Xaver Schlager",
+      "fifa_code": "AUT",
+      "before": 73,
+      "edition_overall": 80,
+      "after": 80,
+      "matched_as": "Xaver Schlager"
+    },
+    {
+      "name": "Romano Schmid",
+      "fifa_code": "AUT",
+      "before": 72,
+      "edition_overall": 70,
+      "after": 72,
+      "matched_as": "Romano Christian Schmid"
+    },
+    {
+      "name": "Alessandro Schöpf",
+      "fifa_code": "AUT",
+      "before": 72,
+      "edition_overall": 71,
+      "after": 71,
+      "matched_as": "Alessandro Schöpf"
+    },
+    {
+      "name": "Michael Gregoritsch",
+      "fifa_code": "AUT",
+      "before": 72,
+      "edition_overall": 72,
+      "after": 72,
+      "matched_as": "Michael Gregoritsch"
+    },
+    {
+      "name": "Sasa Kalajdzic",
+      "fifa_code": "AUT",
+      "before": 72,
+      "edition_overall": 77,
+      "after": 77,
+      "matched_as": "Saša Kalajdžić"
+    },
+    {
+      "name": "Rui Silva",
+      "fifa_code": "POR",
+      "before": 79,
+      "edition_overall": 78,
+      "after": 78,
+      "matched_as": "Mário Rui Silva Duarte"
+    },
+    {
+      "name": "Diogo Dalot",
+      "fifa_code": "POR",
+      "before": 84,
+      "edition_overall": 76,
+      "after": 77,
+      "matched_as": "José Diogo Dalot Teixeira"
+    },
+    {
+      "name": "Nelson Semedo",
+      "fifa_code": "POR",
+      "before": 80,
+      "edition_overall": 80,
+      "after": 80,
+      "matched_as": "Nélson Cabral Semedo"
+    },
+    {
+      "name": "Joao Cancelo",
+      "fifa_code": "POR",
+      "before": 86,
+      "edition_overall": 86,
+      "after": 86,
+      "matched_as": "João Pedro Cavaco Cancelo"
+    },
+    {
+      "name": "Goncalo Inacio",
+      "fifa_code": "POR",
+      "before": 83,
+      "edition_overall": 76,
+      "after": 81,
+      "matched_as": "Gonçalo Bernardo Inácio"
+    },
+    {
+      "name": "Ruben Neves",
+      "fifa_code": "POR",
+      "before": 79,
+      "edition_overall": 82,
+      "after": 82,
+      "matched_as": "Rúben Diogo da Silva Neves"
+    },
+    {
+      "name": "Samuel Costa",
+      "fifa_code": "POR",
+      "before": 79,
+      "edition_overall": 69,
+      "after": 74,
+      "matched_as": "Samuel de Almeida Costa"
+    },
+    {
+      "name": "Joao Neves",
+      "fifa_code": "POR",
+      "before": 86,
+      "edition_overall": 72,
+      "after": 73,
+      "matched_as": "João Pedro Neves Filipe"
+    },
+    {
+      "name": "Francisco Trincao",
+      "fifa_code": "POR",
+      "before": 83,
+      "edition_overall": 76,
+      "after": 78,
+      "matched_as": "Francisco António Machado Mota Castro Trincão"
+    },
+    {
+      "name": "Francisco Conceicao",
+      "fifa_code": "POR",
+      "before": 84,
+      "edition_overall": 70,
+      "after": 80,
+      "matched_as": "Francisco Fernandes Conceição"
+    },
+    {
+      "name": "Goncalo Guedes",
+      "fifa_code": "POR",
+      "before": 79,
+      "edition_overall": 81,
+      "after": 81,
+      "matched_as": "Gonçalo Manuel Ganchinho Guedes"
+    },
+    {
+      "name": "Viktor Johansson",
+      "fifa_code": "SWE",
+      "before": 74,
+      "edition_overall": 66,
+      "after": 67,
+      "matched_as": "Viktor Tobias Johansson"
+    },
+    {
+      "name": "Jacob Widell Zetterstrom",
+      "fifa_code": "SWE",
+      "before": 74,
+      "edition_overall": 58,
+      "after": 59,
+      "matched_as": "Jacob Mikael Widell Zetterström"
+    },
+    {
+      "name": "Hjalmar Ekdal",
+      "fifa_code": "SWE",
+      "before": 75,
+      "edition_overall": 64,
+      "after": 65,
+      "matched_as": "Hjalmar Ekdal"
+    },
+    {
+      "name": "Gabriel Gudmundsson",
+      "fifa_code": "SWE",
+      "before": 75,
+      "edition_overall": 73,
+      "after": 74,
+      "matched_as": "Gabriel Gudmundsson"
+    },
+    {
+      "name": "Emil Holm",
+      "fifa_code": "SWE",
+      "before": 79,
+      "edition_overall": 64,
+      "after": 66,
+      "matched_as": "Emil Alfons Holm"
+    },
+    {
+      "name": "Gustaf Lagerbielke",
+      "fifa_code": "SWE",
+      "before": 74,
+      "edition_overall": 55,
+      "after": 58,
+      "matched_as": "Gustaf Lagerbielke"
+    },
+    {
+      "name": "Eric Smith",
+      "fifa_code": "SWE",
+      "before": 74,
+      "edition_overall": 67,
+      "after": 67,
+      "matched_as": "Eric Anders Smith"
+    },
+    {
+      "name": "Carl Starfelt",
+      "fifa_code": "SWE",
+      "before": 74,
+      "edition_overall": 69,
+      "after": 69,
+      "matched_as": "Carl Anders Theodor Starfelt"
+    },
+    {
+      "name": "Daniel Svensson",
+      "fifa_code": "SWE",
+      "before": 77,
+      "edition_overall": 58,
+      "after": 64,
+      "matched_as": "Daniel Svensson"
+    },
+    {
+      "name": "Yasin Ayari",
+      "fifa_code": "SWE",
+      "before": 77,
+      "edition_overall": 55,
+      "after": 67,
+      "matched_as": "Yasin Abbas Ayari"
+    },
+    {
+      "name": "Mattias Svanberg",
+      "fifa_code": "SWE",
+      "before": 74,
+      "edition_overall": 73,
+      "after": 74,
+      "matched_as": "Mattias Olof Svanberg"
+    },
+    {
+      "name": "Alexander Bernhardsson",
+      "fifa_code": "SWE",
+      "before": 74,
+      "edition_overall": 57,
+      "after": 58,
+      "matched_as": "Alexander Bernhardsson"
+    },
+    {
+      "name": "Anthony Elanga",
+      "fifa_code": "SWE",
+      "before": 78,
+      "edition_overall": 65,
+      "after": 72,
+      "matched_as": "Anthony David Junior Elanga"
+    },
+    {
+      "name": "Gustaf Nilsson",
+      "fifa_code": "SWE",
+      "before": 74,
+      "edition_overall": 64,
+      "after": 64,
+      "matched_as": "Håkan Gustaf Nilsson"
+    },
+    {
+      "name": "Benjamin Nygren",
+      "fifa_code": "SWE",
+      "before": 73,
+      "edition_overall": 67,
+      "after": 71,
+      "matched_as": "Erik Benjamin Nygren"
+    },
+    {
+      "name": "Ken Sema",
+      "fifa_code": "SWE",
+      "before": 73,
+      "edition_overall": 73,
+      "after": 73,
+      "matched_as": "Ken Nlata Sema"
+    },
+    {
+      "name": "Carlos Santos",
+      "fifa_code": "CPV",
+      "before": 66,
+      "edition_overall": 71,
+      "after": 71,
+      "matched_as": "Carlos dos Santos Rodrigues"
+    },
+    {
+      "name": "Jamiro Monteiro",
+      "fifa_code": "CPV",
+      "before": 66,
+      "edition_overall": 75,
+      "after": 75,
+      "matched_as": "Jamiro Gregory Monteiro Alvarenga"
+    },
+    {
+      "name": "Jovane Cabral",
+      "fifa_code": "CPV",
+      "before": 66,
+      "edition_overall": 78,
+      "after": 78,
+      "matched_as": "Jovane Eduardo Borges Cabral"
+    },
+    {
+      "name": "Nuno Da Costa",
+      "fifa_code": "CPV",
+      "before": 66,
+      "edition_overall": 70,
+      "after": 70,
+      "matched_as": "Nuno Miguel da Costa Jóia"
+    },
+    {
+      "name": "Gilson Benchimol",
+      "fifa_code": "CPV",
+      "before": 65,
+      "edition_overall": 66,
+      "after": 71,
+      "matched_as": "Gilson Benchimol Tavares"
+    },
+    {
+      "name": "Ali Abdi",
+      "fifa_code": "TUN",
+      "before": 72,
+      "edition_overall": 70,
+      "after": 70,
+      "matched_as": "Ali Abdi"
+    },
+    {
+      "name": "Mortadha Ben Ouanes",
+      "fifa_code": "TUN",
+      "before": 71,
+      "edition_overall": 63,
+      "after": 63,
+      "matched_as": "Mortadha Ben Ouanes"
+    },
+    {
+      "name": "Anis Ben Slimane",
+      "fifa_code": "TUN",
+      "before": 71,
+      "edition_overall": 65,
+      "after": 69,
+      "matched_as": "Anis Ben Slimane"
+    },
+    {
+      "name": "Hannibal Mejbri",
+      "fifa_code": "TUN",
+      "before": 71,
+      "edition_overall": 62,
+      "after": 75,
+      "matched_as": "Hannibal Mejbri"
+    },
+    {
+      "name": "Ellyes Skhiri",
+      "fifa_code": "TUN",
+      "before": 70,
+      "edition_overall": 77,
+      "after": 77,
+      "matched_as": "Ellyes Joris Skhiri"
+    },
+    {
+      "name": "Sebastian Tounekti",
+      "fifa_code": "TUN",
+      "before": 70,
+      "edition_overall": 60,
+      "after": 68,
+      "matched_as": "Sebastian Tounekti"
+    },
+    {
+      "name": "Mark Flekken",
+      "fifa_code": "NED",
+      "before": 83,
+      "edition_overall": 75,
+      "after": 75,
+      "matched_as": "Mark Flekken"
+    },
+    {
+      "name": "Robin Roefs",
+      "fifa_code": "NED",
+      "before": 79,
+      "edition_overall": 57,
+      "after": 65,
+      "matched_as": "Robin Roefs"
+    },
+    {
+      "name": "Bart Verbruggen",
+      "fifa_code": "NED",
+      "before": 82,
+      "edition_overall": 65,
+      "after": 76,
+      "matched_as": "Bart Verbruggen"
+    },
+    {
+      "name": "Nathan Ake",
+      "fifa_code": "NED",
+      "before": 87,
+      "edition_overall": 78,
+      "after": 78,
+      "matched_as": "Nathan Aké"
+    },
+    {
+      "name": "Jurrien Timber",
+      "fifa_code": "NED",
+      "before": 84,
+      "edition_overall": 75,
+      "after": 79,
+      "matched_as": "Jurriën David Norman Timber"
+    },
+    {
+      "name": "Micky van de Ven",
+      "fifa_code": "NED",
+      "before": 83,
+      "edition_overall": 68,
+      "after": 74,
+      "matched_as": "Micky van de Ven"
+    },
+    {
+      "name": "Marten de Roon",
+      "fifa_code": "NED",
+      "before": 80,
+      "edition_overall": 82,
+      "after": 82,
+      "matched_as": "Marten Elco de Roon"
+    },
+    {
+      "name": "Teun Koopmeiners",
+      "fifa_code": "NED",
+      "before": 84,
+      "edition_overall": 79,
+      "after": 79,
+      "matched_as": "Teun Koopmeiners"
+    },
+    {
+      "name": "Noa Lang",
+      "fifa_code": "NED",
+      "before": 79,
+      "edition_overall": 78,
+      "after": 79,
+      "matched_as": "Noa Noëll Lang"
+    },
+    {
+      "name": "Guus Til",
+      "fifa_code": "NED",
+      "before": 82,
+      "edition_overall": 73,
+      "after": 73,
+      "matched_as": "Guus Berend Til"
+    },
+    {
+      "name": "Quinten Timber",
+      "fifa_code": "NED",
+      "before": 79,
+      "edition_overall": 67,
+      "after": 71,
+      "matched_as": "Quinten Ryan Crispito Timber"
+    },
+    {
+      "name": "Justin Kluivert",
+      "fifa_code": "NED",
+      "before": 82,
+      "edition_overall": 76,
+      "after": 77,
+      "matched_as": "Justin Kluivert"
+    },
+    {
+      "name": "Donyell Malen",
+      "fifa_code": "NED",
+      "before": 79,
+      "edition_overall": 80,
+      "after": 81,
+      "matched_as": "Donyell Malen"
+    },
+    {
+      "name": "Crysencio Summerville",
+      "fifa_code": "NED",
+      "before": 81,
+      "edition_overall": 68,
+      "after": 74,
+      "matched_as": "Crysencio Summerville"
+    },
+    {
+      "name": "Wout Weghorst",
+      "fifa_code": "NED",
+      "before": 81,
+      "edition_overall": 83,
+      "after": 83,
+      "matched_as": "Wout Weghorst"
+    },
+    {
+      "name": "Frans Putros",
+      "fifa_code": "IRQ",
+      "before": 68,
+      "edition_overall": 63,
+      "after": 63,
+      "matched_as": "Frans Dhia Jirjis Putros"
+    },
+    {
+      "name": "Gustavo Velazquez",
+      "fifa_code": "PAR",
+      "before": 67,
+      "edition_overall": 70,
+      "after": 70,
+      "matched_as": "Víctor Gustavo Velázquez Ramos"
+    },
+    {
+      "name": "Jose Canale",
+      "fifa_code": "PAR",
+      "before": 67,
+      "edition_overall": 68,
+      "after": 68,
+      "matched_as": "José María Canale Domínguez"
+    },
+    {
+      "name": "Andres Cubas",
+      "fifa_code": "PAR",
+      "before": 67,
+      "edition_overall": 75,
+      "after": 75,
+      "matched_as": "Adrián Andrés Cubas"
+    },
+    {
+      "name": "Ramon Sosa",
+      "fifa_code": "PAR",
+      "before": 67,
+      "edition_overall": 64,
+      "after": 66,
+      "matched_as": "Ramón Sosa Acosta"
+    },
+    {
+      "name": "Braian Ojeda",
+      "fifa_code": "PAR",
+      "before": 67,
+      "edition_overall": 68,
+      "after": 71,
+      "matched_as": "Braian Óscar Ojeda Rodríguez"
+    },
+    {
+      "name": "Antonio Sanabria",
+      "fifa_code": "PAR",
+      "before": 67,
+      "edition_overall": 74,
+      "after": 74,
+      "matched_as": "Arnaldo Antonio Sanabria Ayala"
+    },
+    {
+      "name": "Julio Enciso",
+      "fifa_code": "PAR",
+      "before": 67,
+      "edition_overall": 61,
+      "after": 74,
+      "matched_as": "Julio César Enciso Espínola"
+    },
+    {
+      "name": "Gabriel Avalos",
+      "fifa_code": "PAR",
+      "before": 67,
+      "edition_overall": 71,
+      "after": 71,
+      "matched_as": "Gabriel Ávalos Stumpfs"
+    },
+    {
+      "name": "Isidro Pitta",
+      "fifa_code": "PAR",
+      "before": 66,
+      "edition_overall": 68,
+      "after": 70,
+      "matched_as": "Isidro Miguel Pitta Saldívar"
+    },
+    {
+      "name": "Gedeon Kalulu",
+      "fifa_code": "COD",
+      "before": 70,
+      "edition_overall": 68,
+      "after": 68,
+      "matched_as": "Gédéon Kalulu Kyatengwa"
+    },
+    {
+      "name": "Samuel Moutoussamy",
+      "fifa_code": "COD",
+      "before": 69,
+      "edition_overall": 68,
+      "after": 68,
+      "matched_as": "Samuel Moutoussamy"
+    },
+    {
+      "name": "Edo Kayembe",
+      "fifa_code": "COD",
+      "before": 69,
+      "edition_overall": 69,
+      "after": 69,
+      "matched_as": "Edo Kayembe"
+    },
+    {
+      "name": "Gael Kakuta",
+      "fifa_code": "COD",
+      "before": 68,
+      "edition_overall": 78,
+      "after": 78,
+      "matched_as": "Gaël Kakuta"
+    },
+    {
+      "name": "Meschack Elia",
+      "fifa_code": "COD",
+      "before": 69,
+      "edition_overall": 71,
+      "after": 71,
+      "matched_as": "Meschack Elia Lina"
+    },
+    {
+      "name": "Cedric Bakambu",
+      "fifa_code": "COD",
+      "before": 69,
+      "edition_overall": 80,
+      "after": 80,
+      "matched_as": "Cédric Bakambu"
+    },
+    {
+      "name": "Oliver Baumann",
+      "fifa_code": "GER",
+      "before": 77,
+      "edition_overall": 82,
+      "after": 82,
+      "matched_as": "Oliver Baumann"
+    },
+    {
+      "name": "Alexander Nubel",
+      "fifa_code": "GER",
+      "before": 77,
+      "edition_overall": 75,
+      "after": 75,
+      "matched_as": "Alexander Nübel"
+    },
+    {
+      "name": "Waldemar Anton",
+      "fifa_code": "GER",
+      "before": 82,
+      "edition_overall": 75,
+      "after": 75,
+      "matched_as": "Waldemar Anton"
+    },
+    {
+      "name": "David Raum",
+      "fifa_code": "GER",
+      "before": 77,
+      "edition_overall": 73,
+      "after": 73,
+      "matched_as": "David Raum"
+    },
+    {
+      "name": "Jonathan Tah",
+      "fifa_code": "GER",
+      "before": 84,
+      "edition_overall": 78,
+      "after": 78,
+      "matched_as": "Jonathan Tah"
+    },
+    {
+      "name": "Malick Thiaw",
+      "fifa_code": "GER",
+      "before": 81,
+      "edition_overall": 68,
+      "after": 74,
+      "matched_as": "Malick Laye Thiaw"
+    },
+    {
+      "name": "Nadiem Amiri",
+      "fifa_code": "GER",
+      "before": 78,
+      "edition_overall": 77,
+      "after": 77,
+      "matched_as": "Nadiem Amiri"
+    },
+    {
+      "name": "Leon Goretzka",
+      "fifa_code": "GER",
+      "before": 84,
+      "edition_overall": 87,
+      "after": 87,
+      "matched_as": "Leon Christoph Goretzka"
+    },
+    {
+      "name": "Jamie Leweling",
+      "fifa_code": "GER",
+      "before": 77,
+      "edition_overall": 68,
+      "after": 73,
+      "matched_as": "Jamie Leweling"
+    },
+    {
+      "name": "Angelo Stiller",
+      "fifa_code": "GER",
+      "before": 76,
+      "edition_overall": 67,
+      "after": 71,
+      "matched_as": "Angelo Stiller"
+    },
+    {
+      "name": "Maximilian Beier",
+      "fifa_code": "GER",
+      "before": 81,
+      "edition_overall": 64,
+      "after": 72,
+      "matched_as": "Maximilian Beier"
+    },
+    {
+      "name": "Nick Woltemade",
+      "fifa_code": "GER",
+      "before": 80,
+      "edition_overall": 63,
+      "after": 69,
+      "matched_as": "Nick Woltemade"
+    },
+    {
+      "name": "Karim Hafez",
+      "fifa_code": "EGY",
+      "before": 72,
+      "edition_overall": 71,
+      "after": 71,
+      "matched_as": "Karim Hafez Ramadan"
+    },
+    {
+      "name": "Mousa Al Tamari",
+      "fifa_code": "JOR",
+      "before": 65,
+      "edition_overall": 69,
+      "after": 69,
+      "matched_as": "Mousa Mohammad Sulaiman Al-Tamari"
+    },
+    {
+      "name": "Baba Abdul Rahman",
+      "fifa_code": "GHA",
+      "before": 70,
+      "edition_overall": 74,
+      "after": 74,
+      "matched_as": "Abdul Rahman Baba"
+    },
+    {
+      "name": "Gideon Mensah",
+      "fifa_code": "GHA",
+      "before": 70,
+      "edition_overall": 71,
+      "after": 72,
+      "matched_as": "Gideon Mensah"
+    },
+    {
+      "name": "Abdul Mumin",
+      "fifa_code": "GHA",
+      "before": 69,
+      "edition_overall": 68,
+      "after": 68,
+      "matched_as": "Khalid Abdul Mumin Suleman"
+    },
+    {
+      "name": "Kamaldeen Sulemana",
+      "fifa_code": "GHA",
+      "before": 69,
+      "edition_overall": 72,
+      "after": 78,
+      "matched_as": "Kamaldeen Sulemana"
+    },
+    {
+      "name": "Augustine Boakye",
+      "fifa_code": "GHA",
+      "before": 69,
+      "edition_overall": 56,
+      "after": 60,
+      "matched_as": "Augustine Boakye"
+    },
+    {
+      "name": "Senne Lammens",
+      "fifa_code": "BEL",
+      "before": 83,
+      "edition_overall": 64,
+      "after": 74,
+      "matched_as": "Senne Lammens"
+    },
+    {
+      "name": "Timothy Castagne",
+      "fifa_code": "BEL",
+      "before": 83,
+      "edition_overall": 79,
+      "after": 79,
+      "matched_as": "Timothy Castagne"
+    },
+    {
+      "name": "Zeno Debast",
+      "fifa_code": "BEL",
+      "before": 84,
+      "edition_overall": 61,
+      "after": 74,
+      "matched_as": "Zeno Debast"
+    },
+    {
+      "name": "Brandon Mechele",
+      "fifa_code": "BEL",
+      "before": 79,
+      "edition_overall": 76,
+      "after": 76,
+      "matched_as": "Brandon Mechele"
+    },
+    {
+      "name": "Thomas Meunier",
+      "fifa_code": "BEL",
+      "before": 79,
+      "edition_overall": 77,
+      "after": 77,
+      "matched_as": "Thomas Meunier"
+    },
+    {
+      "name": "Nathan Ngoy",
+      "fifa_code": "BEL",
+      "before": 79,
+      "edition_overall": 57,
+      "after": 67,
+      "matched_as": "Nathan Ngoy"
+    },
+    {
+      "name": "Amadou Onana",
+      "fifa_code": "BEL",
+      "before": 82,
+      "edition_overall": 68,
+      "after": 75,
+      "matched_as": "Amadou Zeund Georges Ba Mvom Onana"
+    },
+    {
+      "name": "Nicolas Raskin",
+      "fifa_code": "BEL",
+      "before": 79,
+      "edition_overall": 71,
+      "after": 75,
+      "matched_as": "Nicolas Thierry Raskin"
+    },
+    {
+      "name": "Hans Vanaken",
+      "fifa_code": "BEL",
+      "before": 79,
+      "edition_overall": 78,
+      "after": 78,
+      "matched_as": "Hans Vanaken"
+    },
+    {
+      "name": "Dodi Lukebakio",
+      "fifa_code": "BEL",
+      "before": 83,
+      "edition_overall": 76,
+      "after": 76,
+      "matched_as": "Dodi Lukébakio"
+    },
+    {
+      "name": "Alexis Saelemaekers",
+      "fifa_code": "BEL",
+      "before": 82,
+      "edition_overall": 76,
+      "after": 77,
+      "matched_as": "Alexis Saelemaekers"
+    },
+    {
+      "name": "Mert Gunok",
+      "fifa_code": "TUR",
+      "before": 73,
+      "edition_overall": 75,
+      "after": 75,
+      "matched_as": "Fehmi Mert Günok"
+    },
+    {
+      "name": "Ugurcan Cakır",
+      "fifa_code": "TUR",
+      "before": 73,
+      "edition_overall": 79,
+      "after": 79,
+      "matched_as": "Uğurcan Çakır"
+    },
+    {
+      "name": "Abdulkerim Bardakcı",
+      "fifa_code": "TUR",
+      "before": 74,
+      "edition_overall": 69,
+      "after": 69,
+      "matched_as": "Abdülkerim Bardakcı"
+    },
+    {
+      "name": "Eren Elmalı",
+      "fifa_code": "TUR",
+      "before": 74,
+      "edition_overall": 60,
+      "after": 63,
+      "matched_as": "Evren Eren Elmalı"
+    },
+    {
+      "name": "Merih Demiral",
+      "fifa_code": "TUR",
+      "before": 73,
+      "edition_overall": 77,
+      "after": 77,
+      "matched_as": "Merih Demiral"
+    },
+    {
+      "name": "Mert Muldur",
+      "fifa_code": "TUR",
+      "before": 73,
+      "edition_overall": 71,
+      "after": 72,
+      "matched_as": "Mert Müldür"
+    },
+    {
+      "name": "Ozan Kabak",
+      "fifa_code": "TUR",
+      "before": 73,
+      "edition_overall": 76,
+      "after": 78,
+      "matched_as": "Ozan Muhammed Kabak"
+    },
+    {
+      "name": "Samet Akaydin",
+      "fifa_code": "TUR",
+      "before": 73,
+      "edition_overall": 60,
+      "after": 60,
+      "matched_as": "Samet Akaydin"
+    },
+    {
+      "name": "Zeki Celik",
+      "fifa_code": "TUR",
+      "before": 73,
+      "edition_overall": 79,
+      "after": 79,
+      "matched_as": "Mehmet Zeki Çelik"
+    },
+    {
+      "name": "Kaan Ayhan",
+      "fifa_code": "TUR",
+      "before": 73,
+      "edition_overall": 75,
+      "after": 75,
+      "matched_as": "Kaan Ayhan"
+    },
+    {
+      "name": "Orkun Kokcu",
+      "fifa_code": "TUR",
+      "before": 73,
+      "edition_overall": 75,
+      "after": 78,
+      "matched_as": "Orkun Kökçü"
+    },
+    {
+      "name": "Irfan Can Kahveci",
+      "fifa_code": "TUR",
+      "before": 73,
+      "edition_overall": 75,
+      "after": 75,
+      "matched_as": "İrfan Can Kahveci"
+    },
+    {
+      "name": "Yunus Akgun",
+      "fifa_code": "TUR",
+      "before": 72,
+      "edition_overall": 65,
+      "after": 68,
+      "matched_as": "Yunus Akgün"
+    },
+    {
+      "name": "Egil Selvik",
+      "fifa_code": "NOR",
+      "before": 75,
+      "edition_overall": 63,
+      "after": 63,
+      "matched_as": "Egil Selvik"
+    },
+    {
+      "name": "Sander Tangvik",
+      "fifa_code": "NOR",
+      "before": 75,
+      "edition_overall": 53,
+      "after": 64,
+      "matched_as": "Sander Tangvik"
+    },
+    {
+      "name": "Julian Ryerson",
+      "fifa_code": "NOR",
+      "before": 80,
+      "edition_overall": 68,
+      "after": 68,
+      "matched_as": "Julian Ryerson"
+    },
+    {
+      "name": "Kristoffer Ajer",
+      "fifa_code": "NOR",
+      "before": 79,
+      "edition_overall": 75,
+      "after": 75,
+      "matched_as": "Kristoffer Vassbakk Ajer"
+    },
+    {
+      "name": "David Møller Wolfe",
+      "fifa_code": "NOR",
+      "before": 75,
+      "edition_overall": 58,
+      "after": 64,
+      "matched_as": "David Møller Wolfe"
+    },
+    {
+      "name": "Marcus Holmgren Pedersen",
+      "fifa_code": "NOR",
+      "before": 75,
+      "edition_overall": 67,
+      "after": 70,
+      "matched_as": "Marcus Holmgren Pedersen"
+    },
+    {
+      "name": "Henrik Falchener",
+      "fifa_code": "NOR",
+      "before": 75,
+      "edition_overall": 52,
+      "after": 63,
+      "matched_as": "Henrik Sælebakke Falchener"
+    },
+    {
+      "name": "Kristian Thorstvedt",
+      "fifa_code": "NOR",
+      "before": 75,
+      "edition_overall": 72,
+      "after": 73,
+      "matched_as": "Kristian Thorstvedt"
+    },
+    {
+      "name": "Morten Thorsby",
+      "fifa_code": "NOR",
+      "before": 75,
+      "edition_overall": 73,
+      "after": 73,
+      "matched_as": "Morten Thorsby"
+    },
+    {
+      "name": "Thelo Aasgaard",
+      "fifa_code": "NOR",
+      "before": 75,
+      "edition_overall": 62,
+      "after": 68,
+      "matched_as": "Thelo Gerard Aasgaard"
+    },
+    {
+      "name": "Andreas Schjelderup",
+      "fifa_code": "NOR",
+      "before": 78,
+      "edition_overall": 65,
+      "after": 77,
+      "matched_as": "Andreas Rædergård Schjelderup"
+    },
+    {
+      "name": "Jens Petter Hauge",
+      "fifa_code": "NOR",
+      "before": 74,
+      "edition_overall": 76,
+      "after": 78,
+      "matched_as": "Jens Petter Hauge"
+    },
+    {
+      "name": "Fredrik Aursnes",
+      "fifa_code": "NOR",
+      "before": 78,
+      "edition_overall": 71,
+      "after": 71,
+      "matched_as": "Fredrik Aursnes"
+    },
+    {
+      "name": "Rustam Ashurmatov",
+      "fifa_code": "UZB",
+      "before": 67,
+      "edition_overall": 66,
+      "after": 66,
+      "matched_as": "Rustamzhon Ashurmatov"
+    },
+    {
+      "name": "Jaloliddin Masharipov",
+      "fifa_code": "UZB",
+      "before": 66,
+      "edition_overall": 73,
+      "after": 73,
+      "matched_as": "Jaloliddin Masharipov"
+    },
+    {
+      "name": "Jamshid Iskanderov",
+      "fifa_code": "UZB",
+      "before": 66,
+      "edition_overall": 62,
+      "after": 62,
+      "matched_as": "Jamshid Iskanderov"
+    }
+  ],
+  "unmatched": [
+    {
+      "name": "Max Arfsten",
+      "fifa_code": "USA",
+      "before": 79,
+      "after": 76
+    },
+    {
+      "name": "Alex Freeman",
+      "fifa_code": "USA",
+      "before": 78,
+      "after": 76
+    },
+    {
+      "name": "Joe Scally",
+      "fifa_code": "USA",
+      "before": 77,
+      "after": 75
+    },
+    {
+      "name": "Malik Tillman",
+      "fifa_code": "USA",
+      "before": 80,
+      "after": 76
+    },
+    {
+      "name": "Alejandro Zendejas",
+      "fifa_code": "USA",
+      "before": 76,
+      "after": 75
+    },
+    {
+      "name": "Orlando Mosquera",
+      "fifa_code": "PAN",
+      "before": 70,
+      "after": 70
+    },
+    {
+      "name": "Cesar Samudio",
+      "fifa_code": "PAN",
+      "before": 70,
+      "after": 70
+    },
+    {
+      "name": "Cesar Blackman",
+      "fifa_code": "PAN",
+      "before": 71,
+      "after": 71
+    },
+    {
+      "name": "Jorge Gutierrez",
+      "fifa_code": "PAN",
+      "before": 71,
+      "after": 70
+    },
+    {
+      "name": "Edgardo Farina",
+      "fifa_code": "PAN",
+      "before": 70,
+      "after": 70
+    },
+    {
+      "name": "Jose Cordoba",
+      "fifa_code": "PAN",
+      "before": 70,
+      "after": 70
+    },
+    {
+      "name": "Eric Davis",
+      "fifa_code": "PAN",
+      "before": 70,
+      "after": 70
+    },
+    {
+      "name": "Jiovani Ramos",
+      "fifa_code": "PAN",
+      "before": 70,
+      "after": 69
+    },
+    {
+      "name": "Roderick Miller",
+      "fifa_code": "PAN",
+      "before": 69,
+      "after": 69
+    },
+    {
+      "name": "Cristian Martinez",
+      "fifa_code": "PAN",
+      "before": 70,
+      "after": 70
+    },
+    {
+      "name": "Azarias Londono",
+      "fifa_code": "PAN",
+      "before": 69,
+      "after": 69
+    },
+    {
+      "name": "Ismael Diaz",
+      "fifa_code": "PAN",
+      "before": 70,
+      "after": 70
+    },
+    {
+      "name": "Cecilio Waterman",
+      "fifa_code": "PAN",
+      "before": 70,
+      "after": 70
+    },
+    {
+      "name": "Jose Fajardo",
+      "fifa_code": "PAN",
+      "before": 69,
+      "after": 69
+    },
+    {
+      "name": "Tomas Rodriguez",
+      "fifa_code": "PAN",
+      "before": 69,
+      "after": 69
+    },
+    {
+      "name": "Luca Zidane",
+      "fifa_code": "ALG",
+      "before": 69,
+      "after": 69
+    },
+    {
+      "name": "Oussama Benbot",
+      "fifa_code": "ALG",
+      "before": 69,
+      "after": 69
+    },
+    {
+      "name": "Melvin Mastil",
+      "fifa_code": "ALG",
+      "before": 69,
+      "after": 69
+    },
+    {
+      "name": "Rafik Belghali",
+      "fifa_code": "ALG",
+      "before": 70,
+      "after": 70
+    },
+    {
+      "name": "Samir Chergui",
+      "fifa_code": "ALG",
+      "before": 70,
+      "after": 70
+    },
+    {
+      "name": "Rayan Ait-Nouri",
+      "fifa_code": "ALG",
+      "before": 77,
+      "after": 69
+    },
+    {
+      "name": "Jaouen Hadjam",
+      "fifa_code": "ALG",
+      "before": 69,
+      "after": 69
+    },
+    {
+      "name": "Zinedine Belaid",
+      "fifa_code": "ALG",
+      "before": 69,
+      "after": 69
+    },
+    {
+      "name": "Mohamed Amine Tougaï",
+      "fifa_code": "ALG",
+      "before": 69,
+      "after": 69
+    },
+    {
+      "name": "Achraf Abada",
+      "fifa_code": "ALG",
+      "before": 69,
+      "after": 68
+    },
+    {
+      "name": "Nabil Bentaleb",
+      "fifa_code": "ALG",
+      "before": 69,
+      "after": 69
+    },
+    {
+      "name": "Houssem Aouar",
+      "fifa_code": "ALG",
+      "before": 69,
+      "after": 69
+    },
+    {
+      "name": "Fares Chaibi",
+      "fifa_code": "ALG",
+      "before": 69,
+      "after": 69
+    },
+    {
+      "name": "Ibrahim Maza",
+      "fifa_code": "ALG",
+      "before": 73,
+      "after": 69
+    },
+    {
+      "name": "Yacine Titraoui",
+      "fifa_code": "ALG",
+      "before": 69,
+      "after": 68
+    },
+    {
+      "name": "Mohamed Amine Amoura",
+      "fifa_code": "ALG",
+      "before": 69,
+      "after": 69
+    },
+    {
+      "name": "Nadhir Benbouali",
+      "fifa_code": "ALG",
+      "before": 69,
+      "after": 69
+    },
+    {
+      "name": "Adil Boulbina",
+      "fifa_code": "ALG",
+      "before": 69,
+      "after": 69
+    },
+    {
+      "name": "Fares Ghedjemis",
+      "fifa_code": "ALG",
+      "before": 69,
+      "after": 69
+    },
+    {
+      "name": "Amine Gouiri",
+      "fifa_code": "ALG",
+      "before": 69,
+      "after": 68
+    },
+    {
+      "name": "Anis Hadj Moussa",
+      "fifa_code": "ALG",
+      "before": 68,
+      "after": 68
+    },
+    {
+      "name": "Mory Diaw",
+      "fifa_code": "SEN",
+      "before": 74,
+      "after": 74
+    },
+    {
+      "name": "Yehvann Diouf",
+      "fifa_code": "SEN",
+      "before": 74,
+      "after": 73
+    },
+    {
+      "name": "Antoine Mendy",
+      "fifa_code": "SEN",
+      "before": 75,
+      "after": 74
+    },
+    {
+      "name": "El Hadji Malick Diouf",
+      "fifa_code": "SEN",
+      "before": 77,
+      "after": 74
+    },
+    {
+      "name": "Mamadou Sarr",
+      "fifa_code": "SEN",
+      "before": 79,
+      "after": 74
+    },
+    {
+      "name": "Moussa Niakhate",
+      "fifa_code": "SEN",
+      "before": 74,
+      "after": 74
+    },
+    {
+      "name": "Ismail Jakobs",
+      "fifa_code": "SEN",
+      "before": 74,
+      "after": 73
+    },
+    {
+      "name": "Lamine Camara",
+      "fifa_code": "SEN",
+      "before": 74,
+      "after": 74
+    },
+    {
+      "name": "Habib Diarra",
+      "fifa_code": "SEN",
+      "before": 74,
+      "after": 74
+    },
+    {
+      "name": "Bara Sapoko Ndiaye",
+      "fifa_code": "SEN",
+      "before": 81,
+      "after": 73
+    },
+    {
+      "name": "Iliman Ndiaye",
+      "fifa_code": "SEN",
+      "before": 74,
+      "after": 74
+    },
+    {
+      "name": "Assane Diao",
+      "fifa_code": "SEN",
+      "before": 74,
+      "after": 74
+    },
+    {
+      "name": "Ibrahim Mbaye",
+      "fifa_code": "SEN",
+      "before": 81,
+      "after": 74
+    },
+    {
+      "name": "Nicolas Jackson",
+      "fifa_code": "SEN",
+      "before": 79,
+      "after": 74
+    },
+    {
+      "name": "Raul Rangel",
+      "fifa_code": "MEX",
+      "before": 75,
+      "after": 74
+    },
+    {
+      "name": "Mateo Chavez",
+      "fifa_code": "MEX",
+      "before": 78,
+      "after": 74
+    },
+    {
+      "name": "Brian Gutierrez",
+      "fifa_code": "MEX",
+      "before": 75,
+      "after": 75
+    },
+    {
+      "name": "Gilberto Mora",
+      "fifa_code": "MEX",
+      "before": 75,
+      "after": 74
+    },
+    {
+      "name": "Alvaro Fidalgo",
+      "fifa_code": "MEX",
+      "before": 75,
+      "after": 74
+    },
+    {
+      "name": "Julian Quiñones",
+      "fifa_code": "MEX",
+      "before": 75,
+      "after": 75
+    },
+    {
+      "name": "Armando Gonzalez",
+      "fifa_code": "MEX",
+      "before": 74,
+      "after": 74
+    },
+    {
+      "name": "Hernan Galíndez",
+      "fifa_code": "ECU",
+      "before": 72,
+      "after": 72
+    },
+    {
+      "name": "Willian Pacho",
+      "fifa_code": "ECU",
+      "before": 80,
+      "after": 72
+    },
+    {
+      "name": "Joel Ordonez",
+      "fifa_code": "ECU",
+      "before": 73,
+      "after": 72
+    },
+    {
+      "name": "Denil Castillo",
+      "fifa_code": "ECU",
+      "before": 72,
+      "after": 72
+    },
+    {
+      "name": "Alan Franco",
+      "fifa_code": "ECU",
+      "before": 77,
+      "after": 72
+    },
+    {
+      "name": "Kendry Paez",
+      "fifa_code": "ECU",
+      "before": 72,
+      "after": 72
+    },
+    {
+      "name": "Yaimar Medina",
+      "fifa_code": "ECU",
+      "before": 72,
+      "after": 71
+    },
+    {
+      "name": "Kevin Rodriguez",
+      "fifa_code": "ECU",
+      "before": 73,
+      "after": 72
+    },
+    {
+      "name": "Anthony Valencia",
+      "fifa_code": "ECU",
+      "before": 72,
+      "after": 72
+    },
+    {
+      "name": "Jordy Caicedo",
+      "fifa_code": "ECU",
+      "before": 72,
+      "after": 72
+    },
+    {
+      "name": "Jeremy Arevalo",
+      "fifa_code": "ECU",
+      "before": 72,
+      "after": 72
+    },
+    {
+      "name": "John Yeboah",
+      "fifa_code": "ECU",
+      "before": 71,
+      "after": 71
+    },
+    {
+      "name": "Max Crocombe",
+      "fifa_code": "NZL",
+      "before": 63,
+      "after": 63
+    },
+    {
+      "name": "Francis De Vries",
+      "fifa_code": "NZL",
+      "before": 64,
+      "after": 63
+    },
+    {
+      "name": "Tyler Bindon",
+      "fifa_code": "NZL",
+      "before": 64,
+      "after": 63
+    },
+    {
+      "name": "Finn Surman",
+      "fifa_code": "NZL",
+      "before": 63,
+      "after": 63
+    },
+    {
+      "name": "Tommy Smith",
+      "fifa_code": "NZL",
+      "before": 63,
+      "after": 62
+    },
+    {
+      "name": "Lachlan Bayliss",
+      "fifa_code": "NZL",
+      "before": 67,
+      "after": 63
+    },
+    {
+      "name": "Matt Garbett",
+      "fifa_code": "NZL",
+      "before": 64,
+      "after": 63
+    },
+    {
+      "name": "Jesse Randall",
+      "fifa_code": "NZL",
+      "before": 62,
+      "after": 62
+    },
+    {
+      "name": "Matej Kovar",
+      "fifa_code": "CZE",
+      "before": 75,
+      "after": 72
+    },
+    {
+      "name": "David Doudera",
+      "fifa_code": "CZE",
+      "before": 73,
+      "after": 72
+    },
+    {
+      "name": "Robin Hranac",
+      "fifa_code": "CZE",
+      "before": 72,
+      "after": 72
+    },
+    {
+      "name": "Stepan Chaloupek",
+      "fifa_code": "CZE",
+      "before": 72,
+      "after": 72
+    },
+    {
+      "name": "David Jurasek",
+      "fifa_code": "CZE",
+      "before": 72,
+      "after": 72
+    },
+    {
+      "name": "Jaroslav Zeleny",
+      "fifa_code": "CZE",
+      "before": 72,
+      "after": 71
+    },
+    {
+      "name": "Lukas Cerv",
+      "fifa_code": "CZE",
+      "before": 72,
+      "after": 72
+    },
+    {
+      "name": "Hugo Sochurek",
+      "fifa_code": "CZE",
+      "before": 72,
+      "after": 71
+    },
+    {
+      "name": "Alexandr Sojka",
+      "fifa_code": "CZE",
+      "before": 72,
+      "after": 71
+    },
+    {
+      "name": "Denis Visinsky",
+      "fifa_code": "CZE",
+      "before": 71,
+      "after": 71
+    },
+    {
+      "name": "Mojmir Chytil",
+      "fifa_code": "CZE",
+      "before": 72,
+      "after": 71
+    },
+    {
+      "name": "Owen Goodman",
+      "fifa_code": "CAN",
+      "before": 74,
+      "after": 70
+    },
+    {
+      "name": "Alistair Johnson",
+      "fifa_code": "CAN",
+      "before": 72,
+      "after": 71
+    },
+    {
+      "name": "Niko Sigur",
+      "fifa_code": "CAN",
+      "before": 71,
+      "after": 71
+    },
+    {
+      "name": "Luc De Fougerolles",
+      "fifa_code": "CAN",
+      "before": 74,
+      "after": 70
+    },
+    {
+      "name": "Moïse Bombito",
+      "fifa_code": "CAN",
+      "before": 71,
+      "after": 70
+    },
+    {
+      "name": "Alfie Jones",
+      "fifa_code": "CAN",
+      "before": 71,
+      "after": 70
+    },
+    {
+      "name": "Ismael Kone",
+      "fifa_code": "CAN",
+      "before": 71,
+      "after": 71
+    },
+    {
+      "name": "Ali Ahmed",
+      "fifa_code": "CAN",
+      "before": 71,
+      "after": 70
+    },
+    {
+      "name": "Liam Miller",
+      "fifa_code": "CAN",
+      "before": 70,
+      "after": 70
+    },
+    {
+      "name": "Marcelo Flores",
+      "fifa_code": "CAN",
+      "before": 70,
+      "after": 70
+    },
+    {
+      "name": "Jonathan Osario",
+      "fifa_code": "CAN",
+      "before": 71,
+      "after": 70
+    },
+    {
+      "name": "Tani Oluwaseyi",
+      "fifa_code": "CAN",
+      "before": 70,
+      "after": 70
+    },
+    {
+      "name": "Promise David",
+      "fifa_code": "CAN",
+      "before": 70,
+      "after": 70
+    },
+    {
+      "name": "Mohamed Al Owais",
+      "fifa_code": "KSA",
+      "before": 69,
+      "after": 69
+    },
+    {
+      "name": "Ahmed Alkassar",
+      "fifa_code": "KSA",
+      "before": 69,
+      "after": 69
+    },
+    {
+      "name": "Saud Abdulhamid",
+      "fifa_code": "KSA",
+      "before": 70,
+      "after": 70
+    },
+    {
+      "name": "Jehad Thakri",
+      "fifa_code": "KSA",
+      "before": 70,
+      "after": 70
+    },
+    {
+      "name": "Moteb Al Harbi",
+      "fifa_code": "KSA",
+      "before": 69,
+      "after": 69
+    },
+    {
+      "name": "Mohammed Abu Alshamat",
+      "fifa_code": "KSA",
+      "before": 68,
+      "after": 68
+    },
+    {
+      "name": "Mohamed Kanno",
+      "fifa_code": "KSA",
+      "before": 69,
+      "after": 69
+    },
+    {
+      "name": "Alaa ⁠Al Hejji",
+      "fifa_code": "KSA",
+      "before": 69,
+      "after": 68
+    },
+    {
+      "name": "Musab Al Juwayr",
+      "fifa_code": "KSA",
+      "before": 68,
+      "after": 68
+    },
+    {
+      "name": "Feras Al Brikan",
+      "fifa_code": "KSA",
+      "before": 68,
+      "after": 68
+    },
+    {
+      "name": "Martin Zlomislic",
+      "fifa_code": "BIH",
+      "before": 68,
+      "after": 68
+    },
+    {
+      "name": "Osman Hadzikic",
+      "fifa_code": "BIH",
+      "before": 68,
+      "after": 67
+    },
+    {
+      "name": "Nihad Mujakic",
+      "fifa_code": "BIH",
+      "before": 69,
+      "after": 68
+    },
+    {
+      "name": "Nikola Katic",
+      "fifa_code": "BIH",
+      "before": 68,
+      "after": 68
+    },
+    {
+      "name": "Tarik Muharemovic",
+      "fifa_code": "BIH",
+      "before": 68,
+      "after": 68
+    },
+    {
+      "name": "Stjepan Radeljic",
+      "fifa_code": "BIH",
+      "before": 68,
+      "after": 68
+    },
+    {
+      "name": "Dennis Hadzikadunic",
+      "fifa_code": "BIH",
+      "before": 68,
+      "after": 68
+    },
+    {
+      "name": "Nidal Celik",
+      "fifa_code": "BIH",
+      "before": 68,
+      "after": 67
+    },
+    {
+      "name": "Ivan Sunjic",
+      "fifa_code": "BIH",
+      "before": 68,
+      "after": 68
+    },
+    {
+      "name": "Ivan Basic",
+      "fifa_code": "BIH",
+      "before": 68,
+      "after": 68
+    },
+    {
+      "name": "Dzenis Burnic",
+      "fifa_code": "BIH",
+      "before": 68,
+      "after": 68
+    },
+    {
+      "name": "Ermin Mahmic",
+      "fifa_code": "BIH",
+      "before": 68,
+      "after": 68
+    },
+    {
+      "name": "Benjamin Tahirovic",
+      "fifa_code": "BIH",
+      "before": 68,
+      "after": 67
+    },
+    {
+      "name": "Amar Memic",
+      "fifa_code": "BIH",
+      "before": 68,
+      "after": 67
+    },
+    {
+      "name": "Armin Gigovic",
+      "fifa_code": "BIH",
+      "before": 67,
+      "after": 67
+    },
+    {
+      "name": "Kerim Alajbegovic",
+      "fifa_code": "BIH",
+      "before": 68,
+      "after": 68
+    },
+    {
+      "name": "Esmir Bajraktarevic",
+      "fifa_code": "BIH",
+      "before": 71,
+      "after": 68
+    },
+    {
+      "name": "Jovo Lukic",
+      "fifa_code": "BIH",
+      "before": 68,
+      "after": 68
+    },
+    {
+      "name": "Samed Bazdar",
+      "fifa_code": "BIH",
+      "before": 68,
+      "after": 67
+    },
+    {
+      "name": "Haris Tabakovic",
+      "fifa_code": "BIH",
+      "before": 67,
+      "after": 67
+    },
+    {
+      "name": "Salah Zakaria",
+      "fifa_code": "QAT",
+      "before": 68,
+      "after": 68
+    },
+    {
+      "name": "Mahmoud Abunada",
+      "fifa_code": "QAT",
+      "before": 68,
+      "after": 68
+    },
+    {
+      "name": "Hashmi Hussein",
+      "fifa_code": "QAT",
+      "before": 69,
+      "after": 69
+    },
+    {
+      "name": "Ayoub Alawi",
+      "fifa_code": "QAT",
+      "before": 69,
+      "after": 68
+    },
+    {
+      "name": "Boualem Khoukhi",
+      "fifa_code": "QAT",
+      "before": 69,
+      "after": 68
+    },
+    {
+      "name": "Pedro Miguel",
+      "fifa_code": "QAT",
+      "before": 68,
+      "after": 68
+    },
+    {
+      "name": "Issa Laaye",
+      "fifa_code": "QAT",
+      "before": 68,
+      "after": 68
+    },
+    {
+      "name": "Lucas Mendes",
+      "fifa_code": "QAT",
+      "before": 68,
+      "after": 68
+    },
+    {
+      "name": "Sultan Al-Brake",
+      "fifa_code": "QAT",
+      "before": 68,
+      "after": 68
+    },
+    {
+      "name": "Homam Al-Amin",
+      "fifa_code": "QAT",
+      "before": 68,
+      "after": 67
+    },
+    {
+      "name": "Mohammed Al-Manai",
+      "fifa_code": "QAT",
+      "before": 69,
+      "after": 68
+    },
+    {
+      "name": "Jassem Jaber",
+      "fifa_code": "QAT",
+      "before": 68,
+      "after": 68
+    },
+    {
+      "name": "Karim Boudiaf",
+      "fifa_code": "QAT",
+      "before": 68,
+      "after": 68
+    },
+    {
+      "name": "Ahmed Fathi",
+      "fifa_code": "QAT",
+      "before": 68,
+      "after": 68
+    },
+    {
+      "name": "Abdulaziz Hatem",
+      "fifa_code": "QAT",
+      "before": 68,
+      "after": 68
+    },
+    {
+      "name": "Assim Madibo",
+      "fifa_code": "QAT",
+      "before": 68,
+      "after": 67
+    },
+    {
+      "name": "Tahseen Mohammed",
+      "fifa_code": "QAT",
+      "before": 69,
+      "after": 68
+    },
+    {
+      "name": "Edmilson Junior",
+      "fifa_code": "QAT",
+      "before": 68,
+      "after": 68
+    },
+    {
+      "name": "Mohammed Muntari",
+      "fifa_code": "QAT",
+      "before": 68,
+      "after": 68
+    },
+    {
+      "name": "Youssef Abdulrazzaq",
+      "fifa_code": "QAT",
+      "before": 68,
+      "after": 68
+    },
+    {
+      "name": "Ahmed Alaa",
+      "fifa_code": "QAT",
+      "before": 68,
+      "after": 68
+    },
+    {
+      "name": "Hassan Al-Haydos",
+      "fifa_code": "QAT",
+      "before": 67,
+      "after": 67
+    },
+    {
+      "name": "Ahmed Al-Janahi",
+      "fifa_code": "QAT",
+      "before": 67,
+      "after": 67
+    },
+    {
+      "name": "Weverton",
+      "fifa_code": "BRA",
+      "before": 80,
+      "after": 79
+    },
+    {
+      "name": "Danilo Santos",
+      "fifa_code": "BRA",
+      "before": 80,
+      "after": 80
+    },
+    {
+      "name": "Fabinho",
+      "fifa_code": "BRA",
+      "before": 80,
+      "after": 79
+    },
+    {
+      "name": "Lucas Paqueta",
+      "fifa_code": "BRA",
+      "before": 80,
+      "after": 79
+    },
+    {
+      "name": "Luiz Henrique",
+      "fifa_code": "BRA",
+      "before": 80,
+      "after": 80
+    },
+    {
+      "name": "Igor Thiago",
+      "fifa_code": "BRA",
+      "before": 83,
+      "after": 79
+    },
+    {
+      "name": "Rayan",
+      "fifa_code": "BRA",
+      "before": 82,
+      "after": 79
+    },
+    {
+      "name": "Marvin Keller",
+      "fifa_code": "SUI",
+      "before": 74,
+      "after": 74
+    },
+    {
+      "name": "Aurele Amenda",
+      "fifa_code": "SUI",
+      "before": 75,
+      "after": 74
+    },
+    {
+      "name": "Luca Jaquez",
+      "fifa_code": "SUI",
+      "before": 74,
+      "after": 74
+    },
+    {
+      "name": "Johan Manzambi",
+      "fifa_code": "SUI",
+      "before": 73,
+      "after": 73
+    },
+    {
+      "name": "Hayakawa Tomoki",
+      "fifa_code": "JPN",
+      "before": 75,
+      "after": 75
+    },
+    {
+      "name": "Suzuki Zion",
+      "fifa_code": "JPN",
+      "before": 75,
+      "after": 75
+    },
+    {
+      "name": "Osako Keisuke",
+      "fifa_code": "JPN",
+      "before": 75,
+      "after": 75
+    },
+    {
+      "name": "Nagatomo Yuto",
+      "fifa_code": "JPN",
+      "before": 76,
+      "after": 76
+    },
+    {
+      "name": "Taniguchi Shogo",
+      "fifa_code": "JPN",
+      "before": 76,
+      "after": 76
+    },
+    {
+      "name": "Tomiyasu Takehiro",
+      "fifa_code": "JPN",
+      "before": 79,
+      "after": 76
+    },
+    {
+      "name": "Itakura Ko",
+      "fifa_code": "JPN",
+      "before": 78,
+      "after": 75
+    },
+    {
+      "name": "Watanabe Tsuyoshi",
+      "fifa_code": "JPN",
+      "before": 75,
+      "after": 75
+    },
+    {
+      "name": "Ito Hiroki",
+      "fifa_code": "JPN",
+      "before": 82,
+      "after": 75
+    },
+    {
+      "name": "Suzuki Junnosuke",
+      "fifa_code": "JPN",
+      "before": 75,
+      "after": 75
+    },
+    {
+      "name": "Seko Ayumu",
+      "fifa_code": "JPN",
+      "before": 75,
+      "after": 75
+    },
+    {
+      "name": "Sugawara Yukinari",
+      "fifa_code": "JPN",
+      "before": 75,
+      "after": 75
+    },
+    {
+      "name": "Kamada Daichi",
+      "fifa_code": "JPN",
+      "before": 78,
+      "after": 75
+    },
+    {
+      "name": "Sano Kaishu",
+      "fifa_code": "JPN",
+      "before": 75,
+      "after": 75
+    },
+    {
+      "name": "Tanaka Ao",
+      "fifa_code": "JPN",
+      "before": 75,
+      "after": 75
+    },
+    {
+      "name": "Endo Wataru",
+      "fifa_code": "JPN",
+      "before": 80,
+      "after": 75
+    },
+    {
+      "name": "Nakamura Keito",
+      "fifa_code": "JPN",
+      "before": 75,
+      "after": 75
+    },
+    {
+      "name": "Doan Ritsu",
+      "fifa_code": "JPN",
+      "before": 75,
+      "after": 75
+    },
+    {
+      "name": "Ito Junya",
+      "fifa_code": "JPN",
+      "before": 75,
+      "after": 75
+    },
+    {
+      "name": "Kubo Takefusa",
+      "fifa_code": "JPN",
+      "before": 75,
+      "after": 75
+    },
+    {
+      "name": "Suzuki Yuito",
+      "fifa_code": "JPN",
+      "before": 75,
+      "after": 75
+    },
+    {
+      "name": "Ueda Ayase",
+      "fifa_code": "JPN",
+      "before": 75,
+      "after": 75
+    },
+    {
+      "name": "Ogawa Koki",
+      "fifa_code": "JPN",
+      "before": 75,
+      "after": 75
+    },
+    {
+      "name": "Maeda Daizen",
+      "fifa_code": "JPN",
+      "before": 75,
+      "after": 75
+    },
+    {
+      "name": "Shiogai Kento",
+      "fifa_code": "JPN",
+      "before": 74,
+      "after": 74
+    },
+    {
+      "name": "Goto Keisuke",
+      "fifa_code": "JPN",
+      "before": 74,
+      "after": 74
+    },
+    {
+      "name": "Munir El Kajoui",
+      "fifa_code": "MAR",
+      "before": 76,
+      "after": 75
+    },
+    {
+      "name": "Ahmed Reda Tagnaouti",
+      "fifa_code": "MAR",
+      "before": 76,
+      "after": 75
+    },
+    {
+      "name": "Anass Salah-Eddine",
+      "fifa_code": "MAR",
+      "before": 80,
+      "after": 76
+    },
+    {
+      "name": "Youssef Belammari",
+      "fifa_code": "MAR",
+      "before": 77,
+      "after": 75
+    },
+    {
+      "name": "Chadi Riad",
+      "fifa_code": "MAR",
+      "before": 79,
+      "after": 75
+    },
+    {
+      "name": "Issa Diop",
+      "fifa_code": "MAR",
+      "before": 79,
+      "after": 75
+    },
+    {
+      "name": "Redouane Halhal",
+      "fifa_code": "MAR",
+      "before": 76,
+      "after": 75
+    },
+    {
+      "name": "Zakaria El Ouahdi",
+      "fifa_code": "MAR",
+      "before": 76,
+      "after": 75
+    },
+    {
+      "name": "Samir El Mourabet",
+      "fifa_code": "MAR",
+      "before": 76,
+      "after": 76
+    },
+    {
+      "name": "Ayyoub Bouaddi",
+      "fifa_code": "MAR",
+      "before": 76,
+      "after": 75
+    },
+    {
+      "name": "Neil El Aynaoui",
+      "fifa_code": "MAR",
+      "before": 76,
+      "after": 75
+    },
+    {
+      "name": "Ismael Saibari",
+      "fifa_code": "MAR",
+      "before": 78,
+      "after": 75
+    },
+    {
+      "name": "Abdessamad Ezzalzouli",
+      "fifa_code": "MAR",
+      "before": 76,
+      "after": 76
+    },
+    {
+      "name": "Chemsdine Talbi",
+      "fifa_code": "MAR",
+      "before": 76,
+      "after": 76
+    },
+    {
+      "name": "Yassine Gessime",
+      "fifa_code": "MAR",
+      "before": 75,
+      "after": 75
+    },
+    {
+      "name": "Ayoube Amaimouni",
+      "fifa_code": "MAR",
+      "before": 75,
+      "after": 75
+    },
+    {
+      "name": "Nicolas Paz",
+      "fifa_code": "ARG",
+      "before": 82,
+      "after": 80
+    },
+    {
+      "name": "Johnny Placide",
+      "fifa_code": "HTI",
+      "before": 65,
+      "after": 65
+    },
+    {
+      "name": "Alexandre Pierre",
+      "fifa_code": "HTI",
+      "before": 65,
+      "after": 65
+    },
+    {
+      "name": "Josue Duverger",
+      "fifa_code": "HTI",
+      "before": 65,
+      "after": 65
+    },
+    {
+      "name": "Wilguens Paugain",
+      "fifa_code": "HTI",
+      "before": 66,
+      "after": 65
+    },
+    {
+      "name": "Duke Lacroix",
+      "fifa_code": "HTI",
+      "before": 66,
+      "after": 65
+    },
+    {
+      "name": "Martin Experience",
+      "fifa_code": "HTI",
+      "before": 65,
+      "after": 65
+    },
+    {
+      "name": "Jean-Kevin Duverne",
+      "fifa_code": "HTI",
+      "before": 65,
+      "after": 65
+    },
+    {
+      "name": "Ricardo Ade",
+      "fifa_code": "HTI",
+      "before": 65,
+      "after": 65
+    },
+    {
+      "name": "Hannes Delcroix",
+      "fifa_code": "HTI",
+      "before": 65,
+      "after": 65
+    },
+    {
+      "name": "Keeto Thermoncy",
+      "fifa_code": "HTI",
+      "before": 65,
+      "after": 64
+    },
+    {
+      "name": "Carl-Fred Sainthe",
+      "fifa_code": "HTI",
+      "before": 65,
+      "after": 65
+    },
+    {
+      "name": "Jean-Jacques Danley",
+      "fifa_code": "HTI",
+      "before": 65,
+      "after": 65
+    },
+    {
+      "name": "Jeanricner Bellegarde",
+      "fifa_code": "HTI",
+      "before": 65,
+      "after": 65
+    },
+    {
+      "name": "Pierre Woodenski",
+      "fifa_code": "HTI",
+      "before": 65,
+      "after": 65
+    },
+    {
+      "name": "Dominique Simon",
+      "fifa_code": "HTI",
+      "before": 65,
+      "after": 64
+    },
+    {
+      "name": "Louicius Deedson",
+      "fifa_code": "HTI",
+      "before": 66,
+      "after": 65
+    },
+    {
+      "name": "Ruben Providence",
+      "fifa_code": "HTI",
+      "before": 65,
+      "after": 65
+    },
+    {
+      "name": "Josue Casimir",
+      "fifa_code": "HTI",
+      "before": 65,
+      "after": 65
+    },
+    {
+      "name": "Wilson Isidor",
+      "fifa_code": "HTI",
+      "before": 65,
+      "after": 65
+    },
+    {
+      "name": "Yassin Fortune",
+      "fifa_code": "HTI",
+      "before": 64,
+      "after": 64
+    },
+    {
+      "name": "Lenny Joseph",
+      "fifa_code": "HTI",
+      "before": 64,
+      "after": 64
+    },
+    {
+      "name": "Yahia Fofana",
+      "fifa_code": "CIV",
+      "before": 73,
+      "after": 73
+    },
+    {
+      "name": "Mohamed Koné",
+      "fifa_code": "CIV",
+      "before": 73,
+      "after": 73
+    },
+    {
+      "name": "Alban Lafont",
+      "fifa_code": "CIV",
+      "before": 73,
+      "after": 73
+    },
+    {
+      "name": "Emmanuel Agbadou",
+      "fifa_code": "CIV",
+      "before": 74,
+      "after": 73
+    },
+    {
+      "name": "Clement Akpa",
+      "fifa_code": "CIV",
+      "before": 74,
+      "after": 73
+    },
+    {
+      "name": "Ousmane Diomande",
+      "fifa_code": "CIV",
+      "before": 78,
+      "after": 73
+    },
+    {
+      "name": "Guela Doue",
+      "fifa_code": "CIV",
+      "before": 73,
+      "after": 73
+    },
+    {
+      "name": "Ghislain Konan",
+      "fifa_code": "CIV",
+      "before": 73,
+      "after": 73
+    },
+    {
+      "name": "Evan Ndicka",
+      "fifa_code": "CIV",
+      "before": 73,
+      "after": 73
+    },
+    {
+      "name": "Wilfried Singo",
+      "fifa_code": "CIV",
+      "before": 73,
+      "after": 72
+    },
+    {
+      "name": "Seko Fofana",
+      "fifa_code": "CIV",
+      "before": 77,
+      "after": 73
+    },
+    {
+      "name": "Parfait Guiagon",
+      "fifa_code": "CIV",
+      "before": 73,
+      "after": 73
+    },
+    {
+      "name": "Christ Inao Oulaï",
+      "fifa_code": "CIV",
+      "before": 73,
+      "after": 73
+    },
+    {
+      "name": "Ibrahim Sangaré",
+      "fifa_code": "CIV",
+      "before": 73,
+      "after": 73
+    },
+    {
+      "name": "Jean-Mickael Seri",
+      "fifa_code": "CIV",
+      "before": 73,
+      "after": 73
+    },
+    {
+      "name": "Ange-Yoan Bonny",
+      "fifa_code": "CIV",
+      "before": 78,
+      "after": 73
+    },
+    {
+      "name": "Amad Diallo",
+      "fifa_code": "CIV",
+      "before": 77,
+      "after": 73
+    },
+    {
+      "name": "Oumar Diakite",
+      "fifa_code": "CIV",
+      "before": 73,
+      "after": 73
+    },
+    {
+      "name": "Yan Diomande",
+      "fifa_code": "CIV",
+      "before": 73,
+      "after": 73
+    },
+    {
+      "name": "Evann Guessand",
+      "fifa_code": "CIV",
+      "before": 76,
+      "after": 73
+    },
+    {
+      "name": "Nicolas Pepe",
+      "fifa_code": "CIV",
+      "before": 73,
+      "after": 73
+    },
+    {
+      "name": "Bazoumana Toure",
+      "fifa_code": "CIV",
+      "before": 72,
+      "after": 72
+    },
+    {
+      "name": "Elye Wahi",
+      "fifa_code": "CIV",
+      "before": 72,
+      "after": 72
+    },
+    {
+      "name": "Dominik Kotarski",
+      "fifa_code": "HRV",
+      "before": 76,
+      "after": 75
+    },
+    {
+      "name": "Luka Vuskovic",
+      "fifa_code": "HRV",
+      "before": 76,
+      "after": 75
+    },
+    {
+      "name": "Petar Sucic",
+      "fifa_code": "HRV",
+      "before": 81,
+      "after": 75
+    },
+    {
+      "name": "Nikola Moro",
+      "fifa_code": "HRV",
+      "before": 75,
+      "after": 75
+    },
+    {
+      "name": "Toni Fruk",
+      "fifa_code": "HRV",
+      "before": 75,
+      "after": 75
+    },
+    {
+      "name": "Igor Matanovic",
+      "fifa_code": "HRV",
+      "before": 75,
+      "after": 75
+    },
+    {
+      "name": "Brice Samba",
+      "fifa_code": "FRA",
+      "before": 82,
+      "after": 80
+    },
+    {
+      "name": "Robin Risser",
+      "fifa_code": "FRA",
+      "before": 82,
+      "after": 80
+    },
+    {
+      "name": "Manu Kone",
+      "fifa_code": "FRA",
+      "before": 82,
+      "after": 80
+    },
+    {
+      "name": "Warren Zaire-Emery",
+      "fifa_code": "FRA",
+      "before": 88,
+      "after": 80
+    },
+    {
+      "name": "Maghnes Akliouche",
+      "fifa_code": "FRA",
+      "before": 83,
+      "after": 80
+    },
+    {
+      "name": "Desire Doue",
+      "fifa_code": "FRA",
+      "before": 88,
+      "after": 80
+    },
+    {
+      "name": "Bradley Barcola",
+      "fifa_code": "FRA",
+      "before": 88,
+      "after": 80
+    },
+    {
+      "name": "Izzo",
+      "fifa_code": "AUS",
+      "before": 73,
+      "after": 73
+    },
+    {
+      "name": "Beach",
+      "fifa_code": "AUS",
+      "before": 73,
+      "after": 73
+    },
+    {
+      "name": "Circati",
+      "fifa_code": "AUS",
+      "before": 73,
+      "after": 73
+    },
+    {
+      "name": "Herrington",
+      "fifa_code": "AUS",
+      "before": 73,
+      "after": 73
+    },
+    {
+      "name": "Okon-Englster",
+      "fifa_code": "AUS",
+      "before": 73,
+      "after": 73
+    },
+    {
+      "name": "Irankunda",
+      "fifa_code": "AUS",
+      "before": 73,
+      "after": 73
+    },
+    {
+      "name": "Velupilly",
+      "fifa_code": "AUS",
+      "before": 73,
+      "after": 73
+    },
+    {
+      "name": "Volpato",
+      "fifa_code": "AUS",
+      "before": 72,
+      "after": 72
+    },
+    {
+      "name": "Song Bumkeun",
+      "fifa_code": "KOR",
+      "before": 74,
+      "after": 74
+    },
+    {
+      "name": "Jo Hyeonwoo",
+      "fifa_code": "KOR",
+      "before": 74,
+      "after": 74
+    },
+    {
+      "name": "Kim Seung-gyu",
+      "fifa_code": "KOR",
+      "before": 74,
+      "after": 74
+    },
+    {
+      "name": "Jens Castrop",
+      "fifa_code": "KOR",
+      "before": 75,
+      "after": 75
+    },
+    {
+      "name": "Lee Hanbeom",
+      "fifa_code": "KOR",
+      "before": 75,
+      "after": 75
+    },
+    {
+      "name": "Park Jinseob",
+      "fifa_code": "KOR",
+      "before": 75,
+      "after": 75
+    },
+    {
+      "name": "Lee Kihyuk",
+      "fifa_code": "KOR",
+      "before": 74,
+      "after": 74
+    },
+    {
+      "name": "Kim Minjae",
+      "fifa_code": "KOR",
+      "before": 81,
+      "after": 74
+    },
+    {
+      "name": "Kim Moonhwan",
+      "fifa_code": "KOR",
+      "before": 74,
+      "after": 74
+    },
+    {
+      "name": "Kim Taehyeon",
+      "fifa_code": "KOR",
+      "before": 74,
+      "after": 74
+    },
+    {
+      "name": "Lee Taeseok",
+      "fifa_code": "KOR",
+      "before": 74,
+      "after": 74
+    },
+    {
+      "name": "Seol Youngwoo",
+      "fifa_code": "KOR",
+      "before": 74,
+      "after": 74
+    },
+    {
+      "name": "Cho Yumin",
+      "fifa_code": "KOR",
+      "before": 73,
+      "after": 73
+    },
+    {
+      "name": "YLee Donggyeong",
+      "fifa_code": "KOR",
+      "before": 74,
+      "after": 74
+    },
+    {
+      "name": "Hwang Heechan",
+      "fifa_code": "KOR",
+      "before": 77,
+      "after": 74
+    },
+    {
+      "name": "Yang Hyunjun",
+      "fifa_code": "KOR",
+      "before": 74,
+      "after": 74
+    },
+    {
+      "name": "Hwang Inbeom",
+      "fifa_code": "KOR",
+      "before": 74,
+      "after": 74
+    },
+    {
+      "name": "Lee Jaesung",
+      "fifa_code": "KOR",
+      "before": 74,
+      "after": 74
+    },
+    {
+      "name": "Kim Jingyu",
+      "fifa_code": "KOR",
+      "before": 73,
+      "after": 73
+    },
+    {
+      "name": "Eom Jisung",
+      "fifa_code": "KOR",
+      "before": 73,
+      "after": 73
+    },
+    {
+      "name": "Bae Junho",
+      "fifa_code": "KOR",
+      "before": 73,
+      "after": 73
+    },
+    {
+      "name": "Lee Kangin",
+      "fifa_code": "KOR",
+      "before": 80,
+      "after": 73
+    },
+    {
+      "name": "Paik Seungho",
+      "fifa_code": "KOR",
+      "before": 73,
+      "after": 73
+    },
+    {
+      "name": "Cho Guesung",
+      "fifa_code": "KOR",
+      "before": 74,
+      "after": 74
+    },
+    {
+      "name": "Son Heungmin",
+      "fifa_code": "KOR",
+      "before": 74,
+      "after": 73
+    },
+    {
+      "name": "Oh Hyeongyu",
+      "fifa_code": "KOR",
+      "before": 73,
+      "after": 73
+    },
+    {
+      "name": "Santiago Mele",
+      "fifa_code": "URU",
+      "before": 76,
+      "after": 75
+    },
+    {
+      "name": "Guillermo Varela",
+      "fifa_code": "URU",
+      "before": 77,
+      "after": 76
+    },
+    {
+      "name": "Joaquin Piquerez",
+      "fifa_code": "URU",
+      "before": 76,
+      "after": 75
+    },
+    {
+      "name": "Emiliano Martinez",
+      "fifa_code": "URU",
+      "before": 76,
+      "after": 76
+    },
+    {
+      "name": "Giorgan de Arrascaeta",
+      "fifa_code": "URU",
+      "before": 76,
+      "after": 75
+    },
+    {
+      "name": "Tino Livramento",
+      "fifa_code": "ENG",
+      "before": 87,
+      "after": 80
+    },
+    {
+      "name": "Jarell Quansah",
+      "fifa_code": "ENG",
+      "before": 86,
+      "after": 80
+    },
+    {
+      "name": "Nico O’Reilly",
+      "fifa_code": "ENG",
+      "before": 88,
+      "after": 80
+    },
+    {
+      "name": "Elliot Anderson",
+      "fifa_code": "ENG",
+      "before": 82,
+      "after": 80
+    },
+    {
+      "name": "Kobbie Mainoo",
+      "fifa_code": "ENG",
+      "before": 86,
+      "after": 80
+    },
+    {
+      "name": "Noni Madueke",
+      "fifa_code": "ENG",
+      "before": 87,
+      "after": 80
+    },
+    {
+      "name": "Danial Eiri",
+      "fifa_code": "IRN",
+      "before": 74,
+      "after": 73
+    },
+    {
+      "name": "Ehsan Hajsafi",
+      "fifa_code": "IRN",
+      "before": 74,
+      "after": 73
+    },
+    {
+      "name": "Saleh Hardani",
+      "fifa_code": "IRN",
+      "before": 74,
+      "after": 73
+    },
+    {
+      "name": "Hossein Kanaani",
+      "fifa_code": "IRN",
+      "before": 73,
+      "after": 73
+    },
+    {
+      "name": "Shoja Khalilzadeh",
+      "fifa_code": "IRN",
+      "before": 73,
+      "after": 73
+    },
+    {
+      "name": "Ali Nemati Omid Noorafkan",
+      "fifa_code": "IRN",
+      "before": 73,
+      "after": 73
+    },
+    {
+      "name": "Ramin Rezaeian",
+      "fifa_code": "IRN",
+      "before": 73,
+      "after": 72
+    },
+    {
+      "name": "Rouzbeh Cheshmi",
+      "fifa_code": "IRN",
+      "before": 74,
+      "after": 73
+    },
+    {
+      "name": "Mehdi Ghaedi",
+      "fifa_code": "IRN",
+      "before": 73,
+      "after": 73
+    },
+    {
+      "name": "Mohammad Ghorbani",
+      "fifa_code": "IRN",
+      "before": 73,
+      "after": 73
+    },
+    {
+      "name": "Amir Mohammad Razzaghinia",
+      "fifa_code": "IRN",
+      "before": 72,
+      "after": 72
+    },
+    {
+      "name": "Mehdi Torabi",
+      "fifa_code": "IRN",
+      "before": 72,
+      "after": 72
+    },
+    {
+      "name": "Aria Yousefi",
+      "fifa_code": "IRN",
+      "before": 72,
+      "after": 72
+    },
+    {
+      "name": "Dennis Dargahi",
+      "fifa_code": "IRN",
+      "before": 73,
+      "after": 73
+    },
+    {
+      "name": "Amirhossein Hosseinzadeh",
+      "fifa_code": "IRN",
+      "before": 73,
+      "after": 72
+    },
+    {
+      "name": "Shahriyar Moghanlou",
+      "fifa_code": "IRN",
+      "before": 72,
+      "after": 72
+    },
+    {
+      "name": "Devier Machado",
+      "fifa_code": "COL",
+      "before": 77,
+      "after": 76
+    },
+    {
+      "name": "Kevin Castano",
+      "fifa_code": "COL",
+      "before": 76,
+      "after": 75
+    },
+    {
+      "name": "Jaminton Campaz",
+      "fifa_code": "COL",
+      "before": 76,
+      "after": 75
+    },
+    {
+      "name": "Carlos Andres Gomez",
+      "fifa_code": "COL",
+      "before": 76,
+      "after": 76
+    },
+    {
+      "name": "Jhon Cordoba",
+      "fifa_code": "COL",
+      "before": 76,
+      "after": 76
+    },
+    {
+      "name": "Portilla",
+      "fifa_code": "COL",
+      "before": 74,
+      "after": 74
+    },
+    {
+      "name": "Angus Gunn",
+      "fifa_code": "SCO",
+      "before": 71,
+      "after": 71
+    },
+    {
+      "name": "Findlay Curtis",
+      "fifa_code": "SCO",
+      "before": 71,
+      "after": 71
+    },
+    {
+      "name": "Ben Gannon-Doak",
+      "fifa_code": "SCO",
+      "before": 74,
+      "after": 70
+    },
+    {
+      "name": "Jack Fletcher",
+      "fifa_code": "SCO",
+      "before": 75,
+      "after": 70
+    },
+    {
+      "name": "George Hirst",
+      "fifa_code": "SCO",
+      "before": 71,
+      "after": 70
+    },
+    {
+      "name": "Pau Cubarsi",
+      "fifa_code": "ESP",
+      "before": 88,
+      "after": 80
+    },
+    {
+      "name": "Marc Pubill",
+      "fifa_code": "ESP",
+      "before": 86,
+      "after": 80
+    },
+    {
+      "name": "Alex Baena",
+      "fifa_code": "ESP",
+      "before": 86,
+      "after": 80
+    },
+    {
+      "name": "Yeremy Pino",
+      "fifa_code": "ESP",
+      "before": 84,
+      "after": 80
+    },
+    {
+      "name": "Victor Munoz",
+      "fifa_code": "ESP",
+      "before": 80,
+      "after": 80
+    },
+    {
+      "name": "Tyrick Bodak",
+      "fifa_code": "CUR",
+      "before": 65,
+      "after": 65
+    },
+    {
+      "name": "Trevor Doornbusch",
+      "fifa_code": "CUR",
+      "before": 65,
+      "after": 65
+    },
+    {
+      "name": "Riechedly Bazoer",
+      "fifa_code": "CUR",
+      "before": 66,
+      "after": 66
+    },
+    {
+      "name": "Joshua Brenet",
+      "fifa_code": "CUR",
+      "before": 66,
+      "after": 66
+    },
+    {
+      "name": "Roshon Van Eijma",
+      "fifa_code": "CUR",
+      "before": 66,
+      "after": 65
+    },
+    {
+      "name": "Sherel Floranus",
+      "fifa_code": "CUR",
+      "before": 65,
+      "after": 65
+    },
+    {
+      "name": "Deveron Fonville",
+      "fifa_code": "CUR",
+      "before": 65,
+      "after": 65
+    },
+    {
+      "name": "Armando Obispo",
+      "fifa_code": "CUR",
+      "before": 68,
+      "after": 65
+    },
+    {
+      "name": "Shurandy Sambo",
+      "fifa_code": "CUR",
+      "before": 65,
+      "after": 65
+    },
+    {
+      "name": "Livano Comenencia",
+      "fifa_code": "CUR",
+      "before": 65,
+      "after": 65
+    },
+    {
+      "name": "Kevin Felida",
+      "fifa_code": "CUR",
+      "before": 65,
+      "after": 65
+    },
+    {
+      "name": "Ar’Jany Martha",
+      "fifa_code": "CUR",
+      "before": 65,
+      "after": 65
+    },
+    {
+      "name": "Tyrese Noslin",
+      "fifa_code": "CUR",
+      "before": 65,
+      "after": 65
+    },
+    {
+      "name": "Godfried Roemeratoe",
+      "fifa_code": "CUR",
+      "before": 65,
+      "after": 65
+    },
+    {
+      "name": "Jeremy Antonisse",
+      "fifa_code": "CUR",
+      "before": 65,
+      "after": 65
+    },
+    {
+      "name": "Tahith Chong",
+      "fifa_code": "CUR",
+      "before": 65,
+      "after": 65
+    },
+    {
+      "name": "Sontje Hansen",
+      "fifa_code": "CUR",
+      "before": 65,
+      "after": 65
+    },
+    {
+      "name": "Brandley Kuwas",
+      "fifa_code": "CUR",
+      "before": 65,
+      "after": 65
+    },
+    {
+      "name": "Jürgen Locadia",
+      "fifa_code": "CUR",
+      "before": 64,
+      "after": 64
+    },
+    {
+      "name": "Jearl Margaritha",
+      "fifa_code": "CUR",
+      "before": 64,
+      "after": 64
+    },
+    {
+      "name": "Ricardo Goss",
+      "fifa_code": "RSA",
+      "before": 67,
+      "after": 67
+    },
+    {
+      "name": "Sipho Chaine",
+      "fifa_code": "RSA",
+      "before": 67,
+      "after": 67
+    },
+    {
+      "name": "Khuliso Mudau",
+      "fifa_code": "RSA",
+      "before": 68,
+      "after": 68
+    },
+    {
+      "name": "Olwethu Makhanya",
+      "fifa_code": "RSA",
+      "before": 68,
+      "after": 68
+    },
+    {
+      "name": "Bradley Cross",
+      "fifa_code": "RSA",
+      "before": 68,
+      "after": 67
+    },
+    {
+      "name": "Thabang Matuludi",
+      "fifa_code": "RSA",
+      "before": 67,
+      "after": 67
+    },
+    {
+      "name": "Nkosinathi Sibisi",
+      "fifa_code": "RSA",
+      "before": 67,
+      "after": 67
+    },
+    {
+      "name": "Aubrey Modiba",
+      "fifa_code": "RSA",
+      "before": 67,
+      "after": 67
+    },
+    {
+      "name": "Khulumani Ndamane",
+      "fifa_code": "RSA",
+      "before": 67,
+      "after": 67
+    },
+    {
+      "name": "Ime Okon",
+      "fifa_code": "RSA",
+      "before": 67,
+      "after": 67
+    },
+    {
+      "name": "Samukele Kabini",
+      "fifa_code": "RSA",
+      "before": 67,
+      "after": 66
+    },
+    {
+      "name": "Mbekezeli Mbokazi",
+      "fifa_code": "RSA",
+      "before": 66,
+      "after": 66
+    },
+    {
+      "name": "Teboho Mokoena",
+      "fifa_code": "RSA",
+      "before": 67,
+      "after": 67
+    },
+    {
+      "name": "Jayden Adams",
+      "fifa_code": "RSA",
+      "before": 67,
+      "after": 67
+    },
+    {
+      "name": "Thalente Mbatha",
+      "fifa_code": "RSA",
+      "before": 67,
+      "after": 67
+    },
+    {
+      "name": "Kamogelo Sebelebele",
+      "fifa_code": "RSA",
+      "before": 67,
+      "after": 67
+    },
+    {
+      "name": "Oswin Appollis",
+      "fifa_code": "RSA",
+      "before": 67,
+      "after": 67
+    },
+    {
+      "name": "Tshepang Moremi",
+      "fifa_code": "RSA",
+      "before": 67,
+      "after": 67
+    },
+    {
+      "name": "Evidence Makgopa",
+      "fifa_code": "RSA",
+      "before": 67,
+      "after": 67
+    },
+    {
+      "name": "Lyle Foster",
+      "fifa_code": "RSA",
+      "before": 67,
+      "after": 67
+    },
+    {
+      "name": "Iqraam Rayners",
+      "fifa_code": "RSA",
+      "before": 67,
+      "after": 67
+    },
+    {
+      "name": "Relebohile Mofokeng",
+      "fifa_code": "RSA",
+      "before": 67,
+      "after": 66
+    },
+    {
+      "name": "Thapelo Maseko",
+      "fifa_code": "RSA",
+      "before": 66,
+      "after": 66
+    },
+    {
+      "name": "Florian Wiegele",
+      "fifa_code": "AUT",
+      "before": 73,
+      "after": 72
+    },
+    {
+      "name": "Carney Chukwuemeka",
+      "fifa_code": "AUT",
+      "before": 77,
+      "after": 73
+    },
+    {
+      "name": "Paul Wanner",
+      "fifa_code": "AUT",
+      "before": 75,
+      "after": 72
+    },
+    {
+      "name": "Jose Sa",
+      "fifa_code": "POR",
+      "before": 79,
+      "after": 78
+    },
+    {
+      "name": "Matheus Nunes",
+      "fifa_code": "POR",
+      "before": 87,
+      "after": 78
+    },
+    {
+      "name": "Renato Veiga",
+      "fifa_code": "POR",
+      "before": 79,
+      "after": 78
+    },
+    {
+      "name": "Tomas Araujo",
+      "fifa_code": "POR",
+      "before": 83,
+      "after": 77
+    },
+    {
+      "name": "Vitinha",
+      "fifa_code": "POR",
+      "before": 86,
+      "after": 78
+    },
+    {
+      "name": "Isak Hien",
+      "fifa_code": "SWE",
+      "before": 75,
+      "after": 74
+    },
+    {
+      "name": "Elliot Stroud Mjallby)",
+      "fifa_code": "SWE",
+      "before": 74,
+      "after": 73
+    },
+    {
+      "name": "Jesper Kalstrom",
+      "fifa_code": "SWE",
+      "before": 74,
+      "after": 74
+    },
+    {
+      "name": "Lucas Bergvall",
+      "fifa_code": "SWE",
+      "before": 78,
+      "after": 73
+    },
+    {
+      "name": "Besfort Zeneli",
+      "fifa_code": "SWE",
+      "before": 74,
+      "after": 73
+    },
+    {
+      "name": "Taha Ali",
+      "fifa_code": "SWE",
+      "before": 74,
+      "after": 74
+    },
+    {
+      "name": "Vozinha",
+      "fifa_code": "CPV",
+      "before": 66,
+      "after": 66
+    },
+    {
+      "name": "Márcio da Rosa",
+      "fifa_code": "CPV",
+      "before": 66,
+      "after": 66
+    },
+    {
+      "name": "Steven Moreira",
+      "fifa_code": "CPV",
+      "before": 68,
+      "after": 66
+    },
+    {
+      "name": "Wagner Pina",
+      "fifa_code": "CPV",
+      "before": 67,
+      "after": 66
+    },
+    {
+      "name": "Joao Paulo Fernandes",
+      "fifa_code": "CPV",
+      "before": 67,
+      "after": 66
+    },
+    {
+      "name": "Sidny Lopes Cabral",
+      "fifa_code": "CPV",
+      "before": 70,
+      "after": 66
+    },
+    {
+      "name": "Logan Costa",
+      "fifa_code": "CPV",
+      "before": 66,
+      "after": 66
+    },
+    {
+      "name": "Roberto Lopes “Pico”",
+      "fifa_code": "CPV",
+      "before": 66,
+      "after": 66
+    },
+    {
+      "name": "Kelvin Pires",
+      "fifa_code": "CPV",
+      "before": 66,
+      "after": 65
+    },
+    {
+      "name": "Edilson Borges “Diney”",
+      "fifa_code": "CPV",
+      "before": 66,
+      "after": 65
+    },
+    {
+      "name": "Telmo Arcanjo",
+      "fifa_code": "CPV",
+      "before": 66,
+      "after": 66
+    },
+    {
+      "name": "Yannick Semedo",
+      "fifa_code": "CPV",
+      "before": 66,
+      "after": 66
+    },
+    {
+      "name": "Laros Duarte",
+      "fifa_code": "CPV",
+      "before": 66,
+      "after": 66
+    },
+    {
+      "name": "Deroy Duarte",
+      "fifa_code": "CPV",
+      "before": 66,
+      "after": 65
+    },
+    {
+      "name": "Kevin Pina",
+      "fifa_code": "CPV",
+      "before": 66,
+      "after": 65
+    },
+    {
+      "name": "Willy Semedo",
+      "fifa_code": "CPV",
+      "before": 66,
+      "after": 66
+    },
+    {
+      "name": "Dailon Livramento",
+      "fifa_code": "CPV",
+      "before": 66,
+      "after": 66
+    },
+    {
+      "name": "Helio Varela",
+      "fifa_code": "CPV",
+      "before": 65,
+      "after": 65
+    },
+    {
+      "name": "Sabri Ben Hessen",
+      "fifa_code": "TUN",
+      "before": 71,
+      "after": 71
+    },
+    {
+      "name": "Abdelmouhib Chamakh",
+      "fifa_code": "TUN",
+      "before": 71,
+      "after": 71
+    },
+    {
+      "name": "Aymen Dahman",
+      "fifa_code": "TUN",
+      "before": 71,
+      "after": 71
+    },
+    {
+      "name": "Adem Arous",
+      "fifa_code": "TUN",
+      "before": 72,
+      "after": 72
+    },
+    {
+      "name": "Mohamed Amine Ben Hamida",
+      "fifa_code": "TUN",
+      "before": 72,
+      "after": 71
+    },
+    {
+      "name": "Raed Chikhaoui",
+      "fifa_code": "TUN",
+      "before": 71,
+      "after": 71
+    },
+    {
+      "name": "Moutaz Neffati",
+      "fifa_code": "TUN",
+      "before": 71,
+      "after": 71
+    },
+    {
+      "name": "Omar Rekik",
+      "fifa_code": "TUN",
+      "before": 71,
+      "after": 71
+    },
+    {
+      "name": "Montassar Talbi",
+      "fifa_code": "TUN",
+      "before": 71,
+      "after": 71
+    },
+    {
+      "name": "Yan Valery",
+      "fifa_code": "TUN",
+      "before": 71,
+      "after": 71
+    },
+    {
+      "name": "Ismael Gharbi",
+      "fifa_code": "TUN",
+      "before": 71,
+      "after": 71
+    },
+    {
+      "name": "Rani Khedira",
+      "fifa_code": "TUN",
+      "before": 71,
+      "after": 71
+    },
+    {
+      "name": "Mohamed Hadj Mahmoud",
+      "fifa_code": "TUN",
+      "before": 71,
+      "after": 71
+    },
+    {
+      "name": "Elias Achouri",
+      "fifa_code": "TUN",
+      "before": 71,
+      "after": 71
+    },
+    {
+      "name": "Khalil Ayari",
+      "fifa_code": "TUN",
+      "before": 71,
+      "after": 71
+    },
+    {
+      "name": "Firas Chaouat",
+      "fifa_code": "TUN",
+      "before": 71,
+      "after": 71
+    },
+    {
+      "name": "Rayan Elloumi",
+      "fifa_code": "TUN",
+      "before": 71,
+      "after": 71
+    },
+    {
+      "name": "Hazem Mastouri",
+      "fifa_code": "TUN",
+      "before": 71,
+      "after": 71
+    },
+    {
+      "name": "Elias Saad",
+      "fifa_code": "TUN",
+      "before": 70,
+      "after": 70
+    },
+    {
+      "name": "Jorrel Hato",
+      "fifa_code": "NED",
+      "before": 85,
+      "after": 78
+    },
+    {
+      "name": "John Paul van Hecke",
+      "fifa_code": "NED",
+      "before": 82,
+      "after": 78
+    },
+    {
+      "name": "Mats Wieffer",
+      "fifa_code": "NED",
+      "before": 81,
+      "after": 78
+    },
+    {
+      "name": "Fahad Talib",
+      "fifa_code": "IRQ",
+      "before": 68,
+      "after": 68
+    },
+    {
+      "name": "Jalal Hassan",
+      "fifa_code": "IRQ",
+      "before": 68,
+      "after": 68
+    },
+    {
+      "name": "Ahmed Basil",
+      "fifa_code": "IRQ",
+      "before": 68,
+      "after": 68
+    },
+    {
+      "name": "Hussein Ali",
+      "fifa_code": "IRQ",
+      "before": 69,
+      "after": 69
+    },
+    {
+      "name": "Manaf Younis",
+      "fifa_code": "IRQ",
+      "before": 69,
+      "after": 69
+    },
+    {
+      "name": "Zaid Tahseen",
+      "fifa_code": "IRQ",
+      "before": 69,
+      "after": 68
+    },
+    {
+      "name": "Rebin Sulaka",
+      "fifa_code": "IRQ",
+      "before": 68,
+      "after": 68
+    },
+    {
+      "name": "Akam Hashem",
+      "fifa_code": "IRQ",
+      "before": 68,
+      "after": 68
+    },
+    {
+      "name": "Merchas Doski",
+      "fifa_code": "IRQ",
+      "before": 68,
+      "after": 68
+    },
+    {
+      "name": "Ahmed Yahya",
+      "fifa_code": "IRQ",
+      "before": 68,
+      "after": 68
+    },
+    {
+      "name": "Zaid ⁠Ismail",
+      "fifa_code": "IRQ",
+      "before": 68,
+      "after": 68
+    },
+    {
+      "name": "Mustafa Saadoon",
+      "fifa_code": "IRQ",
+      "before": 67,
+      "after": 67
+    },
+    {
+      "name": "Amir Al-Ammari",
+      "fifa_code": "IRQ",
+      "before": 68,
+      "after": 68
+    },
+    {
+      "name": "Kevin Yakob",
+      "fifa_code": "IRQ",
+      "before": 68,
+      "after": 68
+    },
+    {
+      "name": "Zidane Iqbal",
+      "fifa_code": "IRQ",
+      "before": 68,
+      "after": 68
+    },
+    {
+      "name": "Aimar Sher",
+      "fifa_code": "IRQ",
+      "before": 68,
+      "after": 68
+    },
+    {
+      "name": "Ibrahim Bayesh",
+      "fifa_code": "IRQ",
+      "before": 68,
+      "after": 67
+    },
+    {
+      "name": "Ahmed Qasem",
+      "fifa_code": "IRQ",
+      "before": 67,
+      "after": 67
+    },
+    {
+      "name": "Youssef Amyn",
+      "fifa_code": "IRQ",
+      "before": 67,
+      "after": 67
+    },
+    {
+      "name": "Marko ⁠Farji",
+      "fifa_code": "IRQ",
+      "before": 67,
+      "after": 67
+    },
+    {
+      "name": "Ali Jassim",
+      "fifa_code": "IRQ",
+      "before": 68,
+      "after": 68
+    },
+    {
+      "name": "Ali Al-Hamadi",
+      "fifa_code": "IRQ",
+      "before": 68,
+      "after": 68
+    },
+    {
+      "name": "Ali Youssef",
+      "fifa_code": "IRQ",
+      "before": 68,
+      "after": 67
+    },
+    {
+      "name": "Mohanad Ali",
+      "fifa_code": "IRQ",
+      "before": 67,
+      "after": 67
+    },
+    {
+      "name": "Gatito Fernandez",
+      "fifa_code": "PAR",
+      "before": 67,
+      "after": 67
+    },
+    {
+      "name": "Orlando Gill",
+      "fifa_code": "PAR",
+      "before": 67,
+      "after": 67
+    },
+    {
+      "name": "Gaston Olveira",
+      "fifa_code": "PAR",
+      "before": 67,
+      "after": 67
+    },
+    {
+      "name": "Gustavo Gomez",
+      "fifa_code": "PAR",
+      "before": 68,
+      "after": 68
+    },
+    {
+      "name": "Junior Alonso",
+      "fifa_code": "PAR",
+      "before": 73,
+      "after": 67
+    },
+    {
+      "name": "Fabian Balbuena",
+      "fifa_code": "PAR",
+      "before": 68,
+      "after": 67
+    },
+    {
+      "name": "Juan Jose Caceres",
+      "fifa_code": "PAR",
+      "before": 67,
+      "after": 67
+    },
+    {
+      "name": "Alexandro Maidana",
+      "fifa_code": "PAR",
+      "before": 67,
+      "after": 67
+    },
+    {
+      "name": "Kaku",
+      "fifa_code": "PAR",
+      "before": 67,
+      "after": 67
+    },
+    {
+      "name": "Diego Gomez",
+      "fifa_code": "PAR",
+      "before": 70,
+      "after": 67
+    },
+    {
+      "name": "Damian Bobadilla",
+      "fifa_code": "PAR",
+      "before": 67,
+      "after": 67
+    },
+    {
+      "name": "Matias Galarza",
+      "fifa_code": "PAR",
+      "before": 66,
+      "after": 66
+    },
+    {
+      "name": "Mauricio",
+      "fifa_code": "PAR",
+      "before": 66,
+      "after": 66
+    },
+    {
+      "name": "Alex Arce",
+      "fifa_code": "PAR",
+      "before": 67,
+      "after": 67
+    },
+    {
+      "name": "Gustavo Caballero",
+      "fifa_code": "PAR",
+      "before": 66,
+      "after": 66
+    },
+    {
+      "name": "Timothy Fayulu",
+      "fifa_code": "COD",
+      "before": 69,
+      "after": 69
+    },
+    {
+      "name": "Lionel Mpasi",
+      "fifa_code": "COD",
+      "before": 69,
+      "after": 69
+    },
+    {
+      "name": "Mike Epolo",
+      "fifa_code": "COD",
+      "before": 69,
+      "after": 69
+    },
+    {
+      "name": "Aaron Wan-Bissaka",
+      "fifa_code": "COD",
+      "before": 73,
+      "after": 69
+    },
+    {
+      "name": "Joris Kayembe",
+      "fifa_code": "COD",
+      "before": 70,
+      "after": 69
+    },
+    {
+      "name": "Steve Kapuadi",
+      "fifa_code": "COD",
+      "before": 69,
+      "after": 69
+    },
+    {
+      "name": "Rocky Bushiri",
+      "fifa_code": "COD",
+      "before": 69,
+      "after": 69
+    },
+    {
+      "name": "Axel Tuanzebe",
+      "fifa_code": "COD",
+      "before": 69,
+      "after": 69
+    },
+    {
+      "name": "Dylan Batubinsika",
+      "fifa_code": "COD",
+      "before": 69,
+      "after": 68
+    },
+    {
+      "name": "Noah Sadiki",
+      "fifa_code": "COD",
+      "before": 69,
+      "after": 69
+    },
+    {
+      "name": "Nathan Mukau",
+      "fifa_code": "COD",
+      "before": 69,
+      "after": 69
+    },
+    {
+      "name": "Charles Pickel",
+      "fifa_code": "COD",
+      "before": 69,
+      "after": 69
+    },
+    {
+      "name": "Ngal’ayel Mukau Mbuku",
+      "fifa_code": "COD",
+      "before": 69,
+      "after": 68
+    },
+    {
+      "name": "Brian Cipenga",
+      "fifa_code": "COD",
+      "before": 68,
+      "after": 68
+    },
+    {
+      "name": "Théo Bongonda",
+      "fifa_code": "COD",
+      "before": 68,
+      "after": 68
+    },
+    {
+      "name": "Fiston Mayele",
+      "fifa_code": "COD",
+      "before": 69,
+      "after": 69
+    },
+    {
+      "name": "Simon Banza",
+      "fifa_code": "COD",
+      "before": 68,
+      "after": 68
+    },
+    {
+      "name": "Nathaniel Brown",
+      "fifa_code": "GER",
+      "before": 78,
+      "after": 77
+    },
+    {
+      "name": "Pascal Gross",
+      "fifa_code": "GER",
+      "before": 80,
+      "after": 77
+    },
+    {
+      "name": "Lennart Karl",
+      "fifa_code": "GER",
+      "before": 84,
+      "after": 76
+    },
+    {
+      "name": "Felix Nmecha",
+      "fifa_code": "GER",
+      "before": 81,
+      "after": 76
+    },
+    {
+      "name": "Alexander Pavlovic",
+      "fifa_code": "GER",
+      "before": 83,
+      "after": 76
+    },
+    {
+      "name": "Denis Undav",
+      "fifa_code": "GER",
+      "before": 76,
+      "after": 76
+    },
+    {
+      "name": "Mostafa Shobeir",
+      "fifa_code": "EGY",
+      "before": 72,
+      "after": 72
+    },
+    {
+      "name": "Mohamed Alaa",
+      "fifa_code": "EGY",
+      "before": 72,
+      "after": 72
+    },
+    {
+      "name": "Mohamed Hani",
+      "fifa_code": "EGY",
+      "before": 73,
+      "after": 72
+    },
+    {
+      "name": "Tarek Alaa",
+      "fifa_code": "EGY",
+      "before": 73,
+      "after": 72
+    },
+    {
+      "name": "Hamdy Fathy",
+      "fifa_code": "EGY",
+      "before": 73,
+      "after": 72
+    },
+    {
+      "name": "Rami Rabia",
+      "fifa_code": "EGY",
+      "before": 72,
+      "after": 72
+    },
+    {
+      "name": "Yasser Ibrahim",
+      "fifa_code": "EGY",
+      "before": 72,
+      "after": 72
+    },
+    {
+      "name": "Hossam Abdelmaguid",
+      "fifa_code": "EGY",
+      "before": 72,
+      "after": 72
+    },
+    {
+      "name": "Mohamed Abdelmonem",
+      "fifa_code": "EGY",
+      "before": 72,
+      "after": 71
+    },
+    {
+      "name": "Ahmed Fotouh",
+      "fifa_code": "EGY",
+      "before": 72,
+      "after": 71
+    },
+    {
+      "name": "Marwan Attia",
+      "fifa_code": "EGY",
+      "before": 72,
+      "after": 72
+    },
+    {
+      "name": "Mohanad Lasheen",
+      "fifa_code": "EGY",
+      "before": 72,
+      "after": 72
+    },
+    {
+      "name": "Nabil Emad",
+      "fifa_code": "EGY",
+      "before": 72,
+      "after": 72
+    },
+    {
+      "name": "Mahmoud Saber",
+      "fifa_code": "EGY",
+      "before": 72,
+      "after": 71
+    },
+    {
+      "name": "Ahmed Zizo",
+      "fifa_code": "EGY",
+      "before": 72,
+      "after": 71
+    },
+    {
+      "name": "Emam Ashour",
+      "fifa_code": "EGY",
+      "before": 72,
+      "after": 71
+    },
+    {
+      "name": "Mostafa Ziko",
+      "fifa_code": "EGY",
+      "before": 71,
+      "after": 71
+    },
+    {
+      "name": "Ibrahim Adel",
+      "fifa_code": "EGY",
+      "before": 71,
+      "after": 71
+    },
+    {
+      "name": "Haissem Hassan",
+      "fifa_code": "EGY",
+      "before": 71,
+      "after": 71
+    },
+    {
+      "name": "Aqtay Abdallah",
+      "fifa_code": "EGY",
+      "before": 71,
+      "after": 71
+    },
+    {
+      "name": "Hamza Abdelkarim",
+      "fifa_code": "EGY",
+      "before": 78,
+      "after": 71
+    },
+    {
+      "name": "Yazid Abulaila",
+      "fifa_code": "JOR",
+      "before": 65,
+      "after": 65
+    },
+    {
+      "name": "Abdallah Al Fakhouri",
+      "fifa_code": "JOR",
+      "before": 65,
+      "after": 65
+    },
+    {
+      "name": "Nour Bani Attiah",
+      "fifa_code": "JOR",
+      "before": 65,
+      "after": 65
+    },
+    {
+      "name": "Mohammad Abualnadi",
+      "fifa_code": "JOR",
+      "before": 66,
+      "after": 66
+    },
+    {
+      "name": "Husam Abu Dahab",
+      "fifa_code": "JOR",
+      "before": 66,
+      "after": 66
+    },
+    {
+      "name": "Mohammad Abu Hashish",
+      "fifa_code": "JOR",
+      "before": 66,
+      "after": 66
+    },
+    {
+      "name": "Yazan Al Arab",
+      "fifa_code": "JOR",
+      "before": 65,
+      "after": 65
+    },
+    {
+      "name": "Abdallah Nasib",
+      "fifa_code": "JOR",
+      "before": 65,
+      "after": 65
+    },
+    {
+      "name": "Saleem Obaid",
+      "fifa_code": "JOR",
+      "before": 65,
+      "after": 65
+    },
+    {
+      "name": "Ehsan Haddad",
+      "fifa_code": "JOR",
+      "before": 65,
+      "after": 65
+    },
+    {
+      "name": "Saed Al-Rosan",
+      "fifa_code": "JOR",
+      "before": 65,
+      "after": 65
+    },
+    {
+      "name": "Anas Banawi",
+      "fifa_code": "JOR",
+      "before": 65,
+      "after": 65
+    },
+    {
+      "name": "Mohannad Abu Taha",
+      "fifa_code": "JOR",
+      "before": 64,
+      "after": 64
+    },
+    {
+      "name": "Mohammad Al Dawoud",
+      "fifa_code": "JOR",
+      "before": 65,
+      "after": 65
+    },
+    {
+      "name": "Nizar Al Rashdan",
+      "fifa_code": "JOR",
+      "before": 65,
+      "after": 65
+    },
+    {
+      "name": "Noor Al Rawabdeh",
+      "fifa_code": "JOR",
+      "before": 65,
+      "after": 65
+    },
+    {
+      "name": "Rajaei Ayed",
+      "fifa_code": "JOR",
+      "before": 65,
+      "after": 65
+    },
+    {
+      "name": "Amer Jamous",
+      "fifa_code": "JOR",
+      "before": 65,
+      "after": 65
+    },
+    {
+      "name": "Ibrahim Sadeh",
+      "fifa_code": "JOR",
+      "before": 64,
+      "after": 64
+    },
+    {
+      "name": "Mahmoud Al-Mardi",
+      "fifa_code": "JOR",
+      "before": 64,
+      "after": 64
+    },
+    {
+      "name": "Odeh Al-Fakhouri",
+      "fifa_code": "JOR",
+      "before": 65,
+      "after": 65
+    },
+    {
+      "name": "Mohammad Abu Zrayq",
+      "fifa_code": "JOR",
+      "before": 65,
+      "after": 65
+    },
+    {
+      "name": "Ali Azaizeh",
+      "fifa_code": "JOR",
+      "before": 65,
+      "after": 65
+    },
+    {
+      "name": "Ali Olwan",
+      "fifa_code": "JOR",
+      "before": 64,
+      "after": 64
+    },
+    {
+      "name": "Ibrahim Sabra",
+      "fifa_code": "JOR",
+      "before": 64,
+      "after": 64
+    },
+    {
+      "name": "Benjamin Asare",
+      "fifa_code": "GHA",
+      "before": 69,
+      "after": 69
+    },
+    {
+      "name": "Joseph Anang",
+      "fifa_code": "GHA",
+      "before": 69,
+      "after": 69
+    },
+    {
+      "name": "Derrick Luckassen",
+      "fifa_code": "GHA",
+      "before": 70,
+      "after": 69
+    },
+    {
+      "name": "Marvin Senaya",
+      "fifa_code": "GHA",
+      "before": 69,
+      "after": 69
+    },
+    {
+      "name": "Alidu Seidu",
+      "fifa_code": "GHA",
+      "before": 69,
+      "after": 69
+    },
+    {
+      "name": "Jerome Opoku",
+      "fifa_code": "GHA",
+      "before": 69,
+      "after": 68
+    },
+    {
+      "name": "Jonas Adjetey",
+      "fifa_code": "GHA",
+      "before": 69,
+      "after": 68
+    },
+    {
+      "name": "Kojo Oppong Peprah",
+      "fifa_code": "GHA",
+      "before": 69,
+      "after": 68
+    },
+    {
+      "name": "Kwasi Sibo",
+      "fifa_code": "GHA",
+      "before": 69,
+      "after": 69
+    },
+    {
+      "name": "Caleb Yirenkyi",
+      "fifa_code": "GHA",
+      "before": 69,
+      "after": 68
+    },
+    {
+      "name": "Abdul Fatawu Issahaku",
+      "fifa_code": "GHA",
+      "before": 69,
+      "after": 68
+    },
+    {
+      "name": "Elisha Owusu",
+      "fifa_code": "GHA",
+      "before": 68,
+      "after": 68
+    },
+    {
+      "name": "Christopher Bonsu Baah",
+      "fifa_code": "GHA",
+      "before": 69,
+      "after": 69
+    },
+    {
+      "name": "Ernest Nuamah",
+      "fifa_code": "GHA",
+      "before": 69,
+      "after": 69
+    },
+    {
+      "name": "Brandon Thomas-Asante",
+      "fifa_code": "GHA",
+      "before": 69,
+      "after": 69
+    },
+    {
+      "name": "Prince Kwabena Adu",
+      "fifa_code": "GHA",
+      "before": 69,
+      "after": 68
+    },
+    {
+      "name": "Inaki Williams",
+      "fifa_code": "GHA",
+      "before": 68,
+      "after": 68
+    },
+    {
+      "name": "Mike Penders",
+      "fifa_code": "BEL",
+      "before": 79,
+      "after": 78
+    },
+    {
+      "name": "Maxim De Cuyper",
+      "fifa_code": "BEL",
+      "before": 83,
+      "after": 78
+    },
+    {
+      "name": "Koni De Winter",
+      "fifa_code": "BEL",
+      "before": 83,
+      "after": 78
+    },
+    {
+      "name": "Joaquin Seys",
+      "fifa_code": "BEL",
+      "before": 79,
+      "after": 77
+    },
+    {
+      "name": "Matias Fernandez Pardo",
+      "fifa_code": "BEL",
+      "before": 79,
+      "after": 79
+    },
+    {
+      "name": "Diego Moreira",
+      "fifa_code": "BEL",
+      "before": 79,
+      "after": 78
+    },
+    {
+      "name": "Altay Bayindir",
+      "fifa_code": "TUR",
+      "before": 77,
+      "after": 73
+    },
+    {
+      "name": "Ferdi Kadioglu",
+      "fifa_code": "TUR",
+      "before": 76,
+      "after": 73
+    },
+    {
+      "name": "Ismail Yuksek",
+      "fifa_code": "TUR",
+      "before": 73,
+      "after": 73
+    },
+    {
+      "name": "Salih Ozcan",
+      "fifa_code": "TUR",
+      "before": 77,
+      "after": 72
+    },
+    {
+      "name": "Barış Alper Yilmaz",
+      "fifa_code": "TUR",
+      "before": 73,
+      "after": 73
+    },
+    {
+      "name": "Can Uzun",
+      "fifa_code": "TUR",
+      "before": 73,
+      "after": 73
+    },
+    {
+      "name": "Deniz Gul",
+      "fifa_code": "TUR",
+      "before": 76,
+      "after": 73
+    },
+    {
+      "name": "Kenan Yildiz",
+      "fifa_code": "TUR",
+      "before": 78,
+      "after": 73
+    },
+    {
+      "name": "Oguz Aydin",
+      "fifa_code": "TUR",
+      "before": 72,
+      "after": 72
+    },
+    {
+      "name": "Leo Skiri Ostigard",
+      "fifa_code": "NOR",
+      "before": 76,
+      "after": 75
+    },
+    {
+      "name": "Torbjorn Heggem",
+      "fifa_code": "NOR",
+      "before": 75,
+      "after": 75
+    },
+    {
+      "name": "Fredrik Bjorkan",
+      "fifa_code": "NOR",
+      "before": 75,
+      "after": 74
+    },
+    {
+      "name": "Sondre Langas",
+      "fifa_code": "NOR",
+      "before": 75,
+      "after": 74
+    },
+    {
+      "name": "Martin Odegaard",
+      "fifa_code": "NOR",
+      "before": 80,
+      "after": 75
+    },
+    {
+      "name": "Alexander Sorloth",
+      "fifa_code": "NOR",
+      "before": 80,
+      "after": 75
+    },
+    {
+      "name": "Jorgen Strand Larsen",
+      "fifa_code": "NOR",
+      "before": 78,
+      "after": 75
+    },
+    {
+      "name": "Oscar Bobb",
+      "fifa_code": "NOR",
+      "before": 77,
+      "after": 74
+    },
+    {
+      "name": "Antonio Nusa",
+      "fifa_code": "NOR",
+      "before": 74,
+      "after": 74
+    },
+    {
+      "name": "Utkir Yusupov",
+      "fifa_code": "UZB",
+      "before": 66,
+      "after": 66
+    },
+    {
+      "name": "Abduvohid Nematov",
+      "fifa_code": "UZB",
+      "before": 66,
+      "after": 66
+    },
+    {
+      "name": "Botirali Ergashev",
+      "fifa_code": "UZB",
+      "before": 66,
+      "after": 66
+    },
+    {
+      "name": "Farrukh Sayfiev",
+      "fifa_code": "UZB",
+      "before": 67,
+      "after": 67
+    },
+    {
+      "name": "Khojiakbar Alijonov",
+      "fifa_code": "UZB",
+      "before": 67,
+      "after": 66
+    },
+    {
+      "name": "Sherzod Nasrullaev",
+      "fifa_code": "UZB",
+      "before": 66,
+      "after": 66
+    },
+    {
+      "name": "Umar Eshmurodov",
+      "fifa_code": "UZB",
+      "before": 66,
+      "after": 66
+    },
+    {
+      "name": "Abdukodir Khusanov",
+      "fifa_code": "UZB",
+      "before": 73,
+      "after": 66
+    },
+    {
+      "name": "Abdulla Abdullaev",
+      "fifa_code": "UZB",
+      "before": 66,
+      "after": 66
+    },
+    {
+      "name": "Bekhruz Karimov",
+      "fifa_code": "UZB",
+      "before": 66,
+      "after": 66
+    },
+    {
+      "name": "Jakhongir Urozov",
+      "fifa_code": "UZB",
+      "before": 66,
+      "after": 65
+    },
+    {
+      "name": "Avazbek Ulmasaliev",
+      "fifa_code": "UZB",
+      "before": 65,
+      "after": 65
+    },
+    {
+      "name": "Otabek Shukurov",
+      "fifa_code": "UZB",
+      "before": 66,
+      "after": 66
+    },
+    {
+      "name": "Odiljon Hamrobekov",
+      "fifa_code": "UZB",
+      "before": 66,
+      "after": 66
+    },
+    {
+      "name": "Oston Urunov",
+      "fifa_code": "UZB",
+      "before": 66,
+      "after": 66
+    },
+    {
+      "name": "Dostonbek Khamdamov",
+      "fifa_code": "UZB",
+      "before": 65,
+      "after": 65
+    },
+    {
+      "name": "Abbosbek Fayzullaev",
+      "fifa_code": "UZB",
+      "before": 65,
+      "after": 65
+    },
+    {
+      "name": "Akmal Mozgovoy",
+      "fifa_code": "UZB",
+      "before": 65,
+      "after": 65
+    },
+    {
+      "name": "Azizjon Ganiev",
+      "fifa_code": "UZB",
+      "before": 65,
+      "after": 65
+    },
+    {
+      "name": "Sherzod Esanov",
+      "fifa_code": "UZB",
+      "before": 65,
+      "after": 65
+    },
+    {
+      "name": "Igor Sergeev",
+      "fifa_code": "UZB",
+      "before": 65,
+      "after": 65
+    },
+    {
+      "name": "Azizbek Amonov",
+      "fifa_code": "UZB",
+      "before": 65,
+      "after": 65
+    }
+  ]
+}

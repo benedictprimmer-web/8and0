@@ -430,6 +430,73 @@ Official WC 2026 squad numbers added to:
 
 ---
 
-## All-Time Mode (deferred)
+## Phase 10: All-Time / Legends Mode
 
-Left for later — needs historical data pipeline. Will plan separately when we get to it.
+**Status**: 📋 Planned (data research done 2026-07-10, not yet implemented).
+Full execution spec with sources, algorithms, and a file-by-file plan:
+[`PHASE10_BUILD_BRIEF.md`](./PHASE10_BUILD_BRIEF.md).
+
+Adds three historical World Cup rosters (2014, 2018, 2022) plus a curated
+legends tier, as a new era alongside 2026.
+
+### Part A — Fix 2026 ratings first (prerequisite)
+
+`scripts/audit-ratings.mjs` shows **1,038/1,248 (83%) of current `ea_overall`
+values are `"estimated"`** — guessed from club/team strength, not real EA
+data (confirmed inflation: England carries 22 players rated 85+, more than
+any real squad would; only 210 players have a genuine rating). Backfill
+before building historical eras on top of the same rating system:
+
+- Pull real EA FC ratings (same non-official sofifa/futbin-style source the
+  original `ea_overall` values already came from) matched by name + club.
+- Re-run `audit-ratings.mjs` after backfill; target near-0% estimated.
+- Only fall back to an estimate for players with no card, and mark it
+  honestly (`rating_confidence: "estimated"` already exists — just stop the
+  club-context inflation logic feeding it).
+
+### Part B — Historical rosters (2014, 2018, 2022)
+
+**Scope: starting XI only** — 11 players × 32 teams × 3 tournaments ≈ 1,056
+players. Not full squads, just the XI people actually remember.
+
+- **Roster + starting-XI source**: [jfjelstul/worldcup](https://github.com/jfjelstul/worldcup)
+  (open dataset, all WCs 1930–2022, includes an appearances table with
+  starts per match). Starting XI per team per tournament = the 11 players
+  with the most starts for that team in that tournament — reproducible, no
+  manual curation needed.
+- **Rating source per era** (numeric rating only, same pattern as the
+  existing `ea_overall` field — no card art/assets):
+  - 2014 → FIFA 14 (sofifa / [fifaindex.com/players/fifa14](https://fifaindex.com/players/fifa14) archive)
+  - 2018 → FIFA 18 (ready-made scraped dataset: [4m4n5/fifa18-all-player-statistics](https://github.com/4m4n5/fifa18-all-player-statistics))
+  - 2022 → **FIFA 23**, not FIFA 22 — released Sept 2022, weeks before the
+    tournament, closer snapshot ([stefanoleone992/fifa-23-complete-player-dataset](https://www.kaggle.com/datasets/stefanoleone992/fifa-23-complete-player-dataset)
+    on Kaggle covers FIFA 15–23 in one file with a version column)
+- **Name matching**: reuse the token-containment matching already built for
+  `data-quality/squad-mismatches.json` (NBC vs WorldCupRanking cross-check) —
+  same accent/nickname problem, same solution.
+
+### Part C — Legends
+
+Extend the existing **Last Dance** mechanic (`LegendMode` in `types.ts`,
+currently Messi/Ronaldo/Neymar) rather than adding legends to the spin
+pool — Icon-tier ratings (Zidane 97, Ronaldo Nazário 97, Cafu 91, Klose 88)
+would dominate any random draw.
+
+- Curated legends list (Klose, R9, Cafu, Zidane + others TBD), each hand-set
+  to their EA FC Icon rating (source: futbin.com / fut.gg Icon cards).
+- Same lock-as-first-pick pattern as today; extend `LegendMode` from a
+  3-value union to a curated list/ID so it scales past 3 names.
+
+### Schema additions (draft)
+
+- New field per player: `tournament_year: 2014 | 2018 | 2022 | 2026`
+- New field: `source_game: "fifa14" | "fifa18" | "fifa23" | "icon" | "fc26"`
+- Likely a **separate** `historical-players.json` rather than growing
+  `players.json`, so the live 2026 mode's payload doesn't balloon.
+
+### Open implementation questions (next session)
+
+- New top-level mode ("All-Time Draft") vs. an era selector added to the
+  existing `SetupScreen` — a UX decision, not just a data one.
+- Whether historical opponents in `simulate.ts` need era-appropriate team
+  ELOs too, or can reuse 2026 team strength for bracket balancing.

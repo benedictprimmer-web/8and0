@@ -8,3 +8,6 @@ probe_report.md
 
 # local UI review renders (throwaway)
 scratchpad-shots/
+
+# cached raw source data for the rating/historical pipeline (large, reproducible)
+data-quality/raw/
