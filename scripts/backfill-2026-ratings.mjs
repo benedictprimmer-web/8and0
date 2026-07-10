@@ -22,8 +22,7 @@
 import fs from "node:fs/promises";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
-import { loadEdition, canonicalNationality, growthAdjust, FIFA_EDITIONS } from "./lib/fifa.mjs";
-import { matchFullName, nameTokens, normalize } from "./lib/text.mjs";
+import { loadEdition, canonicalNationality, growthAdjust, findRatingMatch, FIFA_EDITIONS } from "./lib/fifa.mjs";
 import { writeJson } from "./lib/csv.mjs";
 
 const TARGET_YEAR = 2026;
@@ -57,24 +56,6 @@ function honestEstimate(team, player, depthIndex) {
   return Math.max(55, Math.min(FALLBACK_CAP, est));
 }
 
-// Match ONLY against the full long name, directionally: every token of our
-// clean "First Last" must appear in the candidate's long name. This rejects
-// surname-only collisions (a FIFA short_name "A. Robinson" reduces to just
-// "robinson" and would otherwise match any Robinson). Require a 2-token name to
-// share both names, so "Miles Robinson" ≠ "Antonee Robinson".
-function bestMatch(candidates, player) {
-  const playerTokens = nameTokens(player.name);
-  if (playerTokens.length === 0) return null;
-  const hits = candidates.filter((c) => matchFullName(player.name, c.longName));
-  if (hits.length === 0) return null;
-  const exact = hits.find((c) => normalize(c.longName) === normalize(player.name));
-  if (exact) return exact;
-  // Closest name (fewest extra tokens) wins; tie-break by rating (the star).
-  return hits.sort(
-    (a, b) => nameTokens(a.longName).length - nameTokens(b.longName).length || b.overall - a.overall
-  )[0];
-}
-
 async function main() {
   const players = JSON.parse(await fs.readFile(path.join(root, "public/data/players.json"), "utf8"));
   const teams = JSON.parse(await fs.readFile(path.join(root, "public/data/teams.json"), "utf8"));
@@ -106,7 +87,7 @@ async function main() {
     const team = teamById.get(p.team_id);
     const natKey = team ? canonicalNationality(team.name) : "";
     const candidates = byNationality.get(natKey) ?? [];
-    const hit = bestMatch(candidates, p);
+    const hit = findRatingMatch(candidates, p.name);
 
     if (hit) {
       matched += 1;

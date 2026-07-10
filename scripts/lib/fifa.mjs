@@ -11,7 +11,7 @@
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { parseCsv, fetchCached } from "./csv.mjs";
-import { normalize } from "./text.mjs";
+import { normalize, matchFullName, nameTokens } from "./text.mjs";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const RAW_DIR = path.join(__dirname, "..", "..", "data-quality", "raw", "fifa");
@@ -37,6 +37,7 @@ const NATIONALITY_ALIASES = new Map([
   ["usa", "united states"],
   ["ivory coast", "ivory coast"],
   ["cote divoire", "ivory coast"],
+  ["cote d ivoire", "ivory coast"],
   ["czech republic", "czechia"],
   ["czechia", "czechia"],
   ["cape verde islands", "cape verde"],
@@ -63,6 +64,26 @@ export function growthAdjust({ overall, potential, age }, editionYear, targetYea
   const elapsed = Math.max(0, Math.min(1, gap / 5)); // full weight at ~5 yrs
   const weight = youth * elapsed;
   return Math.min(potential, Math.round(overall + (potential - overall) * weight));
+}
+
+// Find the best FIFA row for a clean "First Last" (or mononym) name within a
+// nationality's candidate list. Matches against BOTH long and short name: the
+// long name catches full-name variants ("Gio"→"Giovanni Reyna"), the short name
+// catches mononyms whose long name is unrelated (Hulk's long name is
+// "Givanildo Vieira de Sousa"). matchFullName is directional/surname-anchored so
+// short-name matching does NOT reintroduce surname-only collisions.
+export function findRatingMatch(candidates, name) {
+  const hits = candidates.filter(
+    (c) => matchFullName(name, c.longName) || matchFullName(name, c.shortName)
+  );
+  if (hits.length === 0) return null;
+  const exact = hits.find(
+    (c) => normalize(c.longName) === normalize(name) || normalize(c.shortName) === normalize(name)
+  );
+  if (exact) return exact;
+  return hits.sort(
+    (a, b) => nameTokens(a.longName).length - nameTokens(b.longName).length || b.overall - a.overall
+  )[0];
 }
 
 // Returns { byNationality: Map<natKey, PlayerRow[]>, edition }.

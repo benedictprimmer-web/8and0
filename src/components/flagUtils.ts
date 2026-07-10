@@ -1,15 +1,15 @@
 const CODE_TO_ISO: Record<string, string> = {
   // Americas
-  ARG: "ar", BRA: "br", CAN: "ca", COL: "co", CRC: "cr",
-  ECU: "ec", HON: "hn", JAM: "jm", MEX: "mx", PAN: "pa",
+  ARG: "ar", BRA: "br", CAN: "ca", CHL: "cl", COL: "co", CRC: "cr", CRI: "cr",
+  ECU: "ec", HON: "hn", HND: "hn", JAM: "jm", MEX: "mx", PAN: "pa", PER: "pe",
   PAR: "py", PRY: "py", URU: "uy", URY: "uy", USA: "us", VEN: "ve",
   // Europe
   AUT: "at", BEL: "be", BIH: "ba", CZE: "cz", DEU: "de",
-  DEN: "dk", ENG: "gb-eng", ESP: "es", FRA: "fr", GBR: "gb",
-  GER: "de", HRV: "hr", HUN: "hu", ITA: "it", NED: "nl",
-  NLD: "nl", NOR: "no", POR: "pt", PRT: "pt", ROU: "ro",
+  DEN: "dk", DNK: "dk", ENG: "gb-eng", ESP: "es", FRA: "fr", GBR: "gb",
+  GER: "de", GRC: "gr", HRV: "hr", HUN: "hu", ISL: "is", ITA: "it", NED: "nl",
+  NLD: "nl", NOR: "no", POL: "pl", POR: "pt", PRT: "pt", ROU: "ro", RUS: "ru",
   SCO: "gb-sct", SRB: "rs", SUI: "ch", CHE: "ch", SWE: "se",
-  TUR: "tr", UKR: "ua",
+  TUR: "tr", UKR: "ua", WAL: "gb-wls",
   // Africa
   ALG: "dz", DZA: "dz", CAM: "cm", CMR: "cm", CIV: "ci",
   EGY: "eg", GHA: "gh", MAR: "ma", NGA: "ng", NIG: "ng",
