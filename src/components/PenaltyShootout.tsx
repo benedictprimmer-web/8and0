@@ -1,12 +1,21 @@
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import Flag from "../components/Flag";
-import { describeGoalDirection, describeMissDirection, type ShotDirection } from "../game8/penaltyText";
+import {
+  describeGoalDirection,
+  describeMissDirection,
+  describePlacedGoal,
+  describePlacedMiss,
+  type ShotDirection,
+  type ShotHeight,
+} from "../game8/penaltyText";
 import {
   OPPONENT_SHOOTER_RATING,
   SHOOTER_CENTER_WEIGHT,
   keeperCenterWeight,
   pickDirection,
   resolveKick,
+  resolvePlacedKick,
+  resolvePoweredKick,
 } from "../game8/penaltyModel";
 import { REGULATION_KICKS, shootoutStatus } from "../game8/shootoutStatus";
 import { type PenaltyTaker, takerForKick } from "../game8/penaltyLineup";
@@ -17,6 +26,7 @@ interface InteractivePenaltyKick {
   team: "user" | "opponent";
   playerName: string;
   userDirection?: ShotDirection;
+  userHeight?: ShotHeight;
   userDiveDirection?: ShotDirection;
   opponentShotDirection?: ShotDirection;
   keeperDirection: ShotDirection;
@@ -24,6 +34,31 @@ interface InteractivePenaltyKick {
 }
 
 type PenaltyMode = "shooter" | "goalkeeper" | "both";
+
+// Pixel-art art direction: two generated sprite sets the player can flip between
+// in practice. Each style ships a stadium background plus keeper/ball sprites,
+// and its own goal geometry (the generated goalmouth sits at a different height
+// in each backdrop), so all overlay positions are driven off GOAL_RECT.
+type SpriteStyle = "16" | "32";
+// How the shooter aims. Two experiments toggled in practice: a 6-zone target
+// grid, or a timed power/placement meter. See resolvePlacedKick / resolvePoweredKick.
+type AimMode = "sixzone" | "power";
+
+const A = "/assets/penalty";
+const STYLE_ASSETS: Record<SpriteStyle, { bg: string; ready: string; dive: string; jump: string }> = {
+  "16": { bg: `${A}/bg16.png`, ready: `${A}/keeper16_ready.png`, dive: `${A}/keeper16_dive.png`, jump: `${A}/keeper16_jump.png` },
+  "32": { bg: `${A}/bg32.png`, ready: `${A}/keeper32_ready.png`, dive: `${A}/keeper32_dive.png`, jump: `${A}/keeper32_jump.png` },
+};
+const BALL_SRC = `${A}/ball.png`;
+
+// Goalmouth rectangle within the 16:9 arena, as percentages. Measured from the
+// generated backgrounds; nudge here if a sprite drifts off the posts.
+interface GoalRect { left: number; right: number; top: number; bottom: number; keeperH: number; }
+const GOAL_RECT: Record<SpriteStyle, GoalRect> = {
+  "16": { left: 28, right: 71, top: 19, bottom: 51, keeperH: 34 },
+  "32": { left: 29, right: 71, top: 42, bottom: 70, keeperH: 30 },
+};
+const SPOT = { top: 84, left: 50 }; // penalty spot in the arena
 
 interface PenaltyShootoutProps {
   opponent: EightZeroTeam;
@@ -45,15 +80,29 @@ interface PenaltyShootoutProps {
 
 // Build a kick the user takes as the shooter (keeper is AI). `shooter` names the
 // player stepping up and supplies their rating; `keeper` is the opponent's GK.
+// `aim` carries the mode-specific placement: a height for 6-zone, an accuracy
+// for power mode. The keeper always commits to a side (L/C/R) either way.
 function buildUserShot(
   direction: ShotDirection,
   kickNumber: number,
   shooter: PenaltyTaker,
-  keeper: PenaltyTaker
+  keeper: PenaltyTaker,
+  aim: { mode: "sixzone"; height: ShotHeight } | { mode: "power"; accuracy: number }
 ): InteractivePenaltyKick {
   const keeperDirection = pickDirection(keeperCenterWeight(keeper.rating), Math.random);
-  const result = resolveKick(direction, keeperDirection, shooter.rating, keeper.rating, Math.random);
-  return { round: kickNumber, team: "user", playerName: shooter.name, userDirection: direction, keeperDirection, result };
+  const result =
+    aim.mode === "sixzone"
+      ? resolvePlacedKick(direction, aim.height, keeperDirection, shooter.rating, keeper.rating, Math.random)
+      : resolvePoweredKick(direction, keeperDirection, shooter.rating, keeper.rating, aim.accuracy, Math.random);
+  return {
+    round: kickNumber,
+    team: "user",
+    playerName: shooter.name,
+    userDirection: direction,
+    userHeight: aim.mode === "sixzone" ? aim.height : "low",
+    keeperDirection,
+    result,
+  };
 }
 
 // Build an opponent kick the user faces as the keeper (shooter is AI). `shooter`
@@ -149,6 +198,21 @@ export default function PenaltyShootout({
   const [currentKick, setCurrentKick] = useState<InteractivePenaltyKick | null>(null);
   const [userWon, setUserWon] = useState<boolean | null>(null);
   const [selectedMode, setSelectedMode] = useState<PenaltyMode | null>(mode || null);
+  // Art direction + aim experiment. Default to the 16-bit look and the 6-zone
+  // grid; both can be flipped live from the practice control strip.
+  const [spriteStyle, setSpriteStyle] = useState<SpriteStyle>("16");
+  const [aimMode, setAimMode] = useState<AimMode>("sixzone");
+  // Power-mode meter: a marker sweeps 0→100→0; the shooter locks a side first,
+  // then taps to fire. Accuracy = how close the marker is to the sweet spot (50).
+  const [powerSide, setPowerSide] = useState<ShotDirection | null>(null);
+  const [meter, setMeter] = useState(0);
+  const meterRef = useRef(0);
+  // The ball/keeper render parked at rest for one painted frame, then `launched`
+  // flips and they move — so the CSS transition eases instead of snapping (a
+  // value + transition set in the same commit skips the animation).
+  const [launched, setLaunched] = useState(false);
+  const activeRect = GOAL_RECT[spriteStyle];
+  const assets = STYLE_ASSETS[spriteStyle];
 
   const effectiveMode = useMemo(() => {
     if (selectedMode) return selectedMode;
@@ -272,20 +336,63 @@ export default function PenaltyShootout({
     [effOppTakers, oppKicks]
   );
 
-  const handleUserKick = useCallback(
-    (direction: ShotDirection) => {
+  // The decisive moments run in slow motion — a longer ball flight ramps the tension.
+  const flightMs = status.suddenDeath ? 2900 : ANIMATION_DURATION;
+
+  const fireUserShot = useCallback(
+    (direction: ShotDirection, aim: { mode: "sixzone"; height: ShotHeight } | { mode: "power"; accuracy: number }) => {
       if (phase !== "waiting" || !isUserTurn) return;
-      const kick = buildUserShot(direction, userKicks + 1, nextUserTaker, effOppKeeper);
+      setPowerSide(null);
+      const kick = buildUserShot(direction, userKicks + 1, nextUserTaker, effOppKeeper, aim);
       setCurrentKick(kick);
       setPhase("kicking");
       window.setTimeout(() => {
         setPhase("revealed");
         addKick(kick);
         window.setTimeout(() => resolveAfterKick(kick, userKicks, oppKicks, userScore, oppScore), RESULT_DURATION);
-      }, ANIMATION_DURATION);
+      }, flightMs);
     },
-    [phase, isUserTurn, userKicks, oppKicks, userScore, oppScore, nextUserTaker, effOppKeeper, addKick, resolveAfterKick]
+    [phase, isUserTurn, userKicks, oppKicks, userScore, oppScore, nextUserTaker, effOppKeeper, addKick, resolveAfterKick, flightMs]
   );
+
+  // 6-zone: a target click carries both a side and a height.
+  const handleZoneKick = useCallback(
+    (direction: ShotDirection, height: ShotHeight) => fireUserShot(direction, { mode: "sixzone", height }),
+    [fireUserShot]
+  );
+
+  // Power mode: first tap picks a side and starts the meter sweeping; second tap
+  // locks the accuracy (marker nearest 50 = perfect) and fires.
+  const startPower = useCallback(
+    (direction: ShotDirection) => {
+      if (phase !== "waiting" || !isUserTurn) return;
+      setPowerSide(direction);
+    },
+    [phase, isUserTurn]
+  );
+  const lockPower = useCallback(() => {
+    if (powerSide === null) return;
+    const accuracy = 1 - Math.abs(meterRef.current - 50) / 50;
+    fireUserShot(powerSide, { mode: "power", accuracy });
+  }, [powerSide, fireUserShot]);
+
+  // Drive the power meter with rAF while a side is armed and we're still waiting.
+  useEffect(() => {
+    if (powerSide === null || phase !== "waiting") return;
+    let raf = 0;
+    let start: number | null = null;
+    const tick = (t: number) => {
+      if (start === null) start = t;
+      // ~0.55s per full sweep; triangle wave 0..100..0.
+      const p = ((t - start) / 550) % 2;
+      const v = (p < 1 ? p : 2 - p) * 100;
+      meterRef.current = v;
+      setMeter(v);
+      raf = requestAnimationFrame(tick);
+    };
+    raf = requestAnimationFrame(tick);
+    return () => cancelAnimationFrame(raf);
+  }, [powerSide, phase]);
 
   const handleUserDive = useCallback(
     (direction: ShotDirection) => {
@@ -323,6 +430,25 @@ export default function PenaltyShootout({
     }
   }, [userWon, onFinished]);
 
+  // Defer the "launch" to the next frame so the ball/keeper paint at rest first,
+  // then transition to their target. Reset the instant the flight ends.
+  useEffect(() => {
+    if (phase !== "kicking" && phase !== "opp_kicking") {
+      setLaunched(false);
+      return;
+    }
+    let r1 = 0;
+    let r2 = 0;
+    r1 = requestAnimationFrame(() => {
+      r2 = requestAnimationFrame(() => setLaunched(true));
+    });
+    return () => {
+      cancelAnimationFrame(r1);
+      cancelAnimationFrame(r2);
+    };
+  }, [phase]);
+
+
   // Compute the shot direction being displayed
   const displayShotDirection = useMemo(() => {
     if (!currentKick) return "center" as const;
@@ -330,54 +456,57 @@ export default function PenaltyShootout({
     return currentKick.opponentShotDirection || "center";
   }, [currentKick]);
 
-  // Ball position logic
+  // Geometry helpers driven off the active style's goalmouth rectangle. The
+  // keeper stands on the goal line; the ball flies from the spot into a corner.
+  const gc = (activeRect.left + activeRect.right) / 2; // goal centre x
+  const postInset = (activeRect.right - activeRect.left) * 0.12;
+  const sideX = useCallback(
+    (dir: ShotDirection) => (dir === "left" ? activeRect.left + postInset : dir === "right" ? activeRect.right - postInset : gc),
+    [activeRect, gc, postInset]
+  );
+  const keeperLineY = activeRect.bottom - 1;
+
+  const flightPhase = phase === "kicking" || phase === "opp_kicking";
+  const restPhase = phase === "waiting" || phase === "selecting_dive";
+
+  // Ball position logic — parked on the spot until the kick launches.
   const ballPosition = useMemo(() => {
-    if (!currentKick || phase === "waiting" || phase === "selecting_dive") {
-      return { top: "88%", left: "50%" }; // Penalty spot
+    if (!currentKick || restPhase || (flightPhase && !launched)) {
+      return { top: `${SPOT.top}%`, left: `${SPOT.left}%` }; // Penalty spot
     }
     const dir = displayShotDirection;
-    
+    const height: ShotHeight = currentKick.userHeight ?? "low";
+
     if (currentKick.result === "saved") {
-      // Ball meets keeper - keeper's position
-      if (currentKick.keeperDirection === "left") return { top: "65%", left: "18%" };
-      if (currentKick.keeperDirection === "center") return { top: "65%", left: "50%" };
-      return { top: "65%", left: "82%" };
+      return { top: `${keeperLineY - 6}%`, left: `${sideX(currentKick.keeperDirection)}%` };
     }
-    
     if (currentKick.result === "missed") {
-      // Ball goes past the goal
-      if (dir === "left") return { top: "45%", left: "-8%" };
-      if (dir === "right") return { top: "45%", left: "108%" };
-      return { top: "-12%", left: "50%" }; // Over the bar
+      if (height === "high" && dir === "center") return { top: `${activeRect.top - 10}%`, left: "50%" };
+      if (dir === "left") return { top: `${activeRect.top + 4}%`, left: `${activeRect.left - 7}%` };
+      if (dir === "right") return { top: `${activeRect.top + 4}%`, left: `${activeRect.right + 7}%` };
+      return { top: `${activeRect.top - 10}%`, left: "50%" };
     }
-    
-    // GOAL - ball inside the goal
-    if (dir === "left") return { top: "32%", left: "22%" };
-    if (dir === "center") return { top: "28%", left: "50%" };
-    return { top: "32%", left: "78%" };
-  }, [currentKick, phase, displayShotDirection]);
+    // GOAL — into the corner. High tucks under the bar, low nestles by the post.
+    const yTop = activeRect.top + (activeRect.bottom - activeRect.top) * (height === "high" ? 0.16 : 0.7);
+    return { top: `${yTop}%`, left: `${sideX(dir)}%` };
+  }, [currentKick, restPhase, flightPhase, launched, displayShotDirection, activeRect, sideX, keeperLineY]);
 
-  // Keeper position logic
-  const keeperPosition = useMemo(() => {
-    if (!currentKick || phase === "waiting" || phase === "selecting_dive") {
-      return { top: "65%", left: "50%" }; // Centered in front of goal
-    }
-    if (currentKick.keeperDirection === "left") return { top: "65%", left: "18%" };
-    if (currentKick.keeperDirection === "center") return { top: "65%", left: "50%" };
-    return { top: "65%", left: "82%" };
-  }, [currentKick, phase]);
+  // Keeper sprite + placement. Ready pose while at rest (and until launch); a
+  // side dive uses the horizontal sprite (mirrored for a left dive, since it's
+  // drawn diving right), and a centre stay uses the jump pose.
+  const keeper = useMemo(() => {
+    if (!currentKick || restPhase || (flightPhase && !launched)) return { src: assets.ready, flip: false, top: keeperLineY, left: gc };
+    const kd = currentKick.keeperDirection;
+    if (kd === "center") return { src: assets.jump, flip: false, top: keeperLineY, left: gc };
+    return { src: assets.dive, flip: kd === "left", top: keeperLineY - 4, left: sideX(kd) };
+  }, [currentKick, restPhase, flightPhase, launched, assets, keeperLineY, gc, sideX]);
 
-  // Keeper rotation for dive effect
-  const keeperRotation = useMemo(() => {
-    if (!currentKick || phase === "waiting" || phase === "selecting_dive") return 0;
-    if (currentKick.keeperDirection === "left") return -55;
-    if (currentKick.keeperDirection === "center") return 0;
-    return 55;
-  }, [currentKick, phase]);
-
-  const transitionClass = currentKick && (phase === "kicking" || phase === "opp_kicking")
-    ? "transition-all duration-[2000ms] ease-out"
-    : "transition-all duration-300";
+  // Long easing only during the flight; a quick 120ms reset snaps everything
+  // back to rest for the next kick.
+  const moveTransition = flightPhase
+    ? `top ${flightMs}ms ease-out, left ${flightMs}ms ease-out, transform ${flightMs}ms ease-out`
+    : "top 120ms, left 120ms, transform 120ms";
+  const suddenZoom = status.suddenDeath && (phase === "kicking" || phase === "opp_kicking" || phase === "revealed");
 
   return (
     <>
@@ -401,10 +530,12 @@ export default function PenaltyShootout({
         @keyframes pen-ball-spin {
           to { transform: rotate(360deg); }
         }
-        @keyframes pen-net-bulge {
-          0% { transform: scale(1); }
-          45% { transform: scale(1.05, 1.04); }
-          100% { transform: scale(1); }
+        @keyframes arena-shake {
+          0%, 100% { transform: translate(0, 0); }
+          15% { transform: translate(-6px, 3px); }
+          35% { transform: translate(6px, -2px); }
+          55% { transform: translate(-4px, 2px); }
+          75% { transform: translate(4px, -1px); }
         }
       `}</style>
       <div className="stat-card animate-fade-up">
@@ -503,9 +634,16 @@ export default function PenaltyShootout({
                 <div className="mb-4 min-h-[2rem]">
                   {phase === "waiting" && isUserTurn && (effectiveMode === "shooter" || effectiveMode === "both") && (
                     <p className="text-lg font-bold text-white">
-                      {nextUserTaker.name === "You"
-                        ? "Your kick — click a corner!"
-                        : `${nextUserTaker.name} steps up — click a corner!`}
+                      {(() => {
+                        const who = nextUserTaker.name === "You" ? "Your kick" : `${nextUserTaker.name} steps up`;
+                        const how =
+                          aimMode === "power"
+                            ? powerSide === null
+                              ? "pick a side"
+                              : "time the meter"
+                            : "pick your spot";
+                        return `${who} — ${how}!`;
+                      })()}
                     </p>
                   )}
                   {phase === "waiting" && !isUserTurn && effectiveMode === "both" && (
@@ -546,196 +684,213 @@ export default function PenaltyShootout({
                           currentKick.team === "user" ?
                             `Keeper dived ${currentKick.keeperDirection}!` :
                             `You dived ${currentKick.keeperDirection}!`
-                        ) : currentKick.result === "missed" ?
-                          describeMissDirection(displayShotDirection) :
-                          describeGoalDirection(displayShotDirection)}
+                        ) : currentKick.result === "missed" ? (
+                          currentKick.team === "user" && currentKick.userHeight
+                            ? describePlacedMiss(displayShotDirection, currentKick.userHeight)
+                            : describeMissDirection(displayShotDirection)
+                        ) : (
+                          currentKick.team === "user" && currentKick.userHeight
+                            ? describePlacedGoal(displayShotDirection, currentKick.userHeight)
+                            : describeGoalDirection(displayShotDirection)
+                        )}
                       </p>
                     </div>
                   )}
                 </div>
 
-                {/* THE GOAL */}
-                <div
-                  className="relative w-full h-80 sm:h-96 rounded-xl overflow-hidden"
-                  style={{
-                    background:
-                      "radial-gradient(125% 85% at 50% 0%, #1f7a40 0%, #14532d 45%, #0b3a1f 100%)",
-                    animation: currentKick?.result === "saved" && phase === "revealed" ? "goal-shake 0.5s ease-in-out" : undefined,
-                  }}
-                >
-                  {/* Stadium floodlight glow */}
-                  <div className="absolute inset-x-0 top-0 h-1/3 pointer-events-none" style={{
-                    background: "radial-gradient(60% 100% at 50% 0%, rgba(255,255,255,0.20), transparent 70%)",
-                  }} />
-
-                  {/* Mowed grass stripes */}
-                  <div className="absolute inset-0 opacity-[0.10] pointer-events-none" style={{
-                    backgroundImage: "repeating-linear-gradient(90deg, transparent 0 30px, rgba(255,255,255,0.65) 30px 60px)",
-                  }} />
-
-                  {/* Penalty box markings + spot */}
-                  <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-[64%] h-[34%] border-2 border-b-0 border-white/25 rounded-t-[44px] pointer-events-none" />
-                  <div className="absolute bottom-[7%] left-1/2 -translate-x-1/2 w-2.5 h-2.5 rounded-full bg-white/70 pointer-events-none" />
-
-                  {/* GOAL — SVG with 3D perspective net */}
-                  <div className="absolute top-[5%] left-[5%] right-[5%] h-[55%] pointer-events-none">
-                    <svg viewBox="0 0 320 180" width="100%" height="100%" preserveAspectRatio="none" className="drop-shadow-[0_6px_10px_rgba(0,0,0,0.4)]">
-                      <defs>
-                        <pattern id="pen-net" width="8" height="8" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
-                          <path d="M0 0H8M0 0V8" stroke="rgba(255,255,255,0.38)" strokeWidth="0.5" fill="none" />
-                        </pattern>
-                        <linearGradient id="pen-post" x1="0" y1="0" x2="1" y2="0">
-                          <stop offset="0" stopColor="#e6ebf0" />
-                          <stop offset="0.5" stopColor="#ffffff" />
-                          <stop offset="1" stopColor="#bcc5cf" />
-                        </linearGradient>
-                      </defs>
-                      {/* Net panels (back + receding top/sides) for depth — bulges on a goal */}
-                      <g style={{ transformBox: "fill-box", transformOrigin: "center", animation: currentKick?.result === "goal" && phase === "revealed" ? "pen-net-bulge 0.5s ease-out" : undefined }}>
-                        <polygon points="10,10 310,10 276,34 44,34" fill="url(#pen-net)" />
-                        <polygon points="10,10 44,34 44,150 10,176" fill="url(#pen-net)" />
-                        <polygon points="310,10 276,34 276,150 310,176" fill="url(#pen-net)" />
-                        <rect x="44" y="34" width="232" height="116" fill="url(#pen-net)" />
-                        <path d="M10 10L44 34M310 10L276 34M10 176L44 150M310 176L276 150" stroke="rgba(255,255,255,0.20)" strokeWidth="1" />
-                      </g>
-                      {/* Frame: crossbar + posts */}
-                      <rect x="6" y="4" width="308" height="8" rx="4" fill="url(#pen-post)" />
-                      <rect x="6" y="4" width="9" height="174" rx="4" fill="url(#pen-post)" />
-                      <rect x="305" y="4" width="9" height="174" rx="4" fill="url(#pen-post)" />
-                    </svg>
-                  </div>
-
-                  {/* CLICKABLE ZONES - User shooter */}
-                  {phase === "waiting" && isUserTurn && (effectiveMode === "shooter" || effectiveMode === "both") && (
-                    <>
-                      <div
-                        className="absolute top-[5%] left-[5%] w-[30%] h-[55%] cursor-pointer hover:bg-white/10 active:bg-white/20 rounded-l-lg"
-                        onClick={() => handleUserKick("left")}
-                        title="Shoot left"
-                      />
-                      <div
-                        className="absolute top-[5%] left-[35%] w-[30%] h-[55%] cursor-pointer hover:bg-white/10 active:bg-white/20"
-                        onClick={() => handleUserKick("center")}
-                        title="Shoot center"
-                      />
-                      <div
-                        className="absolute top-[5%] left-[65%] w-[30%] h-[55%] cursor-pointer hover:bg-white/10 active:bg-white/20 rounded-r-lg"
-                        onClick={() => handleUserKick("right")}
-                        title="Shoot right"
-                      />
-                    </>
-                  )}
-
-                  {/* CLICKABLE ZONES - User goalkeeper */}
-                  {phase === "selecting_dive" && (effectiveMode === "goalkeeper" || effectiveMode === "both") && (
-                    <>
-                      <div
-                        className="absolute top-[5%] left-[5%] w-[30%] h-[55%] cursor-pointer hover:bg-blue-500/20 active:bg-blue-500/30 rounded-l-lg"
-                        onClick={() => handleUserDive("left")}
-                        title="Dive left"
-                      />
-                      <div
-                        className="absolute top-[5%] left-[35%] w-[30%] h-[55%] cursor-pointer hover:bg-blue-500/20 active:bg-blue-500/30"
-                        onClick={() => handleUserDive("center")}
-                        title="Dive center"
-                      />
-                      <div
-                        className="absolute top-[5%] left-[65%] w-[30%] h-[55%] cursor-pointer hover:bg-blue-500/20 active:bg-blue-500/30 rounded-r-lg"
-                        onClick={() => handleUserDive("right")}
-                        title="Dive right"
-                      />
-                    </>
-                  )}
-
-                  {/* Zone labels (only visible on hover) */}
-                  {phase === "waiting" && isUserTurn && (effectiveMode === "shooter" || effectiveMode === "both") && (
-                    <div className="absolute top-[5%] left-[5%] right-[5%] h-[55%] flex pointer-events-none">
-                      <div className="flex-1 flex items-center justify-center">
-                        <span className="text-white/20 text-sm font-bold">LEFT</span>
-                      </div>
-                      <div className="flex-1 flex items-center justify-center">
-                        <span className="text-white/20 text-sm font-bold">CENTER</span>
-                      </div>
-                      <div className="flex-1 flex items-center justify-center">
-                        <span className="text-white/20 text-sm font-bold">RIGHT</span>
-                      </div>
+                {/* Practice-only experiment controls: art style + aim mode */}
+                {practiceMode && (
+                  <div className="mb-3 flex flex-wrap items-center justify-center gap-2">
+                    <div className="inline-flex overflow-hidden rounded-lg border border-surface-700 text-xs font-black">
+                      {(["16", "32"] as SpriteStyle[]).map((s) => (
+                        <button
+                          key={s}
+                          type="button"
+                          onClick={() => setSpriteStyle(s)}
+                          className={`px-3 py-1.5 transition-colors ${spriteStyle === s ? "bg-gold-500 text-black" : "bg-surface-900 text-gray-400 hover:text-white"}`}
+                        >
+                          {s}-bit
+                        </button>
+                      ))}
                     </div>
-                  )}
-
-                  {/* KEEPER */}
-                  <div
-                    className={`absolute z-10 pointer-events-none ${transitionClass}`}
-                    style={{
-                      top: keeperPosition.top,
-                      left: keeperPosition.left,
-                      transform: `translate(-50%, -50%) rotate(${keeperRotation}deg)`,
-                      width: "80px",
-                      height: "80px",
-                    }}
-                  >
-                    <svg viewBox="0 0 80 80" width="100%" height="100%" className="drop-shadow-[0_4px_6px_rgba(0,0,0,0.5)]">
-                      <defs>
-                        <linearGradient id="pen-kit" x1="0" y1="0" x2="0" y2="1">
-                          <stop offset="0" stopColor="#2dd4bf" />
-                          <stop offset="1" stopColor="#0f766e" />
-                        </linearGradient>
-                      </defs>
-                      {/* ground shadow */}
-                      <ellipse cx="40" cy="75" rx="17" ry="3.5" fill="rgba(0,0,0,0.35)" />
-                      {/* legs + boots */}
-                      <rect x="31" y="50" width="7" height="20" rx="3" fill="#0f172a" />
-                      <rect x="42" y="50" width="7" height="20" rx="3" fill="#0f172a" />
-                      <rect x="29" y="66" width="11" height="5" rx="2" fill="#f8fafc" />
-                      <rect x="40" y="66" width="11" height="5" rx="2" fill="#f8fafc" />
-                      {/* outstretched arms */}
-                      <rect x="4" y="30" width="30" height="8" rx="4" fill="url(#pen-kit)" />
-                      <rect x="46" y="30" width="30" height="8" rx="4" fill="url(#pen-kit)" />
-                      {/* gloves */}
-                      <circle cx="7" cy="34" r="7" fill="#fbbf24" stroke="#fff" strokeWidth="1.5" />
-                      <circle cx="73" cy="34" r="7" fill="#fbbf24" stroke="#fff" strokeWidth="1.5" />
-                      {/* torso */}
-                      <rect x="28" y="25" width="24" height="29" rx="9" fill="url(#pen-kit)" />
-                      <text x="40" y="46" textAnchor="middle" fontSize="11" fontWeight="bold" fill="#ecfeff">1</text>
-                      {/* head + hair */}
-                      <circle cx="40" cy="16" r="9" fill="#e8b07a" />
-                      <path d="M31 14a9 9 0 0 1 18 0z" fill="#3f2a1a" />
-                    </svg>
+                    <div className="inline-flex overflow-hidden rounded-lg border border-surface-700 text-xs font-black">
+                      {([["sixzone", "6-Zone"], ["power", "Power"]] as [AimMode, string][]).map(([m, label]) => (
+                        <button
+                          key={m}
+                          type="button"
+                          onClick={() => { setAimMode(m); setPowerSide(null); }}
+                          className={`px-3 py-1.5 transition-colors ${aimMode === m ? "bg-gold-500 text-black" : "bg-surface-900 text-gray-400 hover:text-white"}`}
+                        >
+                          {label}
+                        </button>
+                      ))}
+                    </div>
                   </div>
+                )}
 
-                  {/* BALL */}
-                  <div
-                    className={`absolute z-20 pointer-events-none ${transitionClass}`}
-                    style={{
-                      top: ballPosition.top,
-                      left: ballPosition.left,
-                      transform: "translate(-50%, -50%)",
-                    }}
-                  >
+                {/* THE ARENA — generated pixel-art stadium; all actors positioned off GOAL_RECT */}
+                {(() => {
+                  const shooterTurn = phase === "waiting" && isUserTurn && (effectiveMode === "shooter" || effectiveMode === "both");
+                  const diveTurn = phase === "selecting_dive" && (effectiveMode === "goalkeeper" || effectiveMode === "both");
+                  const gw = activeRect.right - activeRect.left;
+                  const gh = activeRect.bottom - activeRect.top;
+                  const isDive = keeper.src === assets.dive;
+                  const isJump = keeper.src === assets.jump;
+                  const keeperH = isDive ? activeRect.keeperH * 0.66 : isJump ? activeRect.keeperH * 1.12 : activeRect.keeperH;
+                  const shakeAnim =
+                    phase === "revealed" && currentKick
+                      ? currentKick.result === "saved"
+                        ? "arena-shake 0.5s ease-in-out"
+                        : currentKick.result === "goal"
+                          ? "arena-shake 0.35s ease-in-out"
+                          : undefined
+                      : undefined;
+                  return (
                     <div
-                      className="drop-shadow-[0_3px_4px_rgba(0,0,0,0.5)]"
-                      style={{
-                        width: "38px",
-                        height: "38px",
-                        animation: phase === "kicking" || phase === "opp_kicking" ? "pen-ball-spin 0.5s linear infinite" : undefined,
-                      }}
+                      className="relative w-full aspect-video rounded-xl overflow-hidden select-none bg-black"
+                      style={{ animation: shakeAnim }}
                     >
-                      <svg viewBox="0 0 40 40" width="100%" height="100%">
-                        <circle cx="20" cy="20" r="18" fill="#ffffff" stroke="#cbd5e1" strokeWidth="1" />
-                        <polygon points="20,11 26,15.5 23.7,22.5 16.3,22.5 14,15.5" fill="#0f172a" />
-                        <path d="M20 2 L20 11 M38 16 L26 15.5 M31 35 L23.7 22.5 M9 35 L16.3 22.5 M2 16 L14 15.5" stroke="#0f172a" strokeWidth="1.6" fill="none" />
-                      </svg>
-                    </div>
-                  </div>
+                      <div
+                        className="absolute inset-0"
+                        style={{
+                          transform: suddenZoom ? "scale(1.12)" : "scale(1)",
+                          transformOrigin: "50% 40%",
+                          transition: "transform 700ms ease-out",
+                        }}
+                      >
+                        {/* Stadium background */}
+                        <img
+                          src={assets.bg}
+                          alt=""
+                          className="absolute inset-0 h-full w-full object-cover"
+                          style={{ imageRendering: "pixelated" }}
+                          draggable={false}
+                        />
 
-                  {/* Save effect overlay */}
-                  {phase === "revealed" && currentKick?.result === "saved" && (
-                    <div className="absolute inset-0 flex items-center justify-center z-30 pointer-events-none">
-                      <div className="text-6xl animate-bounce" style={{ animation: "result-pop 0.5s ease-out" }}>
-                        🧤
+                        {/* KEEPER sprite (feet on the goal line, bottom-centre anchored) */}
+                        <img
+                          src={keeper.src}
+                          alt="Goalkeeper"
+                          className="absolute z-10 pointer-events-none drop-shadow-[0_4px_6px_rgba(0,0,0,0.55)]"
+                          style={{
+                            top: `${keeper.top}%`,
+                            left: `${keeper.left}%`,
+                            height: `${keeperH}%`,
+                            width: "auto",
+                            transform: `translate(-50%, -100%) scaleX(${keeper.flip ? -1 : 1})`,
+                            transition: moveTransition,
+                            imageRendering: "pixelated",
+                          }}
+                          draggable={false}
+                        />
+
+                        {/* BALL sprite — outer div positions/translates, inner img spins */}
+                        <div
+                          className="absolute z-20 pointer-events-none"
+                          style={{
+                            top: ballPosition.top,
+                            left: ballPosition.left,
+                            width: "6%",
+                            transform: "translate(-50%, -50%)",
+                            transition: moveTransition,
+                          }}
+                        >
+                          <img
+                            src={BALL_SRC}
+                            alt="Ball"
+                            className="block w-full drop-shadow-[0_3px_4px_rgba(0,0,0,0.55)]"
+                            style={{
+                              height: "auto",
+                              animation: flightPhase ? "pen-ball-spin 0.4s linear infinite" : undefined,
+                              imageRendering: "pixelated",
+                            }}
+                            draggable={false}
+                          />
+                        </div>
+
+                        {/* 6-ZONE shooter grid */}
+                        {shooterTurn && aimMode === "sixzone" && (
+                          <div
+                            className="absolute z-30 grid grid-cols-3 grid-rows-2 overflow-hidden rounded-md ring-1 ring-white/20"
+                            style={{ top: `${activeRect.top}%`, left: `${activeRect.left}%`, width: `${gw}%`, height: `${gh}%` }}
+                          >
+                            {(["high", "low"] as ShotHeight[]).flatMap((h) =>
+                              (["left", "center", "right"] as ShotDirection[]).map((side) => (
+                                <button
+                                  key={`${h}-${side}`}
+                                  type="button"
+                                  onClick={() => handleZoneKick(side, h)}
+                                  className={`flex items-center justify-center border border-white/15 text-sm font-black text-white/45 transition-colors hover:bg-gold-400/30 hover:text-white active:bg-gold-400/50 ${h === "high" ? "items-start pt-1" : "items-end pb-1"}`}
+                                >
+                                  {h === "high" ? "▲" : "▼"}
+                                </button>
+                              ))
+                            )}
+                          </div>
+                        )}
+
+                        {/* POWER shooter: pick a side, then lock the accuracy meter */}
+                        {shooterTurn && aimMode === "power" && powerSide === null && (
+                          <div
+                            className="absolute z-30 grid grid-cols-3 overflow-hidden rounded-md ring-1 ring-white/20"
+                            style={{ top: `${activeRect.top}%`, left: `${activeRect.left}%`, width: `${gw}%`, height: `${gh}%` }}
+                          >
+                            {(["left", "center", "right"] as ShotDirection[]).map((side) => (
+                              <button
+                                key={side}
+                                type="button"
+                                onClick={() => startPower(side)}
+                                className="flex items-center justify-center border border-white/10 text-xs font-black uppercase text-white/30 transition-colors hover:bg-gold-400/25 hover:text-white/80"
+                              >
+                                {side}
+                              </button>
+                            ))}
+                          </div>
+                        )}
+                        {shooterTurn && aimMode === "power" && powerSide !== null && (
+                          <button
+                            type="button"
+                            onClick={lockPower}
+                            className="absolute inset-0 z-30 flex cursor-pointer flex-col items-center justify-end pb-[6%]"
+                            aria-label="Lock the shot"
+                          >
+                            <div className="relative h-4 w-[70%] overflow-hidden rounded-full border border-white/40 bg-black/60">
+                              {/* sweet spot */}
+                              <div className="absolute inset-y-0 left-[42%] w-[16%] bg-green-500/40" />
+                              {/* marker */}
+                              <div
+                                className="absolute inset-y-0 w-1.5 bg-white"
+                                style={{ left: `calc(${meter.toFixed(1)}% - 3px)` }}
+                              />
+                            </div>
+                            <span className="mt-2 rounded bg-black/70 px-3 py-1 text-sm font-black uppercase tracking-wide text-gold-400">
+                              Tap to shoot
+                            </span>
+                          </button>
+                        )}
+
+                        {/* KEEPER dive zones (user in goal) */}
+                        {diveTurn && (
+                          <div
+                            className="absolute z-30 grid grid-cols-3 overflow-hidden rounded-md ring-1 ring-blue-300/30"
+                            style={{ top: `${activeRect.top}%`, left: `${activeRect.left}%`, width: `${gw}%`, height: `${gh}%` }}
+                          >
+                            {(["left", "center", "right"] as ShotDirection[]).map((side) => (
+                              <button
+                                key={side}
+                                type="button"
+                                onClick={() => handleUserDive(side)}
+                                className="flex items-center justify-center border border-white/10 text-xs font-black uppercase text-white/30 transition-colors hover:bg-blue-400/30 hover:text-white/80"
+                              >
+                                {side}
+                              </button>
+                            ))}
+                          </div>
+                        )}
                       </div>
                     </div>
-                  )}
-                </div>
+                  );
+                })()}
 
                 {practiceMode && onStopPractice && (
                   <button

@@ -3,8 +3,11 @@ import { seededRandom } from "./random";
 import {
   keeperCenterWeight,
   missChance,
+  missChanceHeight,
   pickDirection,
   resolveKick,
+  resolvePlacedKick,
+  resolvePoweredKick,
   saveChanceWhenCorrect,
 } from "./penaltyModel";
 import { REGULATION_KICKS, shootoutStatus } from "./shootoutStatus";
@@ -46,6 +49,32 @@ describe("penalty probability model", () => {
     expect(resolveKick("center", "center", 80, 80, seq(0.99, 0.99))).toBe("goal");
     // miss roll low → missed
     expect(resolveKick("center", "center", 80, 80, seq(0))).toBe("missed");
+  });
+
+  it("6-zone: high shots are unsaveable but skied more often than low ones", () => {
+    const seq = (...vals: number[]) => {
+      let i = 0;
+      return () => vals[i++] ?? 0;
+    };
+    // High corner: keeper matches the side but can't reach it → goal (only a
+    // miss roll is consumed, never a save roll).
+    expect(resolvePlacedKick("left", "high", "left", 80, 80, seq(0.99))).toBe("goal");
+    // Low corner, keeper matches, save roll succeeds → saved.
+    expect(resolvePlacedKick("left", "low", "left", 80, 80, seq(0.99, 0))).toBe("saved");
+    // Aiming high carries a strictly higher miss chance than low.
+    expect(missChanceHeight(80, "high")).toBeGreaterThan(missChanceHeight(80, "low"));
+  });
+
+  it("power mode: perfect accuracy beats a correct-guessing keeper, mishits don't", () => {
+    const seq = (...vals: number[]) => {
+      let i = 0;
+      return () => vals[i++] ?? 0;
+    };
+    // Perfect accuracy (1): miss chance ~base (0.99 clears it), save chance cut
+    // 70% — a save roll of 0.5 now clears the reduced threshold → goal.
+    expect(resolvePoweredKick("left", "left", 80, 80, 1, seq(0.99, 0.5))).toBe("goal");
+    // Mishit (0): miss chance is inflated far past a low roll → missed.
+    expect(resolvePoweredKick("left", "left", 80, 80, 0, seq(0.2))).toBe("missed");
   });
 
   it("converts penalties at a realistic ~75% over many kicks", () => {

@@ -1,5 +1,5 @@
 import { clamp } from "./random";
-import type { ShotDirection } from "./penaltyText";
+import type { ShotDirection, ShotHeight } from "./penaltyText";
 
 export type KickOutcome = "goal" | "saved" | "missed";
 
@@ -49,6 +49,51 @@ export function resolveKick(
 ): KickOutcome {
   if (rng() < missChance(shooterRating)) return "missed";
   if (shotDirection === keeperDirection && rng() < saveChanceWhenCorrect(keeperRating)) {
+    return "saved";
+  }
+  return "goal";
+}
+
+// --- 6-zone aim mode -------------------------------------------------------
+// Adds a vertical axis to placement. Aiming HIGH roughly doubles the miss
+// chance (skying it) but is unsaveable — a keeper who commits to the right side
+// still can't reach the top corner. Aiming LOW is safe from skying but the
+// keeper saves it on a correct-side dive, exactly like the classic model.
+export function missChanceHeight(shooterRating: number, height: ShotHeight): number {
+  const base = missChance(shooterRating);
+  return height === "high" ? clamp(base * 2, 0.06, 0.28) : base;
+}
+
+export function resolvePlacedKick(
+  side: ShotDirection,
+  height: ShotHeight,
+  keeperDirection: ShotDirection,
+  shooterRating: number,
+  keeperRating: number,
+  rng: () => number
+): KickOutcome {
+  if (rng() < missChanceHeight(shooterRating, height)) return "missed";
+  if (height === "low" && side === keeperDirection && rng() < saveChanceWhenCorrect(keeperRating)) {
+    return "saved";
+  }
+  return "goal";
+}
+
+// --- power / placement aim mode --------------------------------------------
+// The shooter picks a side, then times an accuracy meter (0 = mishit, 1 =
+// perfect). Poor accuracy inflates the miss chance and leaves the shot weak
+// enough for a correct-guessing keeper to save; perfect accuracy tucks it away.
+export function resolvePoweredKick(
+  side: ShotDirection,
+  keeperDirection: ShotDirection,
+  shooterRating: number,
+  keeperRating: number,
+  accuracy: number,
+  rng: () => number
+): KickOutcome {
+  const acc = clamp(accuracy, 0, 1);
+  if (rng() < clamp(missChance(shooterRating) * (1 + (1 - acc) * 3), 0.03, 0.6)) return "missed";
+  if (side === keeperDirection && rng() < saveChanceWhenCorrect(keeperRating) * (1 - acc * 0.7)) {
     return "saved";
   }
   return "goal";
