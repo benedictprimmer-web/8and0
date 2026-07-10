@@ -1,5 +1,6 @@
 import { getFormation } from "./formations";
 import { pickSeeded } from "./random";
+import { getLegend, resolveLegend } from "./legends";
 import type { EightZeroData } from "./data";
 import type {
   DraftDifficulty,
@@ -23,27 +24,21 @@ const DEFAULT_OPTIONS: DraftOptions = {
   superSub: false,
 };
 
-const LEGEND_CONFIG: Record<Exclude<LegendMode, "none">, { fifaCode: string; nameMatch: (name: string) => boolean; category: "FWD" | "MID" }> = {
-  messi: { fifaCode: "ARG", nameMatch: (name) => name.includes("Messi"), category: "FWD" },
-  ronaldo: { fifaCode: "POR", nameMatch: (name) => name.includes("Ronaldo"), category: "FWD" },
-  neymar: { fifaCode: "BRA", nameMatch: (name) => name.includes("Neymar"), category: "MID" },
-};
-
 export function rerollsForDifficulty(difficulty: DraftDifficulty): number {
   if (difficulty === "easy") return 3;
   if (difficulty === "hard") return 0;
   return 1;
 }
 
-function findLegendPlayer(data: EightZeroData, legendMode: LegendMode): EightZeroPlayer | null {
-  if (legendMode === "none") return null;
-  const config = LEGEND_CONFIG[legendMode];
-  for (const player of data.players) {
-    if (player.teamCode === config.fifaCode && config.nameMatch(player.name)) {
-      return player;
-    }
-  }
-  return null;
+// Resolve the Last Dance legend to a draftable player + its spin team (or null
+// when the mode is off / unknown). Retired legends are synthesised from the
+// legends table; the three live legends still come from the current squad data.
+function resolveLegendPick(
+  data: EightZeroData,
+  legendMode: LegendMode
+): { player: EightZeroPlayer; team: EightZeroTeam } | null {
+  const legend = getLegend(legendMode);
+  return legend ? resolveLegend(legend, data) : null;
 }
 
 export function createDraftState(
@@ -62,11 +57,11 @@ export function createDraftState(
   let blindMode = resolvedOptions.blindMode || resolvedOptions.difficulty === "hard";
 
   if (legendMode !== "none" && data) {
-    const legendPlayer = findLegendPlayer(data, legendMode);
-    if (legendPlayer) {
+    const resolved = resolveLegendPick(data, legendMode);
+    if (resolved) {
+      const { player: legendPlayer, team: legendTeam } = resolved;
       const compatibleSlots = formation.slots.filter((slot) => slot.category === legendPlayer.category);
       const slot = compatibleSlots[0] ?? formation.slots[0];
-      const legendTeam = data.teamById.get(legendPlayer.teamId) ?? data.teams[0];
       const pick: DraftPick = {
         slotId: slot.id,
         slotLabel: slot.label,

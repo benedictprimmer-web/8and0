@@ -514,6 +514,32 @@ describe("8-0 legend mode", () => {
     expect(run.legendMode).toBe("ronaldo");
     expect(run.matches.length).toBeGreaterThan(0);
   });
+
+  it("auto-locks a synthetic (retired) legend with its Icon rating", () => {
+    const data = buildEightZeroData(teamsData as RawTeam[], playersData as RawPlayer[]);
+    const state = createDraftState("zidane-seed", "433", { legendMode: "zidane" }, data);
+
+    expect(state.picks).toHaveLength(1);
+    const pick = state.picks[0];
+    expect(pick.player.name).toBe("Zinedine Zidane");
+    expect(pick.player.teamCode).toBe("FRA");
+    expect(pick.category).toBe("MID");
+    expect(pick.player.rating).toBe(96); // Icon peak, not from squad data
+    // Zidane is not in the 2026 squad, so he must be synthesised, not found.
+    expect(data.players.some((p) => p.name === "Zinedine Zidane")).toBe(false);
+  });
+
+  it("completes a full draft anchored by a synthetic legend and simulates", () => {
+    const data = buildEightZeroData(teamsData as RawTeam[], playersData as RawPlayer[]);
+    let state = createDraftState("klose-full-seed", "433", { legendMode: "klose" }, data);
+    while (!state.complete) {
+      state = spinTeam(data, state);
+      const player = getAvailablePlayers(data, state).find((c) => canPickPlayer(c, state));
+      state = selectPlayer(data, state, player!.id);
+    }
+    expect(state.picks).toHaveLength(11);
+    expect(state.picks.some((p) => p.player.name === "Miroslav Klose")).toBe(true);
+  });
 });
 
 describe("8-0 bracket balancing", () => {

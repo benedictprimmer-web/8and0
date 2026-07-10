@@ -1,7 +1,8 @@
 export type SlotCategory = "GK" | "DEF" | "MID" | "FWD";
 export type DraftDifficulty = "easy" | "normal" | "hard";
 export type DraftMode = "squad-first" | "position-first";
-export type LegendMode = "none" | "messi" | "ronaldo" | "neymar";
+// "none" = Last Dance off; any other value is a legend id from legends.ts.
+export type LegendMode = string;
 
 export interface DraftOptions {
   difficulty: DraftDifficulty;
