@@ -187,3 +187,42 @@ Even under "build it all," ship in reviewable chunks — each is independently t
 - **32 vs 48 team bracket structure** — audit every place `formations.ts`/bracket/group code assumes 48 before wiring in 2014/2018/2022.
 - **Scraping etiquette** — sofifa/futbin/fut.gg have no official API; apply the same caching + rate-limit discipline the sibling repo's `CLAUDE.md` mandates for its own scraping, even though this repo has no such file yet.
 - **Name-matching failure rate** — expect some manual review for historical eras (older transliterations, nicknames change over decades more than the 2026 squad-mismatches case did). Budget for a `data-quality/historical-mismatches.json` review pass like the existing `squad-mismatches.json`.
+
+---
+
+## Postscript — what actually shipped (2026-07-10)
+
+All five parts landed on `feat/phase10-ratings-and-eras`. Deviations from the
+plan above, and why:
+
+- **Current-year (FC25/26) ratings were a genuine blocker.** sofifa, futbin,
+  fut.gg and fifaindex are all Cloudflare-blocked (403) from this environment,
+  and Kaggle needs auth. The best GitHub-hosted mirror
+  (`eddwebster/football_analytics`) stops at **FIFA 22**. So Part A uses FIFA 22
+  as the rating base for the 2026 squad (real EA data beats club-strength
+  guesses), **age-adjusted toward EA's `potential`** for players who were young
+  in 2021 (Pepi 65→74, Reyna 77→83). The 210 curated current stars
+  (Mbappé 93, Yamal 89) are kept untouched. The rating source is a swappable
+  CSV — drop a fresher FC26 export in and re-run with `--edition`.
+- **Historical editions:** FIFA 15 → 2014 (FIFA 14 is Cloudflare-only; 15 ships
+  Sep'14, ~2 months post-tournament), FIFA 18 → 2018 (exact), FIFA 22 → 2022
+  (FIFA 23 not in the mirror).
+- **Team strength = mean of the XI's real ratings**, mapped to the game's
+  ~1200–2100 elo scale — self-contained, no dependency on the sibling
+  World-Cup-Simulator Elo pipeline. Simpler and consistent with the ratings the
+  drafted players carry.
+- **32-vs-48 bracket was a non-issue.** The game is fixed at 8 matches (the
+  "8-0" identity) and draws 8 opponents from a pool by strength — it never
+  simulates a real 48- or 32-team bracket. Historical eras just swap the pool.
+- **Legends stay elite but not absurd:** Icon *peak* overalls (88–96), not the
+  95–97 promo specials for everyone.
+- **Name matching** handles: accents, nicknames via first-name prefix
+  (Gio→Giovanni), mononyms via long+short name (Hulk = Givanildo Vieira de
+  Sousa), jfjelstul "not applicable" placeholders, and nation aliases
+  (Côte d'Ivoire, SAU/KSA, DEU/GER). Japan/Qatar stay estimated (native-script /
+  sparse FIFA coverage) at a sane ~69 mean.
+
+Verified end-to-end in a real browser: era selector, 27-legend grid, 2014 draft
+with Zidane locked (96), Dream Team merge (Saudi Arabia 45 players across
+2018/22/26). No console errors. `npm run build`, `npm test` (88), `npm run lint`
+all clean.

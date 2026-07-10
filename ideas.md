@@ -432,9 +432,31 @@ Official WC 2026 squad numbers added to:
 
 ## Phase 10: All-Time / Legends Mode
 
-**Status**: 📋 Planned (data research done 2026-07-10, not yet implemented).
-Full execution spec with sources, algorithms, and a file-by-file plan:
-[`PHASE10_BUILD_BRIEF.md`](./PHASE10_BUILD_BRIEF.md).
+**Status**: ✅ SHIPPED (2026-07-10). Full spec: [`PHASE10_BUILD_BRIEF.md`](./PHASE10_BUILD_BRIEF.md).
+
+Built on branch `feat/phase10-ratings-and-eras`:
+- **Part A** — `scripts/backfill-2026-ratings.mjs` replaced the inflated
+  club-strength estimates with real FIFA 22 ratings (name+nationality match,
+  age-adjusted toward EA potential for young players). Estimated-in-85+-band
+  58 → 0; worst team 22 → 9 players at 85+. `audit-ratings.mjs --ci` gates it.
+- **Part B** — `scripts/build-historical-data.mjs` → `historical-players.json`
+  (1,056 starting-XI players, 2014/18/22, 82% real ratings) +
+  `historical-teams.json` (elo from mean XI rating). Sources: jfjelstul/worldcup
+  (rosters) + eddwebster FIFA 15/18/22 mirror (ratings). `audit-historical-ratings.mjs --ci`.
+- **Part C** — `src/game8/legends.ts`: 27 legends (Icon peak ratings). Last Dance
+  extended from 3 → 27; retired legends synthesised, live 3 preserved.
+- **Part D1** — Era selector (2014/18/22/2026); era threads through the engine.
+  8-match "8-0" structure kept for all eras (only the pool swaps).
+- **Part D2** — "All-Time" Dream Team: all eras + legends merged into one
+  nation-keyed spin pool; faces the 2026 field.
+
+**Deviations from the original brief** (all documented in the brief's postscript):
+FIFA 22 not FIFA 23 (mirror stops at 22); FIFA 15 for 2014 (FIFA 14 is
+Cloudflare-only); team strength derived from mean XI rating, not the sibling
+repo's 49k-match Elo (self-contained, no cross-repo dep); 32-vs-48 bracket was a
+non-issue (the game draws 8 opponents from a pool, not a real bracket).
+
+**Not pushed** — commits are local on the feature branch; open the PR when ready.
 
 Adds three historical World Cup rosters (2014, 2018, 2022) plus a curated
 legends tier, as a new era alongside 2026.
