@@ -1,3 +1,4 @@
+import { createHash } from "node:crypto";
 import { isConfigured, pipeline, redis } from "./_upstash.js";
 import { sanitiseSubmission, type LeaderboardEntry } from "../src/game8/leaderboard.js";
 
@@ -12,6 +13,14 @@ import { sanitiseSubmission, type LeaderboardEntry } from "../src/game8/leaderbo
 //   lb:all          sorted set, score = run score, member = entry id
 //   lb:entry:<id>   JSON string of the full LeaderboardEntry
 //   rl:<ip>         per-minute rate-limit counter
+//
+// Entry id = a hash of the run seed (entryId()), NOT the raw seed. The seed is
+// the caller's private idempotency key — re-submitting the same run overwrites
+// the same row — but it is NEVER published in a response. If the raw seed were
+// both the stored key and returned to every client (as it once was), anyone
+// could read a victim's seed off the board and POST over their row. The `ids`
+// query param is a list of the caller's OWN seeds; the server hashes them the
+// same way to look up "mine".
 
 const ALL_KEY = "lb:all";
 const ENTRY_PREFIX = "lb:entry:";
@@ -19,6 +28,19 @@ const MAX_ENTRIES = 1000;
 const DEFAULT_LIMIT = 200;
 const MAX_LIMIT = 500;
 const RATE_LIMIT_PER_MIN = 20;
+const MAX_MINE = 50;
+
+/** Deterministic public entry id derived from the (private) run seed. */
+function entryId(seed: string): string {
+  return createHash("sha256").update(seed).digest("hex").slice(0, 32);
+}
+
+/** Strip the private seed before returning an entry to any client. */
+function toPublic(entry: LeaderboardEntry): LeaderboardEntry {
+  const copy = { ...entry };
+  delete copy.seed;
+  return copy;
+}
 
 interface ApiRequest {
   method?: string;
@@ -81,20 +103,26 @@ function parseEntry(raw: string | null): LeaderboardEntry | null {
   }
 }
 
-/** Look up specific entries (by id) plus their current global rank. */
+/**
+ * Look up the caller's own entries plus their current global rank.
+ * `seeds` are the caller's private run seeds; each is hashed to its entry id
+ * (the same mapping used on write), so no raw seed is ever a lookup key a
+ * third party could supply.
+ */
 async function rankEntries(
-  ids: string[]
+  seeds: string[]
 ): Promise<Array<{ entry: LeaderboardEntry; rank: number | null }>> {
-  const unique = Array.from(new Set(ids.filter(Boolean))).slice(0, 25);
+  const unique = Array.from(new Set(seeds.filter(Boolean))).slice(0, MAX_MINE);
   if (unique.length === 0) return [];
 
-  const raw = await redis<(string | null)[]>(["MGET", ...unique.map((id) => `${ENTRY_PREFIX}${id}`)]);
+  const ids = unique.map(entryId);
+  const raw = await redis<(string | null)[]>(["MGET", ...ids.map((id) => `${ENTRY_PREFIX}${id}`)]);
   const out: Array<{ entry: LeaderboardEntry; rank: number | null }> = [];
-  for (let i = 0; i < unique.length; i += 1) {
+  for (let i = 0; i < ids.length; i += 1) {
     const entry = parseEntry(raw[i] ?? null);
     if (!entry) continue;
-    const rank = await redis<number | null>(["ZREVRANK", ALL_KEY, unique[i]]);
-    out.push({ entry, rank: rank === null ? null : rank + 1 });
+    const rank = await redis<number | null>(["ZREVRANK", ALL_KEY, ids[i]]);
+    out.push({ entry: toPublic(entry), rank: rank === null ? null : rank + 1 });
   }
   return out;
 }
@@ -120,7 +148,7 @@ async function handleGet(req: ApiRequest, res: ApiResponse): Promise<void> {
   const entries: LeaderboardEntry[] = [];
   for (const item of raw) {
     const entry = parseEntry(item);
-    if (entry) entries.push(entry);
+    if (entry) entries.push(toPublic(entry));
   }
   const total = await redis<number>(["ZCARD", ALL_KEY]);
   const mine = mineIds.length > 0 ? await rankEntries(mineIds) : [];
@@ -146,9 +174,11 @@ async function handlePost(req: ApiRequest, res: ApiResponse): Promise<void> {
     return;
   }
 
-  // Key the entry by the run seed so re-submitting the same run (e.g. to fix a
-  // typo'd name) overwrites rather than creating a duplicate row.
-  const id = result.submission.seed || randomId();
+  // Key the entry by a hash of the run seed so re-submitting the same run (e.g.
+  // to fix a typo'd name) overwrites rather than creating a duplicate row —
+  // without exposing the seed itself, which is what a client would need to
+  // overwrite someone else's row. Runs without a seed fall back to a random id.
+  const id = result.submission.seed ? entryId(result.submission.seed) : randomId();
   const entry: LeaderboardEntry = { id, ...result.submission };
 
   await pipeline([
@@ -170,7 +200,7 @@ async function handlePost(req: ApiRequest, res: ApiResponse): Promise<void> {
   const total = await redis<number>(["ZCARD", ALL_KEY]);
 
   res.status(201).json({
-    entry,
+    entry: toPublic(entry),
     rank: rank === null ? null : rank + 1,
     total,
   });
