@@ -6,8 +6,8 @@ import {
   missChanceHeight,
   pickDirection,
   resolveKick,
+  resolveAimedKick,
   resolvePlacedKick,
-  resolvePoweredKick,
   saveChanceWhenCorrect,
 } from "./penaltyModel";
 import { REGULATION_KICKS, shootoutStatus } from "./shootoutStatus";
@@ -65,16 +65,20 @@ describe("penalty probability model", () => {
     expect(missChanceHeight(80, "high")).toBeGreaterThan(missChanceHeight(80, "low"));
   });
 
-  it("power mode: perfect accuracy beats a correct-guessing keeper, mishits don't", () => {
+  it("power mode: placement beats or feeds the keeper by distance from their dive", () => {
     const seq = (...vals: number[]) => {
       let i = 0;
       return () => vals[i++] ?? 0;
     };
-    // Perfect accuracy (1): miss chance ~base (0.99 clears it), save chance cut
-    // 70% — a save roll of 0.5 now clears the reduced threshold → goal.
-    expect(resolvePoweredKick("left", "left", 80, 80, 1, seq(0.99, 0.5))).toBe("goal");
-    // Mishit (0): miss chance is inflated far past a low roll → missed.
-    expect(resolvePoweredKick("left", "left", 80, 80, 0, seq(0.2))).toBe("missed");
+    // Tuck it into the right corner (x=0.95) while the keeper dived left → out of
+    // reach, so no save roll is even consumed → goal (only the miss roll clears).
+    expect(resolveAimedKick(0.95, "left", 85, 80, seq(0.99))).toBe("goal");
+    // Place it right where the keeper dived (x=0.2 == left dive point), save roll
+    // low → saved.
+    expect(resolveAimedKick(0.2, "left", 85, 80, seq(0.99, 0))).toBe("saved");
+    // Aim flush with the post (x=0) → corner risk pushes miss chance past a mid
+    // roll → dragged wide.
+    expect(resolveAimedKick(0, "center", 85, 80, seq(0.3))).toBe("missed");
   });
 
   it("converts penalties at a realistic ~75% over many kicks", () => {

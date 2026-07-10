@@ -15,7 +15,7 @@ import {
   pickDirection,
   resolveKick,
   resolvePlacedKick,
-  resolvePoweredKick,
+  resolveAimedKick,
 } from "../game8/penaltyModel";
 import { REGULATION_KICKS, shootoutStatus } from "../game8/shootoutStatus";
 import { type PenaltyTaker, takerForKick } from "../game8/penaltyLineup";
@@ -27,6 +27,7 @@ interface InteractivePenaltyKick {
   playerName: string;
   userDirection?: ShotDirection;
   userHeight?: ShotHeight;
+  userAimX?: number; // power mode: 0 (left post) … 1 (right post)
   userDiveDirection?: ShotDirection;
   opponentShotDirection?: ShotDirection;
   keeperDirection: ShotDirection;
@@ -36,8 +37,14 @@ interface InteractivePenaltyKick {
 type PenaltyMode = "shooter" | "goalkeeper" | "both";
 
 // How the shooter aims. Two experiments toggled in practice: a 6-zone target
-// grid, or a timed power/placement meter. See resolvePlacedKick / resolvePoweredKick.
+// grid, or a single sweeping crosshair you tap to place the shot (power). See
+// resolvePlacedKick / resolveAimedKick.
 type AimMode = "sixzone" | "power";
+
+// Map a power-mode aim (0…1 across the goal) to a display side, for flavour text.
+function sideForAimX(x: number): ShotDirection {
+  return x < 0.38 ? "left" : x > 0.62 ? "right" : "center";
+}
 
 // Pixel-art sprite set (16-bit look) — stadium background plus keeper poses.
 const A = "/assets/penalty";
@@ -70,26 +77,26 @@ interface PenaltyShootoutProps {
 
 // Build a kick the user takes as the shooter (keeper is AI). `shooter` names the
 // player stepping up and supplies their rating; `keeper` is the opponent's GK.
-// `aim` carries the mode-specific placement: a height for 6-zone, an accuracy
-// for power mode. The keeper always commits to a side (L/C/R) either way.
+// `aim` carries the mode-specific placement: a side + height for 6-zone, or a
+// continuous xShot (0…1 across the goal) for power. The keeper commits to a side.
 function buildUserShot(
-  direction: ShotDirection,
   kickNumber: number,
   shooter: PenaltyTaker,
   keeper: PenaltyTaker,
-  aim: { mode: "sixzone"; height: ShotHeight } | { mode: "power"; accuracy: number }
+  aim: { mode: "sixzone"; side: ShotDirection; height: ShotHeight } | { mode: "power"; aimX: number }
 ): InteractivePenaltyKick {
   const keeperDirection = pickDirection(keeperCenterWeight(keeper.rating), Math.random);
   const result =
     aim.mode === "sixzone"
-      ? resolvePlacedKick(direction, aim.height, keeperDirection, shooter.rating, keeper.rating, Math.random)
-      : resolvePoweredKick(direction, keeperDirection, shooter.rating, keeper.rating, aim.accuracy, Math.random);
+      ? resolvePlacedKick(aim.side, aim.height, keeperDirection, shooter.rating, keeper.rating, Math.random)
+      : resolveAimedKick(aim.aimX, keeperDirection, shooter.rating, keeper.rating, Math.random);
   return {
     round: kickNumber,
     team: "user",
     playerName: shooter.name,
-    userDirection: direction,
-    userHeight: aim.mode === "sixzone" ? aim.height : "low",
+    userDirection: aim.mode === "sixzone" ? aim.side : sideForAimX(aim.aimX),
+    userHeight: aim.mode === "sixzone" ? aim.height : undefined,
+    userAimX: aim.mode === "power" ? aim.aimX : undefined,
     keeperDirection,
     result,
   };
@@ -190,11 +197,10 @@ export default function PenaltyShootout({
   const [selectedMode, setSelectedMode] = useState<PenaltyMode | null>(mode || null);
   // Aim experiment: default to the 6-zone grid; flip to power from the practice strip.
   const [aimMode, setAimMode] = useState<AimMode>("sixzone");
-  // Power-mode meter: a marker sweeps 0→100→0; the shooter locks a side first,
-  // then taps to fire. Accuracy = how close the marker is to the sweet spot (50).
-  const [powerSide, setPowerSide] = useState<ShotDirection | null>(null);
-  const [meter, setMeter] = useState(0);
-  const meterRef = useRef(0);
+  // Power mode: a crosshair sweeps left↔right across the goal (0→100→0); the
+  // shooter taps once and the ball goes wherever it is. `meter` is 0…100 = x%.
+  const [meter, setMeter] = useState(50);
+  const meterRef = useRef(50);
   // The ball/keeper render parked at rest for one painted frame, then `launched`
   // flips and they move — so the CSS transition eases instead of snapping (a
   // value + transition set in the same commit skips the animation).
@@ -328,10 +334,9 @@ export default function PenaltyShootout({
   const flightMs = status.suddenDeath ? 2900 : ANIMATION_DURATION;
 
   const fireUserShot = useCallback(
-    (direction: ShotDirection, aim: { mode: "sixzone"; height: ShotHeight } | { mode: "power"; accuracy: number }) => {
+    (aim: { mode: "sixzone"; side: ShotDirection; height: ShotHeight } | { mode: "power"; aimX: number }) => {
       if (phase !== "waiting" || !isUserTurn) return;
-      setPowerSide(null);
-      const kick = buildUserShot(direction, userKicks + 1, nextUserTaker, effOppKeeper, aim);
+      const kick = buildUserShot(userKicks + 1, nextUserTaker, effOppKeeper, aim);
       setCurrentKick(kick);
       setPhase("kicking");
       window.setTimeout(() => {
@@ -345,34 +350,26 @@ export default function PenaltyShootout({
 
   // 6-zone: a target click carries both a side and a height.
   const handleZoneKick = useCallback(
-    (direction: ShotDirection, height: ShotHeight) => fireUserShot(direction, { mode: "sixzone", height }),
+    (side: ShotDirection, height: ShotHeight) => fireUserShot({ mode: "sixzone", side, height }),
     [fireUserShot]
   );
 
-  // Power mode: first tap picks a side and starts the meter sweeping; second tap
-  // locks the accuracy (marker nearest 50 = perfect) and fires.
-  const startPower = useCallback(
-    (direction: ShotDirection) => {
-      if (phase !== "waiting" || !isUserTurn) return;
-      setPowerSide(direction);
-    },
-    [phase, isUserTurn]
-  );
-  const lockPower = useCallback(() => {
-    if (powerSide === null) return;
-    const accuracy = 1 - Math.abs(meterRef.current - 50) / 50;
-    fireUserShot(powerSide, { mode: "power", accuracy });
-  }, [powerSide, fireUserShot]);
+  // Power mode: one tap places the shot wherever the crosshair is right now.
+  const firePower = useCallback(() => {
+    fireUserShot({ mode: "power", aimX: meterRef.current / 100 });
+  }, [fireUserShot]);
 
-  // Drive the power meter with rAF while a side is armed and we're still waiting.
+  // Sweep the crosshair left↔right while it's the user's power-mode shooting turn.
+  const powerShooterTurn =
+    aimMode === "power" && phase === "waiting" && isUserTurn && (effectiveMode === "shooter" || effectiveMode === "both");
   useEffect(() => {
-    if (powerSide === null || phase !== "waiting") return;
+    if (!powerShooterTurn) return;
     let raf = 0;
     let start: number | null = null;
     const tick = (t: number) => {
       if (start === null) start = t;
-      // ~0.55s per full sweep; triangle wave 0..100..0.
-      const p = ((t - start) / 550) % 2;
+      // ~0.9s per left→right pass; triangle wave 0..100..0.
+      const p = ((t - start) / 900) % 2;
       const v = (p < 1 ? p : 2 - p) * 100;
       meterRef.current = v;
       setMeter(v);
@@ -380,7 +377,7 @@ export default function PenaltyShootout({
     };
     raf = requestAnimationFrame(tick);
     return () => cancelAnimationFrame(raf);
-  }, [powerSide, phase]);
+  }, [powerShooterTurn]);
 
   const handleUserDive = useCallback(
     (direction: ShotDirection) => {
@@ -462,20 +459,34 @@ export default function PenaltyShootout({
     if (!currentKick || restPhase || (flightPhase && !launched)) {
       return { top: `${SPOT.top}%`, left: `${SPOT.left}%` }; // Penalty spot
     }
-    const dir = displayShotDirection;
-    const height: ShotHeight = currentKick.userHeight ?? "low";
-
+    const gh = activeRect.bottom - activeRect.top;
     if (currentKick.result === "saved") {
       return { top: `${keeperLineY - 6}%`, left: `${sideX(currentKick.keeperDirection)}%` };
     }
+
+    // Power mode: the ball goes to the exact xShot the crosshair was tapped at.
+    const ax = currentKick.userAimX;
+    if (ax != null) {
+      const gx = activeRect.left + ax * (activeRect.right - activeRect.left);
+      if (currentKick.result === "missed") {
+        return ax < 0.5
+          ? { top: `${activeRect.top + 4}%`, left: `${activeRect.left - 7}%` }
+          : { top: `${activeRect.top + 4}%`, left: `${activeRect.right + 7}%` };
+      }
+      const edge = Math.min(ax, 1 - ax); // tighter to a post → higher into the corner
+      return { top: `${activeRect.top + (0.22 + edge) * gh}%`, left: `${gx}%` };
+    }
+
+    // 6-zone mode: side + height.
+    const dir = displayShotDirection;
+    const height: ShotHeight = currentKick.userHeight ?? "low";
     if (currentKick.result === "missed") {
       if (height === "high" && dir === "center") return { top: `${activeRect.top - 10}%`, left: "50%" };
       if (dir === "left") return { top: `${activeRect.top + 4}%`, left: `${activeRect.left - 7}%` };
       if (dir === "right") return { top: `${activeRect.top + 4}%`, left: `${activeRect.right + 7}%` };
       return { top: `${activeRect.top - 10}%`, left: "50%" };
     }
-    // GOAL — into the corner. High tucks under the bar, low nestles by the post.
-    const yTop = activeRect.top + (activeRect.bottom - activeRect.top) * (height === "high" ? 0.16 : 0.7);
+    const yTop = activeRect.top + gh * (height === "high" ? 0.16 : 0.7);
     return { top: `${yTop}%`, left: `${sideX(dir)}%` };
   }, [currentKick, restPhase, flightPhase, launched, displayShotDirection, activeRect, sideX, keeperLineY]);
 
@@ -624,12 +635,7 @@ export default function PenaltyShootout({
                     <p className="text-lg font-bold text-white">
                       {(() => {
                         const who = nextUserTaker.name === "You" ? "Your kick" : `${nextUserTaker.name} steps up`;
-                        const how =
-                          aimMode === "power"
-                            ? powerSide === null
-                              ? "pick a side"
-                              : "time the meter"
-                            : "pick your spot";
+                        const how = aimMode === "power" ? "tap to place your shot" : "pick your spot";
                         return `${who} — ${how}!`;
                       })()}
                     </p>
@@ -694,7 +700,7 @@ export default function PenaltyShootout({
                         <button
                           key={m}
                           type="button"
-                          onClick={() => { setAimMode(m); setPowerSide(null); }}
+                          onClick={() => setAimMode(m)}
                           className={`px-3 py-1.5 transition-colors ${aimMode === m ? "bg-gold-500 text-black" : "bg-surface-900 text-gray-400 hover:text-white"}`}
                         >
                           {label}
@@ -805,41 +811,22 @@ export default function PenaltyShootout({
                           </div>
                         )}
 
-                        {/* POWER shooter: pick a side, then lock the accuracy meter */}
-                        {shooterTurn && aimMode === "power" && powerSide === null && (
-                          <div
-                            className="absolute z-30 grid grid-cols-3 overflow-hidden rounded-md ring-1 ring-white/20"
-                            style={{ top: `${activeRect.top}%`, left: `${activeRect.left}%`, width: `${gw}%`, height: `${gh}%` }}
-                          >
-                            {(["left", "center", "right"] as ShotDirection[]).map((side) => (
-                              <button
-                                key={side}
-                                type="button"
-                                onClick={() => startPower(side)}
-                                className="flex items-center justify-center border border-white/10 text-xs font-black uppercase text-white/30 transition-colors hover:bg-gold-400/25 hover:text-white/80"
-                              >
-                                {side}
-                              </button>
-                            ))}
-                          </div>
-                        )}
-                        {shooterTurn && aimMode === "power" && powerSide !== null && (
+                        {/* POWER: a crosshair sweeps across the goal; tap anywhere to shoot where it is */}
+                        {shooterTurn && aimMode === "power" && (
                           <button
                             type="button"
-                            onClick={lockPower}
-                            className="absolute inset-0 z-30 flex cursor-pointer flex-col items-center justify-end pb-[6%]"
-                            aria-label="Lock the shot"
+                            onClick={firePower}
+                            className="absolute z-30 cursor-pointer overflow-hidden rounded-md ring-1 ring-white/20 hover:ring-gold-400/60"
+                            style={{ top: `${activeRect.top}%`, left: `${activeRect.left}%`, width: `${gw}%`, height: `${gh}%` }}
+                            aria-label="Tap to shoot where the crosshair is"
                           >
-                            <div className="relative h-4 w-[70%] overflow-hidden rounded-full border border-white/40 bg-black/60">
-                              {/* sweet spot */}
-                              <div className="absolute inset-y-0 left-[42%] w-[16%] bg-green-500/40" />
-                              {/* marker */}
-                              <div
-                                className="absolute inset-y-0 w-1.5 bg-white"
-                                style={{ left: `calc(${meter.toFixed(1)}% - 3px)` }}
-                              />
+                            <div
+                              className="absolute inset-y-0 w-0.5 bg-gold-400"
+                              style={{ left: `calc(${meter.toFixed(1)}% - 1px)`, boxShadow: "0 0 6px rgba(250,204,21,0.9)" }}
+                            >
+                              <div className="absolute left-1/2 top-1/2 h-5 w-5 -translate-x-1/2 -translate-y-1/2 rounded-full border-2 border-gold-400" />
                             </div>
-                            <span className="mt-2 rounded bg-black/70 px-3 py-1 text-sm font-black uppercase tracking-wide text-gold-400">
+                            <span className="absolute inset-x-0 bottom-1 text-center text-[11px] font-black uppercase tracking-wide text-white/70">
                               Tap to shoot
                             </span>
                           </button>
