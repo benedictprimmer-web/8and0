@@ -117,22 +117,30 @@ export interface RankedEntry {
   rank: number | null;
 }
 
+/** Which ranking to show: tournament runs (score) or best XI drafted (OVR). */
+export type LeaderboardBoard = "runs" | "team";
+
 export interface LeaderboardResponse {
   entries: LeaderboardEntry[];
   total: number;
   mine?: RankedEntry[];
+  board?: LeaderboardBoard;
 }
 
 export interface SubmitResponse {
   entry: LeaderboardEntry;
   rank: number | null;
   total: number;
+  /** Rank on the "Best teams" board (by team OVR). Absent on older backends. */
+  teamRank?: number | null;
+  teamTotal?: number;
 }
 
 export const leaderboardApi = {
-  list: (limit = 200, ids: string[] = []) => {
+  list: (limit = 200, ids: string[] = [], board: LeaderboardBoard = "runs") => {
     const params = new URLSearchParams({ limit: String(limit) });
     if (ids.length > 0) params.set("ids", ids.join(","));
+    if (board === "team") params.set("board", "team");
     return api.get<LeaderboardResponse>(`/api/leaderboard?${params.toString()}`);
   },
   submit: (submission: LeaderboardSubmission) =>

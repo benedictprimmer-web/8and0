@@ -4,6 +4,7 @@ import {
   cleanName,
   containsProfanity,
   sanitiseSubmission,
+  teamScoreOf,
   topScorerOf,
 } from "./leaderboard";
 import { calculateRunScore } from "./scoring";
@@ -231,5 +232,17 @@ describe("sanitiseSubmission anti-cheat (authoritative score)", () => {
     if (low.ok && high.ok) {
       expect(low.submission.score).toBe(high.submission.score);
     }
+  });
+});
+
+describe("teamScoreOf (Best teams board metric)", () => {
+  it("is the team overall, rounded to one decimal", () => {
+    expect(teamScoreOf({ overall: 88.46 })).toBe(88.5);
+    expect(teamScoreOf({ overall: 90 })).toBe(90);
+  });
+
+  it("ranks a higher-OVR team above a lower one regardless of run score", () => {
+    // A weaker XI that went far still sits below a stronger XI on the team board.
+    expect(teamScoreOf({ overall: 91.2 })).toBeGreaterThan(teamScoreOf({ overall: 85.0 }));
   });
 });

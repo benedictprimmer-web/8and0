@@ -1123,13 +1123,18 @@ function GlobalSubmit({ run }: { run: TournamentRun }) {
   }
 
   if (mutation.isSuccess) {
-    const { rank, total } = mutation.data;
+    const { rank, total, teamRank, teamTotal } = mutation.data;
     return (
       <div className="rounded-2xl border border-gold-600/60 bg-gold-500/10 p-5 text-center">
         <Check className="mx-auto text-gold-400" size={28} />
         <p className="mt-2 text-lg font-black text-white">
           {rank ? `You're #${rank} of ${total} globally!` : "Submitted to the global board!"}
         </p>
+        {teamRank && teamTotal ? (
+          <p className="mt-1 text-sm font-bold text-gold-300">
+            Best team: #{teamRank} of {teamTotal} by squad rating
+          </p>
+        ) : null}
         <Link
           to="/leaderboard"
           className="mt-4 inline-flex items-center justify-center gap-2 rounded-xl bg-gold-500 px-5 py-3 text-sm font-black text-black transition-colors hover:bg-gold-400"

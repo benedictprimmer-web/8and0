@@ -179,6 +179,18 @@ export function topScorerOf(run: Pick<TournamentRun, "goalScorers">): TopScorer 
   return best;
 }
 
+/**
+ * The metric for the "Best teams" board: how good the drafted XI is, regardless
+ * of how the tournament went. It's simply the team's overall rating, which
+ * already folds in the club-chemistry bonus (see ratings.ts) — so it rewards
+ * both star power and squad cohesion, and matches the OVR the player watches
+ * tick up while drafting. Kept as a named helper so the client and the server
+ * rank on the exact same value.
+ */
+export function teamScoreOf(submission: Pick<LeaderboardSubmission, "overall">): number {
+  return Math.round(submission.overall * 10) / 10;
+}
+
 export type SubmissionResult =
   | { ok: true; submission: LeaderboardSubmission }
   | { ok: false; reason: string };
