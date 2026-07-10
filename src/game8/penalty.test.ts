@@ -3,8 +3,11 @@ import { seededRandom } from "./random";
 import {
   keeperCenterWeight,
   missChance,
+  missChanceHeight,
   pickDirection,
   resolveKick,
+  resolveAimedKick,
+  resolvePlacedKick,
   saveChanceWhenCorrect,
 } from "./penaltyModel";
 import { REGULATION_KICKS, shootoutStatus } from "./shootoutStatus";
@@ -46,6 +49,36 @@ describe("penalty probability model", () => {
     expect(resolveKick("center", "center", 80, 80, seq(0.99, 0.99))).toBe("goal");
     // miss roll low → missed
     expect(resolveKick("center", "center", 80, 80, seq(0))).toBe("missed");
+  });
+
+  it("6-zone: high shots are unsaveable but skied more often than low ones", () => {
+    const seq = (...vals: number[]) => {
+      let i = 0;
+      return () => vals[i++] ?? 0;
+    };
+    // High corner: keeper matches the side but can't reach it → goal (only a
+    // miss roll is consumed, never a save roll).
+    expect(resolvePlacedKick("left", "high", "left", 80, 80, seq(0.99))).toBe("goal");
+    // Low corner, keeper matches, save roll succeeds → saved.
+    expect(resolvePlacedKick("left", "low", "left", 80, 80, seq(0.99, 0))).toBe("saved");
+    // Aiming high carries a strictly higher miss chance than low.
+    expect(missChanceHeight(80, "high")).toBeGreaterThan(missChanceHeight(80, "low"));
+  });
+
+  it("power mode: placement beats or feeds the keeper by distance from their dive", () => {
+    const seq = (...vals: number[]) => {
+      let i = 0;
+      return () => vals[i++] ?? 0;
+    };
+    // Tuck it into the right corner (x=0.95) while the keeper dived left → out of
+    // reach, so no save roll is even consumed → goal (only the miss roll clears).
+    expect(resolveAimedKick(0.95, "left", 85, 80, seq(0.99))).toBe("goal");
+    // Place it right where the keeper dived (x=0.2 == left dive point), save roll
+    // low → saved.
+    expect(resolveAimedKick(0.2, "left", 85, 80, seq(0.99, 0))).toBe("saved");
+    // Aim flush with the post (x=0) → corner risk pushes miss chance past a mid
+    // roll → dragged wide.
+    expect(resolveAimedKick(0, "center", 85, 80, seq(0.3))).toBe("missed");
   });
 
   it("converts penalties at a realistic ~75% over many kicks", () => {

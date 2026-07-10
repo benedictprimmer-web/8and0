@@ -2690,14 +2690,19 @@ export default function EightZeroGame() {
                 </div>
               )}
 
-              <PitchXI
-                formationId={draftState.formationId}
-                picks={draftState.picks}
-                activeSlotId={draftState.draftMode === "position-first" ? draftState.activeSlotId : undefined}
-                hideRatings={hideDraftRatings}
-                legendSlotId={draftState.legendMode !== "none" ? draftState.picks[0]?.slotId : undefined}
-                liveRatings={draftState.liveRatings}
-              />
+              {/* On mobile the sidebar (with the pitch) stacks below this; on
+                  desktop the pitch lives in the right column so you can see your
+                  XI while picking — so only render the in-column pitch on mobile. */}
+              <div className="xl:hidden">
+                <PitchXI
+                  formationId={draftState.formationId}
+                  picks={draftState.picks}
+                  activeSlotId={draftState.draftMode === "position-first" ? draftState.activeSlotId : undefined}
+                  hideRatings={hideDraftRatings}
+                  legendSlotId={draftState.legendMode !== "none" ? draftState.picks[0]?.slotId : undefined}
+                  liveRatings={draftState.liveRatings}
+                />
+              </div>
             </div>
           )}
         </section>
@@ -2712,6 +2717,21 @@ export default function EightZeroGame() {
             currentMatchIndex={currentMatchIndex}
             tournamentPhase={tournamentPhase}
           />
+          {/* While picking on desktop, keep your XI on the pitch in view here
+              instead of the leaderboard (which returns once the run starts).
+              Only during the draft — not the standalone penalty practice. */}
+          {!run && tournamentPhase !== "practice_penalties" && (
+            <div className="hidden xl:block">
+              <PitchXI
+                formationId={draftState.formationId}
+                picks={draftState.picks}
+                activeSlotId={draftState.draftMode === "position-first" ? draftState.activeSlotId : undefined}
+                hideRatings={hideDraftRatings}
+                legendSlotId={draftState.legendMode !== "none" ? draftState.picks[0]?.slotId : undefined}
+                liveRatings={draftState.liveRatings}
+              />
+            </div>
+          )}
           {run && (tournamentPhase === "ready" || tournamentPhase === "live" || tournamentPhase === "complete") && (
             <TournamentBracket
               run={run}
@@ -2719,7 +2739,9 @@ export default function EightZeroGame() {
               tournamentPhase={tournamentPhase}
             />
           )}
-          <section className="stat-card">
+          {/* Desktop hides the leaderboard while picking so the pitch above can
+              take its place; mobile keeps it (the pitch is in the left column). */}
+          <section className={`stat-card${!run && tournamentPhase !== "practice_penalties" ? " xl:hidden" : ""}`}>
             <div className="flex items-center justify-between">
               <div>
                 <p className="section-label">Personal best</p>
