@@ -31,17 +31,21 @@ function prefersReducedMotion(): boolean {
 }
 
 interface CelebrationClipProps {
-  /** player_id of the scorer; a clip plays only if the manifest has an entry. */
+  /** player_id whose clip to play; renders nothing unless the manifest has it. */
   playerId: number;
+  /** Caption under the clip, e.g. the scorer's name or "STAR PLAYER". */
+  label?: string;
 }
 
 /**
- * Presentational goal-celebration overlay: a looping pixel-art clip for players
- * that have one in `public/celebrations/celebrations.json` (keyed by player_id).
- * Renders nothing for players without a clip. Respects prefers-reduced-motion by
- * showing the static poster instead of the video. Never intercepts clicks.
+ * Full-screen pixel-art celebration takeover for players that have a clip in
+ * `public/celebrations/celebrations.json` (keyed by player_id). A dark scrim
+ * (identical in light and dark themes) with the looping clip and a caption
+ * centred on top. Renders nothing for players without a clip. Respects
+ * prefers-reduced-motion by showing the static poster. Never intercepts clicks
+ * (pointer-events-none) so the game underneath keeps running.
  */
-export default function CelebrationClip({ playerId }: CelebrationClipProps) {
+export default function CelebrationClip({ playerId, label }: CelebrationClipProps) {
   const [clip, setClip] = useState<ClipEntry | null>(manifestCache?.[String(playerId)] ?? null);
 
   useEffect(() => {
@@ -57,15 +61,13 @@ export default function CelebrationClip({ playerId }: CelebrationClipProps) {
   if (!clip) return null;
 
   const reduceMotion = prefersReducedMotion();
-
-  // The sprite is rendered on an opaque light background, so it's framed as a
-  // rounded "celebration card" that reads intentionally on any theme (rather
-  // than a raw white rectangle floating over the dark UI).
-  const media = "block h-40 w-auto sm:h-48";
+  // The sprite has an opaque light background, so it's framed as a rounded card
+  // that reads intentionally over the dark scrim on any theme.
+  const media = "block h-56 w-auto sm:h-72";
   const mediaStyle = { imageRendering: "pixelated" as const };
 
   return (
-    <div className="pointer-events-none absolute inset-0 z-20 flex items-center justify-center">
+    <div className="animate-fade-in pointer-events-none fixed inset-0 z-50 flex flex-col items-center justify-center gap-5 bg-black/70 p-4">
       <div className="animate-goal-pop overflow-hidden rounded-2xl border border-black/10 shadow-2xl ring-1 ring-white/10">
         {reduceMotion ? (
           <img src={clip.poster} alt={`${clip.name} celebrates`} style={mediaStyle} className={media} />
@@ -83,6 +85,11 @@ export default function CelebrationClip({ playerId }: CelebrationClipProps) {
           />
         )}
       </div>
+      {label && (
+        <p className="animate-fade-up text-center text-3xl font-black uppercase tracking-wide text-gold-400 drop-shadow-[0_2px_12px_rgba(0,0,0,0.7)] sm:text-4xl">
+          {label}
+        </p>
+      )}
     </div>
   );
 }
