@@ -27,7 +27,7 @@ import LiveMatch from "../components/LiveMatch";
 import PenaltyShootout from "../components/PenaltyShootout";
 import HigherLower from "../components/HigherLower";
 import TournamentBracket from "../components/TournamentBracket";
-import { buildEightZeroData, type RawPlayer, type RawTeam } from "../game8/data";
+import { buildAllTimeData, buildEightZeroData, type RawPlayer, type RawTeam } from "../game8/data";
 import { selectKeeper, selectPenaltyTakers } from "../game8/penaltyLineup";
 import {
   autofillDraft,
@@ -92,6 +92,23 @@ const DEFAULT_OPTIONS: DraftOptions = {
   era: 2026,
 };
 
+// Legends as raw players, for the Dream Team pool (spin a nation → its all-time
+// greats appear alongside its era players). Category → a position token
+// buildEightZeroData maps, so CAM legends (Zidane) don't get filtered out.
+const CATEGORY_POSITION: Record<string, string> = { GK: "GK", DEF: "DF", MID: "MF", FWD: "FW" };
+const LEGEND_RAW_PLAYERS: RawPlayer[] = LEGENDS.map((l, i) => ({
+  player_id: 800000 + i,
+  team_id: 0, // re-pointed to the nation team by buildAllTimeData
+  fifa_code: l.nation,
+  name: l.name,
+  position: CATEGORY_POSITION[l.category],
+  is_goalkeeper: l.category === "GK",
+  club_name: l.club,
+  ea_overall: l.rating,
+  aura_composite: Math.round((l.rating / 100) * 1000) / 1000,
+  shirt_number: 10,
+}));
+
 // Legend id → display name (ids like "robertocarlos" should never reach the UI).
 const LEGEND_NAME = new Map(LEGENDS.map((l) => [l.id, l.name]));
 function legendLabel(mode: LegendMode): string {
@@ -104,6 +121,7 @@ const ERAS: Array<{ id: Era; label: string; detail: string }> = [
   { id: 2022, label: "2022", detail: "Qatar" },
   { id: 2018, label: "2018", detail: "Russia" },
   { id: 2014, label: "2014", detail: "Brazil" },
+  { id: "all-time", label: "All-Time", detail: "Dream Team" },
 ];
 
 const DIFFICULTIES: Array<{
@@ -737,8 +755,12 @@ function SetupScreen({
 
       <section className="rounded-2xl border border-surface-700 bg-surface-panel p-5 shadow-2xl shadow-black/20">
         <p className="section-label text-base tracking-[0.18em]">Era</p>
-        <p className="mt-1 text-sm text-gray-500">Draft from a past World Cup — real squads, era ratings, era opponents.</p>
-        <div className="mt-4 grid grid-cols-4 gap-2">
+        <p className="mt-1 text-sm text-gray-500">
+          {options.era === "all-time"
+            ? "Dream Team: spin any nation and draft its all-time greats — legends included. Cross-era ratings are approximate."
+            : "Draft from a past World Cup — real squads, era ratings, era opponents."}
+        </p>
+        <div className="mt-4 grid grid-cols-3 gap-2 sm:grid-cols-5">
           {ERAS.map((era) => (
             <OptionButton
               key={era.id}
@@ -1509,15 +1531,15 @@ export default function EightZeroGame() {
     const ht = historicalTeamsQuery.data;
     const hp = historicalPlayersQuery.data;
     if (ht && hp) {
+      const sources = [{ teams: teamsQuery.data, players: playersQuery.data }];
       for (const year of [2014, 2018, 2022] as const) {
-        map.set(
-          year,
-          buildEightZeroData(
-            ht.filter((t) => t.tournament_year === year) as RawTeam[],
-            hp.filter((p) => p.tournament_year === year) as RawPlayer[]
-          )
-        );
+        const teams = ht.filter((t) => t.tournament_year === year) as RawTeam[];
+        const players = hp.filter((p) => p.tournament_year === year) as RawPlayer[];
+        map.set(year, buildEightZeroData(teams, players));
+        sources.push({ teams, players });
       }
+      // Dream Team: every era + legends merged into one nation-keyed pool.
+      map.set("all-time", buildAllTimeData(sources, LEGEND_RAW_PLAYERS));
     }
     return map;
   }, [teamsQuery.data, playersQuery.data, historicalTeamsQuery.data, historicalPlayersQuery.data]);
@@ -1726,8 +1748,12 @@ export default function EightZeroGame() {
     const sub = superSubPlayer(next);
     // Fresh run starts with no shootout overrides.
     setPenOverrides({});
+    // Dream Team drafts from an all-nation pool, but faces the 2026 field — the
+    // merged nation "teams" aren't a real opponent bracket.
+    const opponentTeams =
+      next.era === "all-time" ? dataByEra?.get(2026)?.teams ?? gameData.teams : gameData.teams;
     const nextRun = simulateTournamentRun({
-      teams: gameData.teams,
+      teams: opponentTeams,
       picks: next.picks,
       ratings,
       seed: next.seed,
@@ -1765,7 +1791,7 @@ export default function EightZeroGame() {
     if (!match) return;
     const sub = superSubPlayer(draftState);
     const rebuilt = simulateTournamentRun({
-      teams: gameData.teams,
+      teams: run.era === "all-time" ? dataByEra?.get(2026)?.teams ?? gameData.teams : gameData.teams,
       picks: run.picks,
       ratings: run.ratings,
       seed: run.seed,
@@ -1837,7 +1863,7 @@ export default function EightZeroGame() {
     setPenOverrides(nextOverrides);
 
     const rebuilt = simulateTournamentRun({
-      teams: gameData.teams,
+      teams: run.era === "all-time" ? dataByEra?.get(2026)?.teams ?? gameData.teams : gameData.teams,
       picks: run.picks,
       ratings: run.ratings,
       seed: run.seed,

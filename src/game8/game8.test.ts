@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { buildEightZeroData, mapPositionCategory, type RawPlayer, type RawTeam } from "./data";
+import { buildAllTimeData, buildEightZeroData, mapPositionCategory, type RawPlayer, type RawTeam } from "./data";
 import {
   canPickPlayer,
   createDraftState,
@@ -540,6 +540,41 @@ describe("8-0 legend mode", () => {
     }
     expect(state.picks).toHaveLength(11);
     expect(state.picks.some((p) => p.player.name === "Miroslav Klose")).toBe(true);
+  });
+});
+
+describe("8-0 Dream Team (all-time pool)", () => {
+  const rawTeam = (id: number, code: string, name: string, elo: number): RawTeam => ({
+    team_id: id, name, fifa_code: code, wc2026_group: null, fifa_ranking: null, elo, qualified_2026: true,
+  });
+  const rawPlayer = (id: number, teamId: number, code: string, name: string, pos: string, rating: number): RawPlayer => ({
+    player_id: id, team_id: teamId, fifa_code: code, name, position: pos, is_goalkeeper: pos === "GK",
+    club_name: null, ea_overall: rating, aura_composite: 0.5, shirt_number: null,
+  });
+
+  it("merges DEU/GER into one nation, dedupes to the best rating, and folds in legends", () => {
+    const sources = [
+      // 2026 Germany (GER) + a 2014 Germany (DEU) — must merge into one nation.
+      { teams: [rawTeam(1, "GER", "Germany", 1980)], players: [rawPlayer(1, 1, "GER", "Kai Havertz", "FW", 85), rawPlayer(2, 1, "GER", "Manuel Neuer", "GK", 88)] },
+      { teams: [rawTeam(9001, "DEU", "Germany", 2046)], players: [rawPlayer(1001, 9001, "DEU", "Miroslav Klose", "FW", 84), rawPlayer(1002, 9001, "DEU", "Manuel Neuer", "GK", 90)] },
+    ];
+    const legend = rawPlayer(800000, 0, "DEU", "Franz Beckenbauer", "DF", 92);
+    const data = buildAllTimeData(sources, [legend]);
+
+    // One Germany team, carrying its peak elo.
+    const germanys = data.teams.filter((t) => t.name === "Germany");
+    expect(germanys).toHaveLength(1);
+    expect(germanys[0].elo).toBe(2046);
+
+    const squad = data.playersByTeam.get(germanys[0].teamId) ?? [];
+    const names = squad.map((p) => p.name);
+    // Neuer appears in both eras → deduped to the higher (90), not two entries.
+    expect(names.filter((n) => n === "Manuel Neuer")).toHaveLength(1);
+    expect(squad.find((p) => p.name === "Manuel Neuer")?.rating).toBe(90);
+    // Legend folded in despite DEU code + CAM-style position mapping upstream.
+    expect(names).toContain("Franz Beckenbauer");
+    // Havertz (GER) and Klose (DEU) both present under the merged nation.
+    expect(names).toEqual(expect.arrayContaining(["Kai Havertz", "Miroslav Klose"]));
   });
 });
 
