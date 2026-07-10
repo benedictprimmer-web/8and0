@@ -2242,6 +2242,7 @@ export default function EightZeroGame() {
               opponent={run.matches[currentMatchIndex]?.opponent ?? run.matches[0].opponent}
               result={run.matches[currentMatchIndex]}
               events={allMatchEvents[currentMatchIndex] ?? []}
+              scorerIds={Object.fromEntries(run.picks.map((pick) => [pick.player.name, pick.player.id]))}
               legendMode={run.legendMode}
               superSubName={run.superSub ? run.superSubName : null}
               canBringOnSub={

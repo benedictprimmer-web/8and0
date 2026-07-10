@@ -1,6 +1,7 @@
 import { useEffect, useState, useRef, useCallback } from "react";
 import { Zap } from "lucide-react";
 import Flag from "../components/Flag";
+import CelebrationClip from "../components/CelebrationClip";
 import type { EightZeroTeam, LegendMode, MatchEvent, MatchResult } from "../game8/types";
 
 interface LiveMatchProps {
@@ -13,6 +14,8 @@ interface LiveMatchProps {
   superSubName?: string | null;
   canBringOnSub?: boolean;
   onBringOnSub?: () => void;
+  /** scorer name → player_id, for looking up a celebration clip on a user goal. */
+  scorerIds?: Record<string, number>;
 }
 
 const BASE_TICK_MS = 600;
@@ -76,7 +79,7 @@ function EventRow({ event }: { event: MatchEvent }) {
   );
 }
 
-export default function LiveMatch({ stage, opponent, result, events, onFinished, legendMode, superSubName, canBringOnSub, onBringOnSub }: LiveMatchProps) {
+export default function LiveMatch({ stage, opponent, result, events, onFinished, legendMode, superSubName, canBringOnSub, onBringOnSub, scorerIds }: LiveMatchProps) {
   const [currentMinute, setCurrentMinute] = useState(0);
   const [userScore, setUserScore] = useState(0);
   const [oppScore, setOppScore] = useState(0);
@@ -85,6 +88,9 @@ export default function LiveMatch({ stage, opponent, result, events, onFinished,
   const [isFinished, setIsFinished] = useState(false);
   const [speed, setSpeed] = useState<Speed>(1);
   const [goalFlash, setGoalFlash] = useState(false);
+  // Celebration clip overlay — set to the scorer's player_id when a user goal
+  // has a clip; `key` re-triggers the overlay when the same player scores twice.
+  const [celebration, setCelebration] = useState<{ playerId: number; key: number } | null>(null);
   // Which scoreboard digit just changed (drives the score-pop pulse).
   const [scorePop, setScorePop] = useState<"user" | "opponent" | null>(null);
   // Transient floating "+1 GOAL" callout for user goals only. `key` re-triggers
@@ -92,6 +98,9 @@ export default function LiveMatch({ stage, opponent, result, events, onFinished,
   const [goalPop, setGoalPop] = useState<{ name: string; key: number } | null>(null);
   const intervalRef = useRef<number | null>(null);
   const logRef = useRef<HTMLDivElement | null>(null);
+  // Read inside `tick` without re-subscribing the interval when the map changes.
+  const scorerIdsRef = useRef(scorerIds);
+  scorerIdsRef.current = scorerIds;
 
   const eventsByMinute = useRef(new Map<number, MatchEvent[]>());
 
@@ -135,6 +144,10 @@ export default function LiveMatch({ stage, opponent, result, events, onFinished,
               setScorePop("user");
               // Only user goals get the celebratory floating callout.
               setGoalPop({ name: event.playerName ?? "GOAL", key: Date.now() });
+              const scorerId = event.playerName ? scorerIdsRef.current?.[event.playerName] : undefined;
+              if (scorerId !== undefined) {
+                setCelebration({ playerId: scorerId, key: Date.now() });
+              }
             } else {
               setOppScore((s) => s + 1);
               setScorePop("opponent");
@@ -162,6 +175,13 @@ export default function LiveMatch({ stage, opponent, result, events, onFinished,
     intervalRef.current = window.setInterval(tick, BASE_TICK_MS / speed);
     return clearTimer;
   }, [clearTimer, tick, speed]);
+
+  // Celebration clip auto-dismisses after ~2.8s.
+  useEffect(() => {
+    if (!celebration) return;
+    const timer = window.setTimeout(() => setCelebration(null), 2800);
+    return () => window.clearTimeout(timer);
+  }, [celebration]);
 
   function skipToHalf() {
     const targetMinute = currentMinute < 45 ? 45 : 90;
@@ -199,7 +219,8 @@ export default function LiveMatch({ stage, opponent, result, events, onFinished,
   const speeds: Speed[] = [1, 2, 5, 10];
 
   return (
-    <div className="stat-card animate-fade-up">
+    <div className="stat-card animate-fade-up relative">
+      {celebration && <CelebrationClip key={celebration.key} playerId={celebration.playerId} />}
       <div className="text-center mb-4">
         <p className="section-label text-sm">{stage}</p>
       </div>
