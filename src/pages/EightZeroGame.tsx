@@ -2713,8 +2713,9 @@ export default function EightZeroGame() {
             tournamentPhase={tournamentPhase}
           />
           {/* While picking on desktop, keep your XI on the pitch in view here
-              instead of the leaderboard (which returns once the run starts). */}
-          {!run && (
+              instead of the leaderboard (which returns once the run starts).
+              Only during the draft — not the standalone penalty practice. */}
+          {!run && tournamentPhase !== "practice_penalties" && (
             <div className="hidden xl:block">
               <PitchXI
                 formationId={draftState.formationId}
@@ -2735,7 +2736,7 @@ export default function EightZeroGame() {
           )}
           {/* Desktop hides the leaderboard while picking so the pitch above can
               take its place; mobile keeps it (the pitch is in the left column). */}
-          <section className={`stat-card${!run ? " xl:hidden" : ""}`}>
+          <section className={`stat-card${!run && tournamentPhase !== "practice_penalties" ? " xl:hidden" : ""}`}>
             <div className="flex items-center justify-between">
               <div>
                 <p className="section-label">Personal best</p>
