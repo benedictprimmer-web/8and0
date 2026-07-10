@@ -18,6 +18,10 @@ export interface RawPlayer {
   position: string;
   is_goalkeeper: boolean;
   club_name: string | null;
+  // Career clubs unioned across editions (snapshot first). Set by buildAllTimeData
+  // and for legends; absent for single-edition data.
+  club_history?: string[];
+  is_legend?: boolean;
   ea_overall: number | null;
   aura_composite: number | null;
   shirt_number: number | null;
@@ -91,11 +95,21 @@ export function buildAllTimeData(
   const nameKey = (name: string) =>
     name.normalize("NFD").replace(/[̀-ͯ]/g, "").replace(/[^a-z0-9]+/gi, " ").trim().toLowerCase();
   const best = new Map<string, RawPlayer>();
+  // Every club each player wore across editions (+ authored legend histories),
+  // so career-club chemistry can link players who shared a club at any point.
+  const clubsSeen = new Map<string, Set<string>>();
+  // Legend-ness is sticky: if any edition of a player is a legend, the merged
+  // player is too (else a tied historical version would drop the boost).
+  const legendKeys = new Set<string>();
   const allPlayers = [...sources.flatMap((s) => s.players), ...extraPlayers];
   for (const p of allPlayers) {
     if (typeof p.ea_overall !== "number") continue;
     const nation = canonNation(p.fifa_code);
     const key = `${nation}:${nameKey(p.name)}`;
+    const clubs = clubsSeen.get(key) ?? new Set<string>();
+    for (const c of [p.club_name, ...(p.club_history ?? [])]) if (c) clubs.add(c);
+    clubsSeen.set(key, clubs);
+    if (p.is_legend) legendKeys.add(key);
     const prev = best.get(key);
     if (!prev || (p.ea_overall ?? 0) > (prev.ea_overall ?? 0)) best.set(key, p);
   }
@@ -119,11 +133,15 @@ export function buildAllTimeData(
   }
 
   const players: RawPlayer[] = [];
-  for (const p of best.values()) {
+  for (const [key, p] of best) {
     const nation = canonNation(p.fifa_code);
     const teamId = nationTeamId.get(nation);
     if (teamId === undefined) continue; // nation had no elo (shouldn't happen)
-    players.push({ ...p, team_id: teamId, fifa_code: nation });
+    // Snapshot club (the best version's) first, then the rest of the career.
+    const clubs = clubsSeen.get(key) ?? new Set<string>();
+    const history = [p.club_name, ...clubs].filter((c): c is string => !!c);
+    const clubHistory = [...new Set(history)];
+    players.push({ ...p, team_id: teamId, fifa_code: nation, club_history: clubHistory, is_legend: legendKeys.has(key) });
   }
 
   return buildEightZeroData(teams, players);
@@ -159,6 +177,8 @@ export function buildEightZeroData(rawTeams: RawTeam[], rawPlayers: RawPlayer[])
         category,
         rating: player.ea_overall,
         clubName: player.club_name,
+        clubHistory: player.club_history ?? (player.club_name ? [player.club_name] : []),
+        isLegend: player.is_legend ?? false,
         aura: player.aura_composite,
         shirtNumber: player.shirt_number,
       };
