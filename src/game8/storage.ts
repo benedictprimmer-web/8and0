@@ -1,4 +1,6 @@
 import type { TournamentRun } from "./types";
+import { chemistryBonus } from "./chemistry";
+import { topScorerOf, type TopScorer } from "./leaderboard";
 
 export const HISTORY_KEY = "eightZero:history:v1";
 export const PLAYER_NAME_KEY = "eightZero:playerName";
@@ -90,6 +92,11 @@ export function loadHistory(): TournamentRun[] {
 }
 
 export function saveRun(run: TournamentRun): TournamentRun[] {
+  // Also record it in the permanent, complete run log (every run ever played,
+  // with its timestamp). The detailed history below stays capped for the rich
+  // results view; the log is the full record.
+  logRun(run);
+
   // De-duplicate by run id so re-saving the same run (e.g. after an interactive
   // penalty shootout updates the result) replaces the earlier entry instead of
   // creating a duplicate.
@@ -97,6 +104,93 @@ export function saveRun(run: TournamentRun): TournamentRun[] {
   const history = sortRuns([run, ...others]).slice(0, 12);
   window.localStorage.setItem(HISTORY_KEY, JSON.stringify(history));
   return history;
+}
+
+// ── Complete run log ─────────────────────────────────────────────────────────
+// A permanent, append-only record of EVERY run this device has played, with the
+// time it happened. Unlike `history` (top 12 by score, full detail) this keeps a
+// slim ~1 KB summary per run so thousands fit comfortably under the localStorage
+// quota. Newest-first, de-duplicated by run id.
+
+export const RUN_LOG_KEY = "eightZero:runLog:v1";
+// Generous safety cap so the log can never blow the ~5 MB localStorage quota.
+// At ~1 KB/entry this is ~2 MB; far more runs than anyone will realistically play.
+const RUN_LOG_LIMIT = 2000;
+
+export interface RunLogEntry {
+  id: string;
+  seed: string;
+  /** ISO timestamp of when the run was played. */
+  createdAt: string;
+  score: number;
+  stageReached: string;
+  record: string;
+  wins: number;
+  draws: number;
+  losses: number;
+  overall: number;
+  chemistry: number;
+  difficulty: string;
+  era: string;
+  draftMode: string;
+  legendMode: string;
+  blindMode: boolean;
+  formationId: string;
+  formationLabel: string;
+  topScorer: TopScorer | null;
+  xi: string[];
+}
+
+/** Project a full run down to the slim, permanent log shape. Pure. */
+export function toRunLogEntry(run: TournamentRun): RunLogEntry {
+  return {
+    id: run.id,
+    seed: run.seed,
+    createdAt: run.createdAt,
+    score: Math.max(0, Math.round(run.score)),
+    stageReached: run.stageReached,
+    record: run.record,
+    wins: run.wins,
+    draws: run.draws,
+    losses: run.losses,
+    overall: Math.round(run.ratings.overall * 10) / 10,
+    chemistry: Math.round(chemistryBonus(run.picks, run.chemistry) * 10) / 10,
+    difficulty: run.difficulty,
+    era: String(run.era),
+    draftMode: run.draftMode,
+    legendMode: run.legendMode,
+    blindMode: run.blindMode,
+    formationId: run.formationId,
+    formationLabel: run.formationLabel,
+    topScorer: topScorerOf(run),
+    xi: run.picks.map((pick) => pick.player.name),
+  };
+}
+
+/** All runs this device has played, newest-first. */
+export function loadRunLog(): RunLogEntry[] {
+  try {
+    const raw = window.localStorage.getItem(RUN_LOG_KEY);
+    if (!raw) return [];
+    const parsed = JSON.parse(raw);
+    return Array.isArray(parsed) ? (parsed as RunLogEntry[]) : [];
+  } catch {
+    return [];
+  }
+}
+
+/** Append (or update, by id) a completed run in the permanent log. Newest-first. */
+export function logRun(run: TournamentRun): RunLogEntry[] {
+  try {
+    const entry = toRunLogEntry(run);
+    const others = loadRunLog().filter((item) => item.id !== entry.id);
+    const next = [entry, ...others].slice(0, RUN_LOG_LIMIT);
+    window.localStorage.setItem(RUN_LOG_KEY, JSON.stringify(next));
+    return next;
+  } catch {
+    // ignore storage failures (private mode, quota, etc.)
+    return loadRunLog();
+  }
 }
 
 export function shareText(run: TournamentRun): string {
