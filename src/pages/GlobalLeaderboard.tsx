@@ -2,7 +2,12 @@ import { useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { ArrowLeft, ChevronRight, Globe, RefreshCw, Trophy, Users, X } from "lucide-react";
-import { leaderboardApi, type LeaderboardResponse, type RankedEntry } from "../api/client";
+import {
+  leaderboardApi,
+  type LeaderboardBoard,
+  type LeaderboardResponse,
+  type RankedEntry,
+} from "../api/client";
 import { loadMyGlobalEntries } from "../game8/storage";
 import type { LeaderboardEntry } from "../game8/leaderboard";
 
@@ -30,11 +35,13 @@ function Row({
   entry,
   rank,
   isOwn,
+  board,
   onSelect,
 }: {
   entry: LeaderboardEntry;
   rank: number;
   isOwn: boolean;
+  board: LeaderboardBoard;
   onSelect: () => void;
 }) {
   return (
@@ -68,10 +75,21 @@ function Row({
         </p>
       </div>
       <div className="flex flex-col items-end">
-        <span className="font-black text-gold-400 tabular-nums">{entry.score} pts</span>
-        <span className="text-[11px] font-bold text-gray-500 tabular-nums">
-          {Math.round(entry.overall)} OVR
-        </span>
+        {board === "team" ? (
+          <>
+            <span className="font-black text-gold-400 tabular-nums">{entry.overall} OVR</span>
+            <span className="text-[11px] font-bold text-emerald-400 tabular-nums">
+              +{entry.chemistry ?? 0} chem
+            </span>
+          </>
+        ) : (
+          <>
+            <span className="font-black text-gold-400 tabular-nums">{entry.score} pts</span>
+            <span className="text-[11px] font-bold text-gray-500 tabular-nums">
+              {Math.round(entry.overall)} OVR
+            </span>
+          </>
+        )}
       </div>
       <ChevronRight size={16} className="text-gray-600" />
     </button>
@@ -140,9 +158,14 @@ function TeamDetailModal({
           </div>
         </div>
 
-        <div className="mt-5 grid grid-cols-2 gap-2 sm:grid-cols-4">
+        <div className="mt-5 grid grid-cols-2 gap-2 sm:grid-cols-3">
+          <StatChip
+            label="Squad rating"
+            value={`${Math.round((entry.overall - (entry.chemistry ?? 0)) * 10) / 10}`}
+          />
+          <StatChip label="Chemistry" value={`+${entry.chemistry ?? 0}`} />
+          <StatChip label="Combined OVR" value={`${entry.overall}`} />
           <StatChip label="Formation" value={entry.formationLabel} />
-          <StatChip label="Overall" value={`${Math.round(entry.overall)}`} />
           <StatChip label="Record" value={`${entry.wins}-${entry.draws}-${entry.losses}`} />
           <StatChip label="Difficulty" value={titleCase(entry.difficulty)} />
         </div>
@@ -196,15 +219,21 @@ function bestRanked(mine: RankedEntry[]): RankedEntry | null {
   return best;
 }
 
+const BOARDS: Array<{ id: LeaderboardBoard; label: string }> = [
+  { id: "runs", label: "Best runs" },
+  { id: "team", label: "Best teams" },
+];
+
 export default function GlobalLeaderboard() {
+  const [board, setBoard] = useState<LeaderboardBoard>("runs");
   const [filter, setFilter] = useState<FilterId>("all");
   const [selected, setSelected] = useState<LeaderboardEntry | null>(null);
   const mySeeds = useMemo(() => loadMyGlobalEntries().map((entry) => entry.seed), []);
   const mySeedSet = useMemo(() => new Set(mySeeds), [mySeeds]);
 
   const query = useQuery<LeaderboardResponse>({
-    queryKey: ["global-leaderboard", mySeeds],
-    queryFn: () => leaderboardApi.list(200, mySeeds),
+    queryKey: ["global-leaderboard", board, mySeeds],
+    queryFn: () => leaderboardApi.list(200, mySeeds, board),
     staleTime: 30_000,
     retry: 2,
     placeholderData: { entries: [], total: 0, mine: [] },
@@ -241,7 +270,9 @@ export default function GlobalLeaderboard() {
             Global leaderboard
           </h1>
           <p className="mt-2 text-base text-gray-400">
-            The best 8-0 World Cup runs from players everywhere.
+            {board === "team"
+              ? "The highest-rated XIs drafted by players everywhere — build the best team."
+              : "The best 8-0 World Cup runs from players everywhere."}
           </p>
         </div>
         <button
@@ -254,12 +285,34 @@ export default function GlobalLeaderboard() {
         </button>
       </div>
 
+      <div className="grid grid-cols-2 gap-2 rounded-xl border border-surface-700 bg-surface-950 p-1">
+        {BOARDS.map((item) => (
+          <button
+            key={item.id}
+            type="button"
+            onClick={() => setBoard(item.id)}
+            aria-pressed={board === item.id}
+            className={`rounded-lg px-4 py-2.5 text-sm font-black transition-colors ${
+              board === item.id
+                ? "bg-gold-500 text-black"
+                : "text-gray-400 hover:text-white"
+            }`}
+          >
+            {item.label}
+          </button>
+        ))}
+      </div>
+
       <section className="stat-card">
         <div className="flex flex-wrap items-center justify-between gap-3">
           <div>
-            <p className="section-label">Rankings</p>
+            <p className="section-label">{board === "team" ? "Best teams" : "Rankings"}</p>
             <h2 className="mt-1 text-2xl font-black text-white">
-              {query.data ? `${query.data.total} runs` : "Top runs"}
+              {query.data
+                ? `${query.data.total} ${board === "team" ? "teams" : "runs"}`
+                : board === "team"
+                  ? "Top teams"
+                  : "Top runs"}
             </h2>
           </div>
           <div className="flex flex-wrap gap-2">
@@ -296,13 +349,15 @@ export default function GlobalLeaderboard() {
 
           {!query.isLoading && !query.isError && myBest && !myBestVisible && (
             <div className="rounded-lg border border-gold-600 bg-gold-500/10 px-3 py-3">
-              <p className="text-xs font-bold uppercase tracking-wide text-gold-400">Your best run</p>
+              <p className="text-xs font-bold uppercase tracking-wide text-gold-400">
+                {board === "team" ? "Your best team" : "Your best run"}
+              </p>
               <div className="mt-1 flex items-center justify-between gap-3">
                 <p className="min-w-0 truncate text-sm font-bold text-white">
                   #{myBest.rank} · {myBest.entry.name} · {myBest.entry.stageReached}
                 </p>
                 <span className="flex-shrink-0 font-black text-gold-400 tabular-nums">
-                  {myBest.entry.score} pts
+                  {board === "team" ? `${myBest.entry.overall} OVR` : `${myBest.entry.score} pts`}
                 </span>
               </div>
             </div>
@@ -316,13 +371,14 @@ export default function GlobalLeaderboard() {
                 entry={entry}
                 rank={globalRankById.get(entry.id) ?? 0}
                 isOwn={mySeedSet.has(entry.id)}
+                board={board}
                 onSelect={() => setSelected(entry)}
               />
             ))}
 
           {!query.isLoading && !query.isError && filtered.length === 0 && (
             <div className="rounded-lg border border-surface-700 bg-surface-800 px-4 py-6 text-center text-sm text-gray-500">
-              No runs on the global board for this filter yet. Be the first!
+              No {board === "team" ? "teams" : "runs"} on the global board for this filter yet. Be the first!
             </div>
           )}
         </div>

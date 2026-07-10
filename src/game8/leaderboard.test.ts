@@ -4,6 +4,7 @@ import {
   cleanName,
   containsProfanity,
   sanitiseSubmission,
+  teamScoreOf,
   topScorerOf,
 } from "./leaderboard";
 import { calculateRunScore } from "./scoring";
@@ -145,6 +146,19 @@ describe("buildSubmission", () => {
     const result = buildSubmission(makeRun(), "shithead");
     expect(result.ok).toBe(false);
   });
+
+  it("records a zero chemistry bonus when chemistry mode is off", () => {
+    const result = buildSubmission(makeRun(), "Ben");
+    expect(result.ok).toBe(true);
+    if (result.ok) expect(result.submission.chemistry).toBe(0);
+  });
+
+  it("records a positive chemistry bonus for clubmates when enabled", () => {
+    // Both fixture picks share "Test FC", so enabling chemistry links them.
+    const result = buildSubmission({ ...makeRun(), chemistry: true }, "Ben");
+    expect(result.ok).toBe(true);
+    if (result.ok) expect(result.submission.chemistry).toBeGreaterThan(0);
+  });
 });
 
 describe("sanitiseSubmission (server-side)", () => {
@@ -231,5 +245,17 @@ describe("sanitiseSubmission anti-cheat (authoritative score)", () => {
     if (low.ok && high.ok) {
       expect(low.submission.score).toBe(high.submission.score);
     }
+  });
+});
+
+describe("teamScoreOf (Best teams board metric)", () => {
+  it("is the team overall, rounded to one decimal", () => {
+    expect(teamScoreOf({ overall: 88.46 })).toBe(88.5);
+    expect(teamScoreOf({ overall: 90 })).toBe(90);
+  });
+
+  it("ranks a higher-OVR team above a lower one regardless of run score", () => {
+    // A weaker XI that went far still sits below a stronger XI on the team board.
+    expect(teamScoreOf({ overall: 91.2 })).toBeGreaterThan(teamScoreOf({ overall: 85.0 }));
   });
 });
