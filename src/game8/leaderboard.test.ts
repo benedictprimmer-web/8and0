@@ -57,6 +57,7 @@ function makeRun(overrides: Partial<TournamentRun> = {}): TournamentRun {
     liveRatings: false,
     chemistry: false,
     superSub: false,
+    era: 2026,
     superSubName: null,
     score: 42,
     record: "8-0-0",

@@ -97,9 +97,12 @@ export function resolveLegend(
   if (legend.live) {
     const match = legend.match;
     const player = data.players.find((p) => p.teamCode === legend.nation && (match ? match(p.name) : false));
-    if (!player) return null;
-    const team = data.teamById.get(player.teamId) ?? legendTeam(legend);
-    return { player, team };
+    if (player) {
+      const team = data.teamById.get(player.teamId) ?? legendTeam(legend);
+      return { player, team };
+    }
+    // Live legend not in this era's data (e.g. Messi in a 2014 draft) — fall
+    // through to synthesis from the table so the pick still locks.
   }
   const team = legendTeam(legend);
   const player: EightZeroPlayer = {

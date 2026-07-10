@@ -439,6 +439,7 @@ describe("8-0 simulation", () => {
       liveRatings: false,
       chemistry: false,
       superSub: false,
+      era: 2026,
       superSubName: null,
       score: 0,
       draws: 0,

@@ -57,6 +57,7 @@ import {
   sortRuns,
 } from "../game8/storage";
 import { buildMatchEvents, simulateTournamentRun } from "../game8/simulate";
+import { LEGENDS } from "../game8/legends";
 import type {
   DraftDifficulty,
   DraftOptions,
@@ -64,11 +65,18 @@ import type {
   DraftState,
   EightZeroPlayer,
   EightZeroTeam,
+  Era,
   FormationSlot,
+  LegendMode,
   MatchEvent,
   SlotCategory,
   TournamentRun,
 } from "../game8/types";
+
+// Historical raw rows extend RawTeam/RawPlayer with the era tag used to split
+// the combined files into per-tournament pools.
+type HistoricalTeam = RawTeam & { tournament_year: Era };
+type HistoricalPlayer = RawPlayer & { tournament_year: Era };
 
 const DEFAULT_FORMATION = "433";
 // Knockout stages that trigger the confetti celebration (group wins do not).
@@ -81,7 +89,22 @@ const DEFAULT_OPTIONS: DraftOptions = {
   liveRatings: false,
   chemistry: false,
   superSub: false,
+  era: 2026,
 };
+
+// Legend id → display name (ids like "robertocarlos" should never reach the UI).
+const LEGEND_NAME = new Map(LEGENDS.map((l) => [l.id, l.name]));
+function legendLabel(mode: LegendMode): string {
+  return LEGEND_NAME.get(mode) ?? titleCase(mode);
+}
+
+// Era selector options. 2026 is the live squad data; the rest are historical XIs.
+const ERAS: Array<{ id: Era; label: string; detail: string }> = [
+  { id: 2026, label: "2026", detail: "Live squads" },
+  { id: 2022, label: "2022", detail: "Qatar" },
+  { id: 2018, label: "2018", detail: "Russia" },
+  { id: 2014, label: "2014", detail: "Brazil" },
+];
 
 const DIFFICULTIES: Array<{
   id: DraftDifficulty;
@@ -442,35 +465,12 @@ function LegendModal({
   onSelect,
   onClose,
 }: {
-  onSelect: (legendMode: "messi" | "ronaldo" | "neymar") => void;
+  onSelect: (legendMode: LegendMode) => void;
   onClose: () => void;
 }) {
-  const legends = [
-    {
-      mode: "messi" as const,
-      name: "Lionel Messi",
-      team: "Argentina",
-      code: "ARG",
-      rating: 90,
-      position: "FW",
-    },
-    {
-      mode: "ronaldo" as const,
-      name: "Cristiano Ronaldo",
-      team: "Portugal",
-      code: "POR",
-      rating: 88,
-      position: "FW",
-    },
-    {
-      mode: "neymar" as const,
-      name: "Neymar",
-      team: "Brazil",
-      code: "BRA",
-      rating: 87,
-      position: "MF",
-    },
-  ];
+  // Sorted strongest-first so the marquee names lead. Category badge colours
+  // the same way the pitch does.
+  const legends = [...LEGENDS].sort((a, b) => b.rating - a.rating);
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 p-4 animate-fade-up" onClick={onClose}>
@@ -478,29 +478,32 @@ function LegendModal({
         role="dialog"
         aria-modal="true"
         aria-label="Last Dance"
-        className="w-full max-w-2xl rounded-2xl border border-surface-700 bg-surface-panel p-6 shadow-2xl shadow-black/40"
+        className="flex max-h-[85vh] w-full max-w-3xl flex-col rounded-2xl border border-surface-700 bg-surface-panel p-6 shadow-2xl shadow-black/40"
         onClick={(event) => event.stopPropagation()}
       >
-        <div className="mb-6 text-center">
+        <div className="mb-5 text-center">
           <h2 className="text-2xl font-black text-white">Last Dance</h2>
-          <p className="mt-1 text-sm text-gray-400">Choose your legend. They are auto-locked as your first pick.</p>
+          <p className="mt-1 text-sm text-gray-400">
+            Choose a legend — auto-locked as your guaranteed first pick.
+          </p>
         </div>
-        <div className="grid gap-4 sm:grid-cols-3">
+        <div className="grid gap-3 overflow-y-auto pr-1 sm:grid-cols-3">
           {legends.map((legend) => (
             <button
-              key={legend.mode}
+              key={legend.id}
               type="button"
-              onClick={() => onSelect(legend.mode)}
-              className="group flex flex-col items-center rounded-xl border border-surface-700 bg-surface-950 p-5 text-center transition-colors hover:border-gold-600/60 hover:bg-surface-900"
+              onClick={() => onSelect(legend.id)}
+              className="group flex items-center gap-3 rounded-xl border border-surface-700 bg-surface-950 p-3 text-left transition-colors hover:border-gold-600/60 hover:bg-surface-900"
             >
-              <div className="flex h-16 w-16 items-center justify-center rounded-full bg-gold-500/10 group-hover:bg-gold-500/20">
-                <Flag fifaCode={legend.code} size={48} />
+              <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-gold-500/10 group-hover:bg-gold-500/20">
+                <Flag fifaCode={legend.nation} size={32} />
               </div>
-              <p className="mt-3 text-lg font-black text-white">{legend.name}</p>
-              <p className="text-sm text-gray-400">{legend.team}</p>
-              <div className="mt-2 flex items-center gap-2">
-                <span className="rounded-md bg-gold-500/10 px-2 py-1 text-xs font-bold text-gold-400">{legend.rating} OVR</span>
-                <span className="rounded-md bg-surface-800 px-2 py-1 text-xs font-bold text-gray-400">{legend.position}</span>
+              <div className="min-w-0 flex-1">
+                <p className="truncate text-sm font-black text-white">{legend.name}</p>
+                <div className="mt-1 flex items-center gap-1.5">
+                  <span className="rounded bg-gold-500/10 px-1.5 py-0.5 text-[11px] font-bold text-gold-400">{legend.rating}</span>
+                  <span className="rounded bg-surface-800 px-1.5 py-0.5 text-[11px] font-bold text-gray-400">{legend.position}</span>
+                </div>
               </div>
             </button>
           ))}
@@ -508,7 +511,7 @@ function LegendModal({
         <button
           type="button"
           onClick={onClose}
-          className="mt-6 inline-flex w-full items-center justify-center rounded-xl border border-surface-700 bg-surface-950 px-4 py-3 text-sm font-bold text-gray-400 transition-colors hover:border-gold-600/40 hover:text-white"
+          className="mt-5 inline-flex w-full shrink-0 items-center justify-center rounded-xl border border-surface-700 bg-surface-950 px-4 py-3 text-sm font-bold text-gray-400 transition-colors hover:border-gold-600/40 hover:text-white"
         >
           Cancel
         </button>
@@ -679,7 +682,7 @@ function SetupScreen({
   onFormationChange: (formationId: string) => void;
   onOptionsChange: (options: DraftOptions) => void;
   onStart: () => void;
-  onLegendSelect: (legendMode: "none" | "messi" | "ronaldo" | "neymar") => void;
+  onLegendSelect: (legendMode: LegendMode) => void;
   onStartPracticePenalties?: () => void;
   onStartHigherLower?: () => void;
 }) {
@@ -727,6 +730,26 @@ function SetupScreen({
             >
               <FormationGlyph formationId={formation.id} active={formationId === formation.id} />
               <span className="text-base sm:text-xl">{formation.label}</span>
+            </OptionButton>
+          ))}
+        </div>
+      </section>
+
+      <section className="rounded-2xl border border-surface-700 bg-surface-panel p-5 shadow-2xl shadow-black/20">
+        <p className="section-label text-base tracking-[0.18em]">Era</p>
+        <p className="mt-1 text-sm text-gray-500">Draft from a past World Cup — real squads, era ratings, era opponents.</p>
+        <div className="mt-4 grid grid-cols-4 gap-2">
+          {ERAS.map((era) => (
+            <OptionButton
+              key={era.id}
+              active={options.era === era.id}
+              onClick={() => updateOptions({ era: era.id })}
+              className="flex flex-col items-center justify-center px-2 py-2.5"
+            >
+              <span className="block text-base sm:text-lg">{era.label}</span>
+              <span className={`mt-0.5 block text-[11px] leading-tight ${options.era === era.id ? "text-gold-300/70" : "text-gray-500"}`}>
+                {era.detail}
+              </span>
             </OptionButton>
           ))}
         </div>
@@ -794,9 +817,9 @@ function SetupScreen({
           />
           <ModeCard
             icon={<PixelIcon name="trophy" />}
-            title={options.legendMode !== "none" ? `Last Dance: ${titleCase(options.legendMode)}` : "Last Dance"}
-            desc="Lock a legend — Messi, Ronaldo or Neymar — as your guaranteed first pick."
-            rightLabel={options.legendMode !== "none" ? titleCase(options.legendMode) : "Pick"}
+            title={options.legendMode !== "none" ? `Last Dance: ${legendLabel(options.legendMode)}` : "Last Dance"}
+            desc="Lock an all-time great — Zidane, Pelé, R9, Maradona and 20+ more — as your guaranteed first pick."
+            rightLabel={options.legendMode !== "none" ? legendLabel(options.legendMode) : "Pick"}
             active={options.legendMode !== "none"}
             disabled={loading}
             onClick={() => (options.legendMode !== "none" ? onLegendSelect("none") : setShowLegendModal(true))}
@@ -1183,7 +1206,7 @@ function ResultPanel({
           {run.liveRatings && " · Live ratings"}
           {run.chemistry && " · Chemistry"}
           {run.superSub && run.superSubName ? ` · Super-Sub: ${run.superSubName}` : ""}
-          {run.legendMode !== "none" && ` · Last Dance: ${titleCase(run.legendMode)}`}
+          {run.legendMode !== "none" && ` · Last Dance: ${legendLabel(run.legendMode)}`}
         </p>
       </div>
 
@@ -1365,7 +1388,7 @@ function LeaderboardPanel({
                 {run.liveRatings && " · Live ratings"}
                 {run.chemistry && " · Chemistry"}
                 {run.superSub && " · Super-Sub"}
-                {run.legendMode !== "none" && ` · Last Dance: ${titleCase(run.legendMode)}`}
+                {run.legendMode !== "none" && ` · Last Dance: ${legendLabel(run.legendMode)}`}
               </p>
             </div>
             <span className="font-black text-gold-400">{Math.round(run.ratings.overall)} OVR</span>
@@ -1464,11 +1487,45 @@ export default function EightZeroGame() {
     queryFn: () => api.get<RawPlayer[]>("/api/players"),
     staleTime: Infinity,
   });
+  // Historical eras (2014/18/22) ship as their own static files. Fetched
+  // directly (they have no /api route); a failed fetch just leaves those eras
+  // unavailable, never breaking the live 2026 mode.
+  const historicalTeamsQuery = useQuery({
+    queryKey: ["8-0-historical-teams"],
+    queryFn: () => fetch("/data/historical-teams.json").then((r) => r.json() as Promise<HistoricalTeam[]>),
+    staleTime: Infinity,
+  });
+  const historicalPlayersQuery = useQuery({
+    queryKey: ["8-0-historical-players"],
+    queryFn: () => fetch("/data/historical-players.json").then((r) => r.json() as Promise<HistoricalPlayer[]>),
+    staleTime: Infinity,
+  });
 
-  const gameData = useMemo(() => {
+  // One EightZeroData per era, built once. gameData tracks the selected era.
+  const dataByEra = useMemo(() => {
     if (!teamsQuery.data || !playersQuery.data) return null;
-    return buildEightZeroData(teamsQuery.data, playersQuery.data);
-  }, [teamsQuery.data, playersQuery.data]);
+    const map = new Map<Era, ReturnType<typeof buildEightZeroData>>();
+    map.set(2026, buildEightZeroData(teamsQuery.data, playersQuery.data));
+    const ht = historicalTeamsQuery.data;
+    const hp = historicalPlayersQuery.data;
+    if (ht && hp) {
+      for (const year of [2014, 2018, 2022] as const) {
+        map.set(
+          year,
+          buildEightZeroData(
+            ht.filter((t) => t.tournament_year === year) as RawTeam[],
+            hp.filter((p) => p.tournament_year === year) as RawPlayer[]
+          )
+        );
+      }
+    }
+    return map;
+  }, [teamsQuery.data, playersQuery.data, historicalTeamsQuery.data, historicalPlayersQuery.data]);
+
+  const gameData = useMemo(
+    () => dataByEra?.get(options.era) ?? dataByEra?.get(2026) ?? null,
+    [dataByEra, options.era]
+  );
 
   // Live Ratings: a boosted copy of the data. When the mode is on the whole
   // draft (candidates, squad, team OVR, and the sim — all read `player.rating`)
@@ -1682,6 +1739,7 @@ export default function EightZeroGame() {
       liveRatings: next.liveRatings,
       chemistry: next.chemistry,
       superSub: next.superSub,
+      era: next.era,
       superSubName: sub?.name ?? null,
       superSubRating: sub?.rating ?? null,
       superSubStage,
@@ -1719,6 +1777,7 @@ export default function EightZeroGame() {
       liveRatings: run.liveRatings,
       chemistry: run.chemistry,
       superSub: run.superSub,
+      era: run.era,
       superSubName: run.superSubName,
       superSubRating: sub?.rating ?? null,
       superSubStage: match.stage,
@@ -1790,6 +1849,7 @@ export default function EightZeroGame() {
       liveRatings: run.liveRatings,
       chemistry: run.chemistry,
       superSub: run.superSub,
+      era: run.era,
       superSubName: run.superSubName,
       superSubRating: superSubPlayer(draftState)?.rating ?? null,
       superSubStage,
@@ -2147,7 +2207,7 @@ export default function EightZeroGame() {
               {draftState.draftMode === "squad-first" ? "Squad first" : "Position first"}
               {draftState.blindMode ? " · Blind ratings" : ""}
               {draftState.legendMode !== "none" && (
-                <span className="ml-1 text-gold-400">· Last Dance: {titleCase(draftState.legendMode)}</span>
+                <span className="ml-1 text-gold-400">· Last Dance: {legendLabel(draftState.legendMode)}</span>
               )}
             </p>
           </div>
@@ -2218,7 +2278,7 @@ export default function EightZeroGame() {
                   </div>
                   <p className="mt-2 text-sm font-bold text-white">
                     {run.legendMode !== "none"
-                      ? `${titleCase(run.legendMode)} XI`
+                      ? `${legendLabel(run.legendMode)} XI`
                       : "You"}
                   </p>
                 </div>

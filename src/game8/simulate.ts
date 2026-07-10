@@ -8,6 +8,7 @@ import type {
   DraftMode,
   DraftPick,
   EightZeroTeam,
+  Era,
   LegendMode,
   MatchEvent,
   MatchResult,
@@ -314,6 +315,7 @@ export function simulateTournamentRun(args: {
   superSub?: boolean;
   superSubName?: string | null;
   superSubRating?: number | null;
+  era?: Era;
   // The knockout stage where the player brought the sub on (interactive, one-time).
   superSubStage?: string | null;
   // Authoritative knockout shootout results, keyed by stage name. When the
@@ -382,6 +384,7 @@ export function simulateTournamentRun(args: {
   const chemistry = args.chemistry ?? false;
   const superSub = args.superSub ?? false;
   const superSubName = args.superSubName ?? null;
+  const era = args.era ?? 2026;
   const score = calculateRunScore({
     wins,
     draws,
@@ -415,6 +418,7 @@ export function simulateTournamentRun(args: {
     liveRatings,
     chemistry,
     superSub,
+    era,
     superSubName,
     score,
     record: recordLabel(wins, draws, losses),

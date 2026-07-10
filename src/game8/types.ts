@@ -1,6 +1,9 @@
 export type SlotCategory = "GK" | "DEF" | "MID" | "FWD";
 export type DraftDifficulty = "easy" | "normal" | "hard";
 export type DraftMode = "squad-first" | "position-first";
+// The tournament era you draft from. 2026 is the live squad data; the rest are
+// historical starting XIs. "all-time" pools every era + legends (Dream Team).
+export type Era = 2014 | 2018 | 2022 | 2026 | "all-time";
 // "none" = Last Dance off; any other value is a legend id from legends.ts.
 export type LegendMode = string;
 
@@ -12,6 +15,7 @@ export interface DraftOptions {
   liveRatings: boolean;
   chemistry: boolean;
   superSub: boolean;
+  era: Era;
 }
 
 export interface EightZeroTeam {
@@ -79,6 +83,7 @@ export interface DraftState {
   liveRatings: boolean;
   chemistry: boolean;
   superSub: boolean;
+  era: Era;
   // The 12th man drafted before kickoff (a bench impact sub), or null until picked.
   superSubId: number | null;
 }
@@ -139,6 +144,7 @@ export interface TournamentRun {
   liveRatings: boolean;
   chemistry: boolean;
   superSub: boolean;
+  era: Era;
   superSubName: string | null;
   score: number;
   record: string;

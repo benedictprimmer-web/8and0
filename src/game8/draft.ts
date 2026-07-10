@@ -22,6 +22,7 @@ const DEFAULT_OPTIONS: DraftOptions = {
   liveRatings: false,
   chemistry: false,
   superSub: false,
+  era: 2026,
 };
 
 export function rerollsForDifficulty(difficulty: DraftDifficulty): number {
@@ -96,6 +97,7 @@ export function createDraftState(
     liveRatings: resolvedOptions.liveRatings,
     chemistry: resolvedOptions.chemistry,
     superSub: resolvedOptions.superSub,
+    era: resolvedOptions.era,
     superSubId: null,
   };
 }
