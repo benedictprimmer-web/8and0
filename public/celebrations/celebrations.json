@@ -3,5 +3,15 @@
     "name": "Kylian Mbappe",
     "webm": "/celebrations/121.webm",
     "poster": "/celebrations/121.png"
+  },
+  "104": {
+    "name": "Lionel Messi",
+    "webm": "/celebrations/104.webm",
+    "poster": "/celebrations/104.png"
+  },
+  "196": {
+    "name": "Cristiano Ronaldo",
+    "webm": "/celebrations/196.webm",
+    "poster": "/celebrations/196.png"
   }
 }

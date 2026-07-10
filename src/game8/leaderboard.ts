@@ -2,6 +2,7 @@ import type { DraftDifficulty, TournamentRun } from "./types";
 // NOTE: .js extension is required — the Vercel serverless function runs this as
 // native ESM (see api/_upstash.ts / PR #32). Extensionless would crash at load.
 import { calculateRunScore } from "./scoring.js";
+import { CHEMISTRY_CAP, chemistryBonus } from "./chemistry.js";
 
 // ── Shared leaderboard types ─────────────────────────────────────────────────
 // This module is intentionally free of any browser/DOM or Node-only APIs so it
@@ -22,7 +23,10 @@ export interface LeaderboardSubmission {
   wins: number;
   draws: number;
   losses: number;
+  /** Team overall rating — already includes the chemistry bonus below. */
   overall: number;
+  /** Club-chemistry bonus baked into `overall` (0–3), surfaced for display. */
+  chemistry: number;
   difficulty: string;
   formationId: string;
   formationLabel: string;
@@ -184,6 +188,18 @@ export function topScorerOf(run: Pick<TournamentRun, "goalScorers">): TopScorer 
   return best;
 }
 
+/**
+ * The metric for the "Best teams" board: how good the drafted XI is, regardless
+ * of how the tournament went. It's simply the team's overall rating, which
+ * already folds in the club-chemistry bonus (see ratings.ts) — so it rewards
+ * both star power and squad cohesion, and matches the OVR the player watches
+ * tick up while drafting. Kept as a named helper so the client and the server
+ * rank on the exact same value.
+ */
+export function teamScoreOf(submission: Pick<LeaderboardSubmission, "overall">): number {
+  return Math.round(submission.overall * 10) / 10;
+}
+
 export type SubmissionResult =
   | { ok: true; submission: LeaderboardSubmission }
   | { ok: false; reason: string };
@@ -202,6 +218,7 @@ export function buildSubmission(run: TournamentRun, rawName: string): Submission
     draws: run.draws,
     losses: run.losses,
     overall: Math.round(run.ratings.overall * 10) / 10,
+    chemistry: Math.round(chemistryBonus(run.picks, run.chemistry) * 10) / 10,
     difficulty: run.difficulty,
     formationId: run.formationId,
     formationLabel: run.formationLabel,
@@ -270,6 +287,7 @@ export function sanitiseSubmission(input: unknown): SubmissionResult {
     draws: clampInt(num(body.draws), 0, 8),
     losses: clampInt(num(body.losses), 0, 8),
     overall: Math.max(0, Math.min(120, Math.round(num(body.overall) * 10) / 10)),
+    chemistry: Math.max(0, Math.min(CHEMISTRY_CAP, Math.round(num(body.chemistry) * 10) / 10)),
     difficulty: ["easy", "normal", "hard"].includes(String(body.difficulty))
       ? String(body.difficulty)
       : "normal",

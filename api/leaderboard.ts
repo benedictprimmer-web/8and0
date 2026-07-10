@@ -1,16 +1,22 @@
 import { createHash } from "node:crypto";
 import { isConfigured, pipeline, redis } from "./_upstash.js";
-import { sanitiseSubmission, type LeaderboardEntry } from "../src/game8/leaderboard.js";
+import { sanitiseSubmission, teamScoreOf, type LeaderboardEntry } from "../src/game8/leaderboard.js";
 
 // ── Vercel serverless function: global leaderboard ───────────────────────────
 //
-//   GET  /api/leaderboard?limit=200&ids=seedA,seedB
-//        → { entries: LeaderboardEntry[], total, mine: RankedEntry[] }
+//   GET  /api/leaderboard?limit=200&ids=seedA,seedB&board=runs|team
+//        → { entries: LeaderboardEntry[], total, mine: RankedEntry[], board }
 //   POST /api/leaderboard
-//        → { entry, rank, total }
+//        → { entry, rank, total, teamRank, teamTotal }
+//
+// There are two ranked boards over the SAME entry blobs:
+//   • "runs"  — ranked by tournament score (how far you got). Default.
+//   • "team"  — ranked by team overall rating (how good an XI you drafted),
+//               so players compete to build the best team, not just get lucky.
 //
 // Storage (Upstash Redis):
 //   lb:all          sorted set, score = run score, member = entry id
+//   lb:team         sorted set, score = team overall, member = entry id
 //   lb:entry:<id>   JSON string of the full LeaderboardEntry
 //   rl:<ip>         per-minute rate-limit counter
 //
@@ -23,6 +29,7 @@ import { sanitiseSubmission, type LeaderboardEntry } from "../src/game8/leaderbo
 // same way to look up "mine".
 
 const ALL_KEY = "lb:all";
+const TEAM_KEY = "lb:team";
 const ENTRY_PREFIX = "lb:entry:";
 const MAX_ENTRIES = 1000;
 const DEFAULT_LIMIT = 200;
@@ -103,14 +110,20 @@ function parseEntry(raw: string | null): LeaderboardEntry | null {
   }
 }
 
+/** "team" → the best-XI board; anything else → the tournament-runs board. */
+function boardKey(board: string | undefined): string {
+  return board === "team" ? TEAM_KEY : ALL_KEY;
+}
+
 /**
- * Look up the caller's own entries plus their current global rank.
+ * Look up the caller's own entries plus their current rank on the given board.
  * `seeds` are the caller's private run seeds; each is hashed to its entry id
  * (the same mapping used on write), so no raw seed is ever a lookup key a
  * third party could supply.
  */
 async function rankEntries(
-  seeds: string[]
+  seeds: string[],
+  key: string
 ): Promise<Array<{ entry: LeaderboardEntry; rank: number | null }>> {
   const unique = Array.from(new Set(seeds.filter(Boolean))).slice(0, MAX_MINE);
   if (unique.length === 0) return [];
@@ -121,7 +134,7 @@ async function rankEntries(
   for (let i = 0; i < ids.length; i += 1) {
     const entry = parseEntry(raw[i] ?? null);
     if (!entry) continue;
-    const rank = await redis<number | null>(["ZREVRANK", ALL_KEY, ids[i]]);
+    const rank = await redis<number | null>(["ZREVRANK", key, ids[i]]);
     out.push({ entry: toPublic(entry), rank: rank === null ? null : rank + 1 });
   }
   return out;
@@ -137,10 +150,13 @@ async function handleGet(req: ApiRequest, res: ApiResponse): Promise<void> {
   const idsRaw = param(req, "ids");
   const mineIds = idsRaw ? idsRaw.split(",").map((s) => s.trim()).filter(Boolean) : [];
 
-  const ids = await redis<string[]>(["ZREVRANGE", ALL_KEY, 0, limit - 1]);
+  const board = param(req, "board") === "team" ? "team" : "runs";
+  const key = boardKey(board);
+
+  const ids = await redis<string[]>(["ZREVRANGE", key, 0, limit - 1]);
   if (!ids || ids.length === 0) {
-    const mine = mineIds.length > 0 ? await rankEntries(mineIds) : [];
-    res.status(200).json({ entries: [], total: 0, mine });
+    const mine = mineIds.length > 0 ? await rankEntries(mineIds, key) : [];
+    res.status(200).json({ entries: [], total: 0, mine, board });
     return;
   }
 
@@ -150,9 +166,9 @@ async function handleGet(req: ApiRequest, res: ApiResponse): Promise<void> {
     const entry = parseEntry(item);
     if (entry) entries.push(toPublic(entry));
   }
-  const total = await redis<number>(["ZCARD", ALL_KEY]);
-  const mine = mineIds.length > 0 ? await rankEntries(mineIds) : [];
-  res.status(200).json({ entries, total, mine });
+  const total = await redis<number>(["ZCARD", key]);
+  const mine = mineIds.length > 0 ? await rankEntries(mineIds, key) : [];
+  res.status(200).json({ entries, total, mine, board });
 }
 
 async function handlePost(req: ApiRequest, res: ApiResponse): Promise<void> {
@@ -180,29 +196,49 @@ async function handlePost(req: ApiRequest, res: ApiResponse): Promise<void> {
   // overwrite someone else's row. Runs without a seed fall back to a random id.
   const id = result.submission.seed ? entryId(result.submission.seed) : randomId();
   const entry: LeaderboardEntry = { id, ...result.submission };
+  const teamScore = teamScoreOf(entry);
 
   await pipeline([
     ["SET", `${ENTRY_PREFIX}${id}`, JSON.stringify(entry)],
     ["ZADD", ALL_KEY, entry.score, id],
+    ["ZADD", TEAM_KEY, teamScore, id],
   ]);
 
-  // Trim to the top MAX_ENTRIES by score, deleting the orphaned entry blobs of
-  // any rows that fall off the bottom so they don't leak memory in Redis.
-  const overflowIds = await redis<string[]>(["ZRANGE", ALL_KEY, 0, -(MAX_ENTRIES + 1)]);
-  if (overflowIds.length > 0) {
-    await pipeline([
-      ["DEL", ...overflowIds.map((overflowId) => `${ENTRY_PREFIX}${overflowId}`)],
-      ["ZREMRANGEBYRANK", ALL_KEY, 0, -(MAX_ENTRIES + 1)],
-    ]);
+  // Trim BOTH boards to the top MAX_ENTRIES by their own score. The entry blob
+  // is SHARED between boards, so it must only be deleted once the row has fallen
+  // off BOTH — a run can rank on the team board while off the bottom of the runs
+  // board (and vice versa). Trim first, then delete only the blobs of ids that
+  // are members of neither set afterwards.
+  const runsOverflow = await redis<string[]>(["ZRANGE", ALL_KEY, 0, -(MAX_ENTRIES + 1)]);
+  const teamOverflow = await redis<string[]>(["ZRANGE", TEAM_KEY, 0, -(MAX_ENTRIES + 1)]);
+  const trimOps: (string | number)[][] = [];
+  if (runsOverflow.length > 0) trimOps.push(["ZREMRANGEBYRANK", ALL_KEY, 0, -(MAX_ENTRIES + 1)]);
+  if (teamOverflow.length > 0) trimOps.push(["ZREMRANGEBYRANK", TEAM_KEY, 0, -(MAX_ENTRIES + 1)]);
+  if (trimOps.length > 0) await pipeline(trimOps);
+
+  const candidates = Array.from(new Set([...runsOverflow, ...teamOverflow]));
+  const orphaned: string[] = [];
+  for (const cid of candidates) {
+    const onRuns = await redis<number | null>(["ZSCORE", ALL_KEY, cid]);
+    if (onRuns !== null) continue;
+    const onTeam = await redis<number | null>(["ZSCORE", TEAM_KEY, cid]);
+    if (onTeam === null) orphaned.push(cid);
+  }
+  if (orphaned.length > 0) {
+    await redis(["DEL", ...orphaned.map((oid) => `${ENTRY_PREFIX}${oid}`)]);
   }
 
   const rank = await redis<number | null>(["ZREVRANK", ALL_KEY, id]);
   const total = await redis<number>(["ZCARD", ALL_KEY]);
+  const teamRank = await redis<number | null>(["ZREVRANK", TEAM_KEY, id]);
+  const teamTotal = await redis<number>(["ZCARD", TEAM_KEY]);
 
   res.status(201).json({
     entry: toPublic(entry),
     rank: rank === null ? null : rank + 1,
     total,
+    teamRank: teamRank === null ? null : teamRank + 1,
+    teamTotal,
   });
 }
 
