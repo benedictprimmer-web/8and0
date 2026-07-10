@@ -20,6 +20,7 @@ import {
 import { api, leaderboardApi, type LeaderboardResponse, type RankedEntry, type SubmitResponse } from "../api/client";
 import { buildSubmission } from "../game8/leaderboard";
 import Celebration from "../components/Celebration";
+import CelebrationClip from "../components/CelebrationClip";
 import Flag from "../components/Flag";
 import { PixelIcon } from "../components/PixelIcon";
 import LiveMatch from "../components/LiveMatch";
@@ -1423,6 +1424,10 @@ export default function EightZeroGame() {
   // Active full-screen confetti celebration (knockout wins + the final), or
   // null when nothing is celebrating.
   const [celebration, setCelebration] = useState<{ headline: string; intensity: "normal" | "big" } | null>(null);
+  // Full-screen pixel-clip celebration (drafting a legend, or a legend scoring).
+  // `key` re-triggers the overlay for repeat events; clip only shows if the
+  // player_id has an entry in the celebrations manifest.
+  const [clipCeleb, setClipCeleb] = useState<{ playerId: number; label: string; key: number } | null>(null);
   // Authoritative interactive-shootout results, keyed by knockout stage. Fed
   // back into simulateTournamentRun so the bracket follows actual play.
   const [penOverrides, setPenOverrides] = useState<Record<string, "W" | "L">>({});
@@ -1969,12 +1974,21 @@ export default function EightZeroGame() {
     animateSpin(next);
   }
 
+  // The pixel-clip celebration auto-dismisses after ~2.8s.
+  useEffect(() => {
+    if (!clipCeleb) return;
+    const timer = window.setTimeout(() => setClipCeleb(null), 2800);
+    return () => window.clearTimeout(timer);
+  }, [clipCeleb]);
+
   function commitPick(playerId: number, slotId?: string) {
     if (!draftData) return;
     const next = selectPlayer(draftData, draftState, playerId, slotId);
     setDraftState(next);
     setSearch("");
     setCategoryFilter("ALL");
+    // Full-screen "STAR PLAYER" moment when you draft a player that has a clip.
+    setClipCeleb({ playerId, label: "STAR PLAYER", key: Date.now() });
     if (!next.complete) {
       window.requestAnimationFrame(() => {
         draftControlsRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
@@ -2156,6 +2170,10 @@ export default function EightZeroGame() {
         />
       )}
 
+      {clipCeleb && (
+        <CelebrationClip key={clipCeleb.key} playerId={clipCeleb.playerId} label={clipCeleb.label} />
+      )}
+
       {showLeaderboard && (
         <LeaderboardPanel
           history={sortRuns(history)}
@@ -2242,6 +2260,8 @@ export default function EightZeroGame() {
               opponent={run.matches[currentMatchIndex]?.opponent ?? run.matches[0].opponent}
               result={run.matches[currentMatchIndex]}
               events={allMatchEvents[currentMatchIndex] ?? []}
+              scorerIds={Object.fromEntries(run.picks.map((pick) => [pick.player.name, pick.player.id]))}
+              onCelebrate={(playerId, label) => setClipCeleb({ playerId, label: label || "GOAL", key: Date.now() })}
               legendMode={run.legendMode}
               superSubName={run.superSub ? run.superSubName : null}
               canBringOnSub={

@@ -13,6 +13,10 @@ interface LiveMatchProps {
   superSubName?: string | null;
   canBringOnSub?: boolean;
   onBringOnSub?: () => void;
+  /** scorer name → player_id, for looking up a celebration clip on a user goal. */
+  scorerIds?: Record<string, number>;
+  /** Called when a user goal is scored by a player that may have a celebration clip. */
+  onCelebrate?: (playerId: number, label: string) => void;
 }
 
 const BASE_TICK_MS = 600;
@@ -76,7 +80,7 @@ function EventRow({ event }: { event: MatchEvent }) {
   );
 }
 
-export default function LiveMatch({ stage, opponent, result, events, onFinished, legendMode, superSubName, canBringOnSub, onBringOnSub }: LiveMatchProps) {
+export default function LiveMatch({ stage, opponent, result, events, onFinished, legendMode, superSubName, canBringOnSub, onBringOnSub, scorerIds, onCelebrate }: LiveMatchProps) {
   const [currentMinute, setCurrentMinute] = useState(0);
   const [userScore, setUserScore] = useState(0);
   const [oppScore, setOppScore] = useState(0);
@@ -92,6 +96,11 @@ export default function LiveMatch({ stage, opponent, result, events, onFinished,
   const [goalPop, setGoalPop] = useState<{ name: string; key: number } | null>(null);
   const intervalRef = useRef<number | null>(null);
   const logRef = useRef<HTMLDivElement | null>(null);
+  // Read inside `tick` without re-subscribing the interval when they change.
+  const scorerIdsRef = useRef(scorerIds);
+  scorerIdsRef.current = scorerIds;
+  const onCelebrateRef = useRef(onCelebrate);
+  onCelebrateRef.current = onCelebrate;
 
   const eventsByMinute = useRef(new Map<number, MatchEvent[]>());
 
@@ -135,6 +144,10 @@ export default function LiveMatch({ stage, opponent, result, events, onFinished,
               setScorePop("user");
               // Only user goals get the celebratory floating callout.
               setGoalPop({ name: event.playerName ?? "GOAL", key: Date.now() });
+              const scorerId = event.playerName ? scorerIdsRef.current?.[event.playerName] : undefined;
+              if (scorerId !== undefined) {
+                onCelebrateRef.current?.(scorerId, event.playerName ?? "");
+              }
             } else {
               setOppScore((s) => s + 1);
               setScorePop("opponent");
