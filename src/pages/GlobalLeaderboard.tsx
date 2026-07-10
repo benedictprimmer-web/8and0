@@ -78,7 +78,9 @@ function Row({
         {board === "team" ? (
           <>
             <span className="font-black text-gold-400 tabular-nums">{entry.overall} OVR</span>
-            <span className="text-[11px] font-bold text-gray-500 tabular-nums">{entry.score} pts</span>
+            <span className="text-[11px] font-bold text-emerald-400 tabular-nums">
+              +{entry.chemistry ?? 0} chem
+            </span>
           </>
         ) : (
           <>
@@ -156,9 +158,14 @@ function TeamDetailModal({
           </div>
         </div>
 
-        <div className="mt-5 grid grid-cols-2 gap-2 sm:grid-cols-4">
+        <div className="mt-5 grid grid-cols-2 gap-2 sm:grid-cols-3">
+          <StatChip
+            label="Squad rating"
+            value={`${Math.round((entry.overall - (entry.chemistry ?? 0)) * 10) / 10}`}
+          />
+          <StatChip label="Chemistry" value={`+${entry.chemistry ?? 0}`} />
+          <StatChip label="Combined OVR" value={`${entry.overall}`} />
           <StatChip label="Formation" value={entry.formationLabel} />
-          <StatChip label="Overall" value={`${Math.round(entry.overall)}`} />
           <StatChip label="Record" value={`${entry.wins}-${entry.draws}-${entry.losses}`} />
           <StatChip label="Difficulty" value={titleCase(entry.difficulty)} />
         </div>

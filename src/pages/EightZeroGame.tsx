@@ -1094,10 +1094,12 @@ function TeamSheet({
 function GlobalSubmit({ run }: { run: TournamentRun }) {
   const [name, setName] = useState(() => loadPlayerName());
   const [validationError, setValidationError] = useState<string | null>(null);
+  const [autoSubmitted, setAutoSubmitted] = useState(false);
+  const autoTriedRef = useRef(false);
 
-  const mutation = useMutation<SubmitResponse, Error>({
-    mutationFn: async () => {
-      const built = buildSubmission(run, name);
+  const mutation = useMutation<SubmitResponse, Error, string>({
+    mutationFn: async (submitName: string) => {
+      const built = buildSubmission(run, submitName);
       if (!built.ok) {
         throw new Error(built.reason);
       }
@@ -1112,6 +1114,21 @@ function GlobalSubmit({ run }: { run: TournamentRun }) {
     },
   });
 
+  // Auto-submit finished runs once the player has a saved name — i.e. they've
+  // already opted in by submitting at least once. This fills the global board
+  // automatically (more data) instead of relying on a manual tap every run.
+  // First-timers still submit by hand below, which is what sets the name.
+  useEffect(() => {
+    if (autoTriedRef.current) return;
+    autoTriedRef.current = true;
+    const savedName = loadPlayerName();
+    const alreadyOnBoard = loadMyGlobalEntries().some((entry) => entry.seed === run.seed);
+    if (savedName && !alreadyOnBoard && buildSubmission(run, savedName).ok) {
+      setAutoSubmitted(true);
+      mutation.mutate(savedName);
+    }
+  }, [run, mutation]);
+
   function handleSubmit() {
     setValidationError(null);
     const built = buildSubmission(run, name);
@@ -1119,7 +1136,8 @@ function GlobalSubmit({ run }: { run: TournamentRun }) {
       setValidationError(built.reason);
       return;
     }
-    mutation.mutate();
+    setAutoSubmitted(false);
+    mutation.mutate(name);
   }
 
   if (mutation.isSuccess) {
@@ -1127,6 +1145,11 @@ function GlobalSubmit({ run }: { run: TournamentRun }) {
     return (
       <div className="rounded-2xl border border-gold-600/60 bg-gold-500/10 p-5 text-center">
         <Check className="mx-auto text-gold-400" size={28} />
+        {autoSubmitted && (
+          <p className="text-[11px] font-bold uppercase tracking-wide text-gold-400">
+            Auto-added to the global board
+          </p>
+        )}
         <p className="mt-2 text-lg font-black text-white">
           {rank ? `You're #${rank} of ${total} globally!` : "Submitted to the global board!"}
         </p>

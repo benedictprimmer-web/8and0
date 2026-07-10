@@ -146,6 +146,19 @@ describe("buildSubmission", () => {
     const result = buildSubmission(makeRun(), "shithead");
     expect(result.ok).toBe(false);
   });
+
+  it("records a zero chemistry bonus when chemistry mode is off", () => {
+    const result = buildSubmission(makeRun(), "Ben");
+    expect(result.ok).toBe(true);
+    if (result.ok) expect(result.submission.chemistry).toBe(0);
+  });
+
+  it("records a positive chemistry bonus for clubmates when enabled", () => {
+    // Both fixture picks share "Test FC", so enabling chemistry links them.
+    const result = buildSubmission({ ...makeRun(), chemistry: true }, "Ben");
+    expect(result.ok).toBe(true);
+    if (result.ok) expect(result.submission.chemistry).toBeGreaterThan(0);
+  });
 });
 
 describe("sanitiseSubmission (server-side)", () => {
