@@ -37,6 +37,11 @@ export interface EightZeroPlayer {
   category: SlotCategory;
   rating: number;
   clubName: string | null;
+  // Career clubs, snapshot (current) club first. Used by career-club chemistry.
+  // Absent → treated as [clubName]. Populated for all-time mode + legends.
+  clubHistory?: string[];
+  // True for Last Dance / Dream Team legends — they count double in chemistry.
+  isLegend?: boolean;
   aura: number | null;
   shirtNumber: number | null;
 }

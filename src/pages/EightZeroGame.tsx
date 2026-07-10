@@ -104,6 +104,8 @@ const LEGEND_RAW_PLAYERS: RawPlayer[] = LEGENDS.map((l, i) => ({
   position: CATEGORY_POSITION[l.category],
   is_goalkeeper: l.category === "GK",
   club_name: l.club,
+  club_history: l.clubHistory,
+  is_legend: true,
   ea_overall: l.rating,
   aura_composite: Math.round((l.rating / 100) * 1000) / 1000,
   shirt_number: 10,
