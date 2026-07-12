@@ -16894,5 +16894,53 @@
     "rating_source": "sofifa fifa22",
     "rating_confidence": "sourced",
     "shirt_number": 6
+  },
+  {
+    "player_id": 101101,
+    "team_id": 9033,
+    "fifa_code": "SAU",
+    "name": "Abdullah Al-Mayouf",
+    "position": "GK",
+    "is_goalkeeper": true,
+    "club_name": "Al Hilal",
+    "ea_overall": 67,
+    "aura_composite": 0.55,
+    "tournament_year": 2018,
+    "source_game": "fifa18",
+    "rating_source": "sofifa fifa18",
+    "rating_confidence": "estimated",
+    "shirt_number": 21
+  },
+  {
+    "player_id": 101102,
+    "team_id": 9042,
+    "fifa_code": "ARG",
+    "name": "Franco Armani",
+    "position": "GK",
+    "is_goalkeeper": true,
+    "club_name": "River Plate",
+    "ea_overall": 79,
+    "aura_composite": 0.72,
+    "tournament_year": 2018,
+    "source_game": "fifa18",
+    "rating_source": "sofifa fifa18",
+    "rating_confidence": "estimated",
+    "shirt_number": 12
+  },
+  {
+    "player_id": 101103,
+    "team_id": 9071,
+    "fifa_code": "WAL",
+    "name": "Wayne Hennessey",
+    "position": "GK",
+    "is_goalkeeper": true,
+    "club_name": "Nottingham Forest",
+    "ea_overall": 74,
+    "aura_composite": 0.62,
+    "tournament_year": 2022,
+    "source_game": "fifa22",
+    "rating_source": "sofifa fifa22",
+    "rating_confidence": "estimated",
+    "shirt_number": 1
   }
 ]

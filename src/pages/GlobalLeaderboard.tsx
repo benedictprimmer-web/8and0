@@ -229,7 +229,6 @@ export default function GlobalLeaderboard() {
   const [filter, setFilter] = useState<FilterId>("all");
   const [selected, setSelected] = useState<LeaderboardEntry | null>(null);
   const mySeeds = useMemo(() => loadMyGlobalEntries().map((entry) => entry.seed), []);
-  const mySeedSet = useMemo(() => new Set(mySeeds), [mySeeds]);
 
   const query = useQuery<LeaderboardResponse>({
     queryKey: ["global-leaderboard", board, mySeeds],
@@ -240,6 +239,12 @@ export default function GlobalLeaderboard() {
   });
 
   const entries = useMemo(() => query.data?.entries ?? [], [query.data]);
+  // The API no longer returns seeds; identify our own rows by entry id via the
+  // server-resolved "mine" list rather than by matching a leaked seed.
+  const myIdSet = useMemo(
+    () => new Set((query.data?.mine ?? []).map((item) => item.entry.id)),
+    [query.data]
+  );
   // Position in the server-ordered top list == true global rank (we fetch from #1).
   const globalRankById = useMemo(() => {
     const map = new Map<string, number>();
@@ -370,7 +375,7 @@ export default function GlobalLeaderboard() {
                 key={entry.id}
                 entry={entry}
                 rank={globalRankById.get(entry.id) ?? 0}
-                isOwn={mySeedSet.has(entry.id)}
+                isOwn={myIdSet.has(entry.id)}
                 board={board}
                 onSelect={() => setSelected(entry)}
               />
@@ -388,7 +393,7 @@ export default function GlobalLeaderboard() {
         <TeamDetailModal
           entry={selected}
           rank={globalRankById.get(selected.id) ?? 0}
-          isOwn={mySeedSet.has(selected.id)}
+          isOwn={myIdSet.has(selected.id)}
           onClose={() => setSelected(null)}
         />
       )}

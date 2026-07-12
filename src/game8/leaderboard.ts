@@ -38,8 +38,13 @@ export interface LeaderboardSubmission {
 }
 
 /** A stored / returned global leaderboard row (submission + server id). */
-export interface LeaderboardEntry extends LeaderboardSubmission {
+export interface LeaderboardEntry extends Omit<LeaderboardSubmission, "seed"> {
   id: string;
+  // The run seed is the server-side idempotency key but is NEVER returned in
+  // public GET responses — publishing it would let anyone overwrite another
+  // player's row (the entry is keyed by a hash of this seed). Present only on
+  // the owner's own submit response, if at all.
+  seed?: string;
 }
 
 export const NAME_MAX_LENGTH = 20;

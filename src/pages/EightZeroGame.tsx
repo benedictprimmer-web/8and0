@@ -546,13 +546,18 @@ function GlobalTopFive() {
   // Seeds this device has submitted — sent with the request so the API returns
   // this player's current rank ("mine"), even when they're outside the top 5.
   const mySeeds = useMemo(() => loadMyGlobalEntries().map((entry) => entry.seed), []);
-  const mySeedSet = useMemo(() => new Set(mySeeds), [mySeeds]);
 
   const query = useQuery<LeaderboardResponse>({
     queryKey: ["8-0-global-top5", mySeeds],
     queryFn: () => leaderboardApi.list(5, mySeeds),
     staleTime: 30_000,
   });
+  // The API no longer returns seeds, so identify our own rows by entry id via
+  // the server-resolved "mine" list rather than by matching a leaked seed.
+  const myIdSet = useMemo(
+    () => new Set((query.data?.mine ?? []).map((item) => item.entry.id)),
+    [query.data]
+  );
   const entries = (query.data?.entries ?? []).slice(0, 3);
   const myBest = (query.data?.mine ?? []).reduce<RankedEntry | null>((best, item) => {
     if (item.rank == null) return best;
@@ -582,7 +587,7 @@ function GlobalTopFive() {
           <p className="text-sm text-gray-500">No runs yet — be the first to make the board.</p>
         )}
         {entries.map((entry, index) => {
-          const isMine = mySeedSet.has(entry.seed);
+          const isMine = myIdSet.has(entry.id);
           return (
             <div
               key={entry.id}
